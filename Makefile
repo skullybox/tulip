@@ -17,4 +17,5 @@ main: ${objects}
 	${C} ${cflgs} ${incflgs} $^ -o $@
 
 clean:
-	@rm *.o
+	-@rm *.o
+	-@rm tulip
