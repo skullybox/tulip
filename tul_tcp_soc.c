@@ -6,11 +6,11 @@ Listening TCP socket api
 
 #include "tul_tcp_soc.h"
 
+#include <sys/fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -57,7 +57,7 @@ int tul_tcp_listen_init(char const *host, const int port, int *sock)
   }
 
   /* set non-blocking */
-  _fd_flags = fcntl(_ret_sock, F_GETFD, 0);
+  _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
   fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
   *sock = _ret_sock;
 
@@ -109,10 +109,6 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
     return -1;
   }
 
-  /* set non-blocking */
-  _fd_flags = fcntl(_ret_sock, F_GETFD, 0);
-  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
-
   /* socket connect to resource ***************/
   while(connect(_ret_sock, (struct sockaddr *)&_serv, sizeof(_serv)))
   {
@@ -127,9 +123,11 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
     }
   }
 
+  /* set non-blocking */
+  _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
+  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
 
-
-
+  while(1){}
   *sock = _ret_sock;
 
   return 0;
