@@ -44,6 +44,7 @@ void _tcp_listen_test()
   else
   {
     fprintf(stdout, "PASS: TCP_LISTEN_TEST\n");
+    close(_ret_sock);
   }
 
 }
