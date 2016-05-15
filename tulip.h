@@ -9,6 +9,4 @@ Listening TCP socket api
 
 void run_tests();
 
-void _tcp_listen_test();
-
 #endif

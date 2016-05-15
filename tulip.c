@@ -3,13 +3,11 @@
 **/
 
 #include "tulip.h"
-#include "tul_tcp_soc.h"
+#include "tul_tests.h"
 #include "tul_globals.h"
 #include "tul_signal_handler.h"
 
-#include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -27,24 +25,6 @@ int main(int argc, char **argv)
 void run_tests()
 {
   _tcp_listen_test();
-
-}
-
-void _tcp_listen_test()
-{
-  int ret = 0;
-  int _ret_sock = 0;
-
-  ret = tul_tcp_listen_init("0.0.0.0", 8080, &_ret_sock);
-
-  if(ret)
-  {
-    fprintf(stderr, "FAIL: TCP_LISTEN_TEST\n");
-  }
-  else
-  {
-    fprintf(stdout, "PASS: TCP_LISTEN_TEST\n");
-    close(_ret_sock);
-  }
+  _tcp_connect_test();
 
 }

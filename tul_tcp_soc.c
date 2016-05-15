@@ -9,8 +9,11 @@ Listening TCP socket api
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
+#include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 int tul_tcp_listen_init(char const *host, const int port, int *sock)
 {
@@ -18,6 +21,8 @@ int tul_tcp_listen_init(char const *host, const int port, int *sock)
   int _ret_sock = 0;
   int _ret_bind = 0;
   int _ret_list = 0;
+  int _fd_flags = 0;
+  int _reuse = 1;
 
   memset(&_serv, 0, sizeof(_serv));
 
@@ -33,6 +38,10 @@ int tul_tcp_listen_init(char const *host, const int port, int *sock)
     return -1;
   }
 
+  #if defined(__linux) | (__FreeBSD__) | (__APPLE__)
+  setsockopt(_ret_sock, SOL_SOCKET, SO_REUSEPORT, &_reuse, sizeof(_reuse));
+  #endif
+
   _ret_bind = bind(_ret_sock, (struct sockaddr*)&_serv, sizeof(_serv));
   if(_ret_bind)
   {
@@ -46,6 +55,80 @@ int tul_tcp_listen_init(char const *host, const int port, int *sock)
     fprintf(stderr, "SOCKET LISTEN: %s(%d)\n", __FILE__, __LINE__);
     return -1;
   }
+
+  /* set non-blocking */
+  _fd_flags = fcntl(_ret_sock, F_GETFD, 0);
+  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+  *sock = _ret_sock;
+
+  return 0;
+}
+
+int tul_tcp_connect(const char *host, const int port, int *sock)
+{
+  struct sockaddr_in _serv;
+  int _ret_sock = 0;
+  int _fd_flags = 0;
+  char _ipaddr[19] = {0};
+  struct addrinfo *_addr_result = NULL;
+  struct sockaddr_in *_addr_ptr = NULL;
+  struct addrinfo _hints;
+  short timeout = 0;
+
+  _ret_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if(_ret_sock < 1)
+  {
+    fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+    return -1;
+  }
+
+  /* get DNS name ***************/
+  memset(&_hints, 0, sizeof(_hints));
+  _hints.ai_family = AF_INET;
+  _hints.ai_socktype = SOCK_STREAM;
+
+   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
+   {
+     freeaddrinfo(_addr_result);
+     fprintf(stderr, "DNS ERROR: %s(%d)\n", __FILE__, __LINE__);
+     return -1;
+   }
+   _addr_ptr = (struct sockaddr_in *) _addr_result->ai_addr;
+   strncpy(_ipaddr, inet_ntoa(_addr_ptr->sin_addr), 15);
+   freeaddrinfo(_addr_result);
+
+  if (strlen(_ipaddr) > 0)
+  {
+    memset(&_serv, 0, sizeof(_serv));
+    _serv.sin_addr.s_addr = inet_addr(_ipaddr);
+    _serv.sin_port = htons(port);
+    _serv.sin_family = AF_INET;
+  }
+  else
+  {
+    return -1;
+  }
+
+  /* set non-blocking */
+  _fd_flags = fcntl(_ret_sock, F_GETFD, 0);
+  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+
+  /* socket connect to resource ***************/
+  while(connect(_ret_sock, (struct sockaddr *)&_serv, sizeof(_serv)))
+  {
+    usleep(1000);
+    timeout++;
+
+    if(timeout >= 10000)
+    {
+      fprintf(stderr, "CONNECT TIMEOUT ERROR: %s(%d) - %s\n", __FILE__,
+      __LINE__, _ipaddr);
+      return -1;
+    }
+  }
+
+
+
 
   *sock = _ret_sock;
 
