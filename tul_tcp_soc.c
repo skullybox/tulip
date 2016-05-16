@@ -126,8 +126,6 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   /* set non-blocking */
   _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
   fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
-
-  while(1){}
   *sock = _ret_sock;
 
   return 0;
