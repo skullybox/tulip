@@ -29,7 +29,7 @@ int tul_tcp_listen_init(char const *host, const int port, int *sock)
   /* bind setup */
   _serv.sin_family = AF_INET;
   _serv.sin_addr.s_addr = inet_addr(host);
-  _serv.sin_port = port;
+  _serv.sin_port = htons(port);
 
   _ret_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if(_ret_sock < 1)

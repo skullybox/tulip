@@ -26,5 +26,6 @@ void run_tests()
 {
   _tcp_listen_test();
   _tcp_connect_test();
+  _udp_listen_test();
 
 }

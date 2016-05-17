@@ -6,7 +6,7 @@ objects := $(patsubst %.c, %.o, ${sources})
 
 ldflgs :=
 incflgs := -I.
-cflgs := -Werror -D_FILE_OFFSET_BITS=64 -std=c11 -c
+cflgs := -Werror -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
 
 all: main
 

@@ -9,5 +9,6 @@
 
 void _tcp_listen_test();
 void _tcp_connect_test();
+void _udp_listen_test();
 
 #endif
