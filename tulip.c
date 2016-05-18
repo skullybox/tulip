@@ -11,14 +11,12 @@
 
 int main(int argc, char **argv)
 {
-  tul_global_signal_handle_init();
-
   if(argc == 2 && !strcmp(argv[1], "-D"))
   {
     run_tests();
     return 0;
   }
-
+  tul_global_signal_handle_init();
   return 0;
 }
 
