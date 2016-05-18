@@ -24,7 +24,7 @@ void _tcp_listen_test()
 {
   int _sock = 0;
 
-  if(tul_tcp_listen_init("0.0.0.0", 8080, &_sock))
+  if(tul_tcp_listen_init(8080, &_sock))
   {
     fprintf(stderr, "FAIL: tcp_listen_test\n");
     return;
@@ -57,18 +57,12 @@ void _udp_listen_test()
   char buff[2048]={0};
   int ret = 0;
 
-  if(tul_udp_listen_init("0.0.0.0", 8080, &_sock))
+  if(tul_udp_listen_init(8080, &_sock))
   {
     fprintf(stderr, "FAIL: udp_listen_test\n");
     return;
   }
 
   fprintf(stdout, "PASS: udp_listen_test\n");
-
-  while(1){
-    ret = recvfrom(_sock, buff, 2048, 0, (struct sockaddr *) &_addr_store, &addr_store_sz);
-    
-  }
-
   close(_sock);
 }

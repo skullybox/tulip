@@ -15,7 +15,7 @@ Listening TCP socket api
 #include <stdio.h>
 #include <unistd.h>
 
-int tul_udp_listen_init(char const *host, const int port, int *sock)
+int tul_udp_listen_init(const int port, int *sock)
 {
   struct sockaddr_in _serv;
   int _ret_sock = 0;
@@ -28,7 +28,7 @@ int tul_udp_listen_init(char const *host, const int port, int *sock)
 
   /* bind setup */
   _serv.sin_family = AF_INET;
-  _serv.sin_addr.s_addr = inet_addr(host);
+  _serv.sin_addr.s_addr = htonl(INADDR_ANY);
   _serv.sin_port = htons(port);
 
   _ret_sock = socket(PF_INET, SOCK_DGRAM, 0);
@@ -53,6 +53,6 @@ int tul_udp_listen_init(char const *host, const int port, int *sock)
   _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
   fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
   *sock = _ret_sock;
-  
+
   return 0;
 }
