@@ -56,8 +56,9 @@ void _udp_listen_test()
   socklen_t addr_store_sz = sizeof(_addr_store);
   char buff[2048]={0};
   int ret = 0;
+  struct sockaddr_in addr;
 
-  if(tul_udp_listen_init(8080, &_sock))
+  if(tul_udp_listen_init(8080, &_sock, &addr))
   {
     fprintf(stderr, "FAIL: udp_listen_test\n");
     return;
