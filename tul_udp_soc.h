@@ -9,9 +9,9 @@
 
 #include <netdb.h>
 
-int tul_udp_listen_init(const int port, int *sock, struct sockaddr_in *addr);
+int tul_udp_listen_init(const int port, int *sock, struct sockaddr_in6 *addr);
 int tul_udp_connect(const char *host, const int port,
-  int *sock, struct sockaddr_in *addr);
+  int *sock, struct sockaddr_in6 *addr);
 
 
 #endif

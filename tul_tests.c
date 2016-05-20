@@ -51,12 +51,12 @@ void _tcp_connect_test()
 void _udp_listen_test()
 {
   int _sock = 0;
-  struct sockaddr_in _hints;
-  struct sockaddr_in _addr_store;
+  struct sockaddr_in6 _hints;
+  struct sockaddr_in6 _addr_store;
   socklen_t addr_store_sz = sizeof(_addr_store);
   char buff[2048]={0};
   int ret = 0;
-  struct sockaddr_in addr;
+  struct sockaddr_in6 addr;
 
   if(tul_udp_listen_init(8080, &_sock, &addr))
   {
