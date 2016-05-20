@@ -67,3 +67,18 @@ void _udp_listen_test()
   fprintf(stdout, "PASS: udp_listen_test\n");
   close(_sock);
 }
+
+void _udp_connect_test()
+{
+  int _sock;
+  struct sockaddr_in6 addr;
+  
+  if(tul_udp_connect("8.8.8.8", 53, &_sock, &addr))
+  {
+    fprintf(stderr, "FAIL: udp_connect_test\n");
+    return;
+  }
+
+  fprintf(stdout, "PASS: udp_connect_test\n");
+  close(_sock);
+}
