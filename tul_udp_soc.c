@@ -16,7 +16,7 @@ Listening TCP socket api
 
 int tul_udp_listen_init(const int port, int *sock, struct sockaddr_in *addr)
 {
-  struct sockaddr_in _serv;
+  struct sockaddr_in6 _serv;
   int _ret_sock = 0;
   int _ret_bind = 0;
   int _ret_list = 0;
@@ -26,11 +26,11 @@ int tul_udp_listen_init(const int port, int *sock, struct sockaddr_in *addr)
   memset(&_serv, 0, sizeof(_serv));
 
   /* bind setup */
-  _serv.sin_family = AF_INET;
-  _serv.sin_addr.s_addr = htonl(INADDR_ANY);
-  _serv.sin_port = htons(port);
+  _serv.sin6_family = AF_INET6;
+  _serv.sin6_addr = in6addr_any;
+  _serv.sin6_port = htons(port);
 
-  _ret_sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  _ret_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
   if(_ret_sock < 1)
   {
     fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
