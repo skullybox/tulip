@@ -17,7 +17,7 @@ Listening TCP socket api
 
 int tul_tcp_listen_init(const int port, int *sock)
 {
-  struct sockaddr_in _serv;
+  struct sockaddr_in6 _serv;
   int _ret_sock = 0;
   int _ret_bind = 0;
   int _ret_list = 0;
@@ -27,11 +27,11 @@ int tul_tcp_listen_init(const int port, int *sock)
   memset(&_serv, 0, sizeof(_serv));
 
   /* bind setup */
-  _serv.sin_family = AF_INET;
-  _serv.sin_addr.s_addr = htonl(INADDR_ANY);
-  _serv.sin_port = htons(port);
+  _serv.sin6_family = AF_INET6;
+  _serv.sin6_addr = in6addr_any;
+  _serv.sin6_port = htons(port);
 
-  _ret_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  _ret_sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if(_ret_sock < 1)
   {
     fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
@@ -66,16 +66,16 @@ int tul_tcp_listen_init(const int port, int *sock)
 
 int tul_tcp_connect(const char *host, const int port, int *sock)
 {
-  struct sockaddr_in _serv;
+  struct sockaddr_in6 _serv;
   int _ret_sock = 0;
   int _fd_flags = 0;
-  char _ipaddr[19] = {0};
+  char _ipaddr[INET6_ADDRSTRLEN] = {0};
   struct addrinfo *_addr_result = NULL;
-  struct sockaddr_in *_addr_ptr = NULL;
+  struct sockaddr_in6 *_addr_ptr = NULL;
   struct addrinfo _hints;
   short timeout = 0;
 
-  _ret_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  _ret_sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if(_ret_sock < 1)
   {
     fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
@@ -84,25 +84,26 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
 
   /* get DNS name ***************/
   memset(&_hints, 0, sizeof(_hints));
-  _hints.ai_family = AF_INET;
+  _hints.ai_family = AF_INET6;
   _hints.ai_socktype = SOCK_STREAM;
+  _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
 
-   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
-   {
-     freeaddrinfo(_addr_result);
-     fprintf(stderr, "DNS ERROR: %s(%d)\n", __FILE__, __LINE__);
-     return -1;
-   }
-   _addr_ptr = (struct sockaddr_in *) _addr_result->ai_addr;
-   strncpy(_ipaddr, inet_ntoa(_addr_ptr->sin_addr), 15);
+  if (getaddrinfo(host, NULL, &_hints, &_addr_result))
+  {
    freeaddrinfo(_addr_result);
+   fprintf(stderr, "DNS ERROR: %s(%d)\n", __FILE__, __LINE__);
+   return -1;
+  }
+  _addr_ptr = (struct sockaddr_in6 *) _addr_result->ai_addr;
+  inet_ntop(AF_INET6, &(_addr_ptr->sin6_addr), _ipaddr, 40);
+  freeaddrinfo(_addr_result);
 
   if (strlen(_ipaddr) > 0)
   {
     memset(&_serv, 0, sizeof(_serv));
-    _serv.sin_addr.s_addr = inet_addr(_ipaddr);
-    _serv.sin_port = htons(port);
-    _serv.sin_family = AF_INET;
+    inet_pton(AF_INET6, _ipaddr, &(_serv.sin6_addr));
+    _serv.sin6_port = htons(port);
+    _serv.sin6_family = AF_INET6;
   }
   else
   {
