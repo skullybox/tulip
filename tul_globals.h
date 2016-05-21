@@ -10,7 +10,7 @@
 #include <netdb.h>
 #include <string.h>
 
-#define DEF_SOCK_BUFF_SIZE 512
+#define DEF_SOCK_BUFF_SIZE 2048
 #define DEF_CTX_LIST_SZ 120
 
 typedef struct __app_context
