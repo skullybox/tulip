@@ -11,7 +11,7 @@ cflgs := -Werror -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
 all: main
 
 main: ${objects}
-	${C} -o tulip ${objects}
+	${C} -lpthread -o tulip ${objects}
 
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o $@
