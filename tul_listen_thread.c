@@ -9,6 +9,7 @@
 
 #include <pthread.h>
 #include <stdlib.h>
+#include <sys/select.h>
 
 
 extern int TUL_SIGNAL_INT;
@@ -23,6 +24,7 @@ typedef struct _internal_list_struct
 } internal_list_s;
 
 void *_run_listener(void *data);
+void _run_core(int fd, int mode);
 
 void run_listener(int port, int udp)
 {
@@ -75,11 +77,56 @@ void *_run_listener(void *data)
   }
   free(d);
   
+  _run_core(sock, udp_mode);
+
+  return NULL;
+}
+
+void _run_core(int fd, int mode)
+{
+  int fd_new;
+  socklen_t size;
+  struct sockaddr_in client;
+  fd_set active_fd_set;
+  fd_set read_fd_set;
+  
+  size = sizeof(client);
+  
+  FD_ZERO(&active_fd_set);
+  FD_SET(fd, &active_fd_set);
+  
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
+    read_fd_set = active_fd_set;
+    if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0)
+    {
+      TUL_SIGNAL_INT = 1;
+      return;
+    }
+    
+    for(int i = 0; i < FD_SETSIZE; i++)
+    {
+      if(FD_ISSET(i, &read_fd_set))
+      {
+        if(i == fd)
+        {
+          /* new socket */
+          fd_new = accept(fd, (struct sockaddr *)&client, &size);
+          if(fd_new < 0)
+          {
+            TUL_SIGNAL_INT=1;
+            return;
+          }
+          FD_SET(fd_new, &active_fd_set);
+        }
+        else
+        {
+          /* do read on connected socket */
+          
+        }
+      }
+    }
     
   }
-  
-  return NULL;
 }
