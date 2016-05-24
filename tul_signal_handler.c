@@ -15,8 +15,13 @@ void tul_global_signal_handle_init()
   for(int i = 1; i < 32; i++)
   {
     if(i == SIGINT)
+    {
       signal(i, tul_signal_handler_interupt);
-    signal(i, tul_signal_handler_ignore);
+    }
+    else
+    {
+      signal(i, tul_signal_handler_ignore);
+    }
   }
 }
 

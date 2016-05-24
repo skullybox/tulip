@@ -8,15 +8,71 @@
 #include "tul_signal_handler.h"
 
 #include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+int usage(int argc)
+{
+  if(argc == 1)
+  {
+    printf("usage: <tulip> <port> <udp [0|1]>\n\n\
+    \tport: listening port\n\
+    \t udp: a flag to enable UDP\n");
+    return 1;
+  } 
+  return 0;
+}
+
+void parseParams(int argc, char **argv)
+{
+  int ret = 0;
+  int port = 0;
+  int udp_flag = 0;
+  
+  if((ret = usage(argc)))
+  {
+    exit(ret);
+  }
+  
+  if(argc == 2)
+  {
+    if(!strcmp(argv[1], "-D"))
+    {
+      run_tests();
+      exit(0);
+    }
+    usage(1);
+    exit(-1);
+  }
+  
+  if(argc == 3)
+  {
+    port = atoi(argv[1]);
+    udp_flag = atoi(argv[2]);
+    
+    if(port <= 0 || (strcmp(argv[2], "0") && strcmp(argv[2], "1")))
+    {
+      usage(1);
+      exit(-1);
+    }
+  }
+}
 
 int main(int argc, char **argv)
 {
-  if(argc == 2 && !strcmp(argv[1], "-D"))
-  {
-    run_tests();
-    return 0;
-  }
+ 
+  parseParams(argc, argv);
+  
   tul_global_signal_handle_init();
+  
+  while(!TUL_SIGNAL_INT)
+  {
+    /* let processes run and sleep
+     * until we are signaled to exit */
+    usleep(1000000);
+  }
+  
   return 0;
 }
 
