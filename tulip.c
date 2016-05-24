@@ -4,6 +4,7 @@
 
 #include "tulip.h"
 #include "tul_tests.h"
+#include "tul_daemon.h"
 #include "tul_globals.h"
 #include "tul_signal_handler.h"
 
@@ -65,6 +66,8 @@ int main(int argc, char **argv)
   parseParams(argc, argv);
   
   tul_global_signal_handle_init();
+  
+  tul_make_daemon();
   
   while(!TUL_SIGNAL_INT)
   {
