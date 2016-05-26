@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 {
  
   parseParams(argc, argv);
-  //tul_make_daemon();
+  tul_make_daemon();
   
   tul_global_signal_handle_init();
   run_listener(port, udp_flag);

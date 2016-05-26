@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
 void tul_make_daemon()
 {
@@ -25,8 +26,10 @@ void tul_make_daemon()
     exit(0);
   }
   
-  fclose(stdout);
-  fclose(stderr);
-  fclose(stdin);
+  umask(0);
+  chdir("/tmp/");
+  //close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
 }
 
