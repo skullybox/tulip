@@ -6,12 +6,16 @@
 #include "tul_tests.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
+#include "tul_listen_thread.h"
 #include "tul_signal_handler.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+
+int port = 0;
+int udp_flag = 0;
 
 int usage(int argc)
 {
@@ -28,8 +32,6 @@ int usage(int argc)
 void parseParams(int argc, char **argv)
 {
   int ret = 0;
-  int port = 0;
-  int udp_flag = 0;
   
   if((ret = usage(argc)))
   {
@@ -64,10 +66,10 @@ int main(int argc, char **argv)
 {
  
   parseParams(argc, argv);
+  //tul_make_daemon();
   
   tul_global_signal_handle_init();
-  
-  tul_make_daemon();
+  run_listener(port, udp_flag);
   
   while(!TUL_SIGNAL_INT)
   {

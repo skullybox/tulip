@@ -14,14 +14,14 @@ void tul_make_daemon()
   pid_t ret_p = 0;
   
   ret_p = fork();
-  if(ret_p == -1)
+  if(ret_p < 0)
   {
     fprintf(stderr, "fork error! ..exiting.\n");
+    exit(-1);
   }
-  
-  if(ret_p > 0)
+  else if(ret_p > 0)
   {
-    fprintf(stdout, "launching deamon ..Done.\n");
+    fprintf(stdout, "launching deamon ..done.\n");
     exit(0);
   }
   
