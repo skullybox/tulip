@@ -1,6 +1,7 @@
 /***
- Copyright (C) irfan
-**/
+  Copyright (C) irfan
+
+ **/
 
 #include "tulip.h"
 #include "tul_tests.h"
@@ -22,7 +23,7 @@ int usage(int argc)
   if(argc == 1)
   {
     printf("usage: <tulip> <port>\n\
-    \tport: listening port\n\n");
+        \tport: listening port\n\n");
     return 1;
   }
   return 0;
@@ -39,16 +40,16 @@ void parseParams(int argc, char **argv)
 
   if(argc == 2 && !strcmp(argv[1], "-D"))
   {
-      #if !defined(__APPLE__) && !defined(__LINUX__)
-        WSADATA wsaData;
-        ZeroMemory(&wsaData,sizeof(wsaData));
-        WSAStartup(MAKEWORD(2,2),&wsaData);
-      #endif
-      run_tests();
-      #if !defined(__APPLE__) && !defined(__LINUX__)
-        WSACleanup();
-      #endif
-      exit(0);
+#if !defined(__APPLE__) && !defined(__linux__)
+    WSADATA wsaData;
+    ZeroMemory(&wsaData,sizeof(wsaData));
+    WSAStartup(MAKEWORD(2,2),&wsaData);
+#endif
+    run_tests();
+#if !defined(__APPLE__) && !defined(__linux__)
+    WSACleanup();
+#endif
+    exit(0);
   }
   else if(argc == 2 && (port = atoi(argv[1])) > 0)
   {
@@ -63,12 +64,12 @@ int main(int argc, char **argv)
 {
 
   parseParams(argc, argv);
-#if defined(__APPLE__) || defined(__LINUX__)
+#if defined(__APPLE__) || defined(__linux__)
   tul_make_daemon();
 #else
-    WSADATA wsaData;
-    ZeroMemory(&wsaData,sizeof(wsaData));
-    WSAStartup(MAKEWORD(2,2),&wsaData);
+  WSADATA wsaData;
+  ZeroMemory(&wsaData,sizeof(wsaData));
+  WSAStartup(MAKEWORD(2,2),&wsaData);
 #endif
   tul_global_signal_handle_init();
   run_listener(port);
@@ -79,7 +80,7 @@ int main(int argc, char **argv)
      * until we are signaled to exit */
     usleep(1000000);
   }
-#if !defined(__APPLE__) && !defined(__LINUX__)
+#if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif
   return 0;

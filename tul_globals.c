@@ -1,8 +1,9 @@
 /***
- Copyright (C) irfan
+  Copyright (C) irfan
 
-**/
+ **/
 
+#if !defined(__APPLE__) && !defined(__linux__)
 #include "tul_globals.h"
 
 int inet_pton(int af, const char *src, void *dst)
@@ -19,11 +20,11 @@ int inet_pton(int af, const char *src, void *dst)
   if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr *)&ss, &size) == 0) {
     switch(af) {
       case AF_INET:
-    *(struct in_addr *)dst = ((struct sockaddr_in *)&ss)->sin_addr;
-    return 1;
+        *(struct in_addr *)dst = ((struct sockaddr_in *)&ss)->sin_addr;
+        return 1;
       case AF_INET6:
-    *(struct in6_addr *)dst = ((struct sockaddr_in6 *)&ss)->sin6_addr;
-    return 1;
+        *(struct in6_addr *)dst = ((struct sockaddr_in6 *)&ss)->sin6_addr;
+        return 1;
     }
   }
   return 0;
@@ -49,5 +50,6 @@ const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
   }
   /* cannot direclty use &size because of strict aliasing rules */
   return (WSAAddressToString((struct sockaddr *)&ss, sizeof(ss), NULL, dst, &s) == 0)?
-          dst : NULL;
+    dst : NULL;
 }
+#endif

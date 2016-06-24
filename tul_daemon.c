@@ -1,14 +1,14 @@
 /***
- Copyright (C) irfan
+  Copyright (C) irfan
 
-**/
+ **/
 
 #include "tul_daemon.h"
 #include "tul_globals.h"
 
 void tul_make_daemon()
 {
-#if defined(__APPLE__) || defined(__LINUX__)
+#if defined(__APPLE__) || defined(__linux__)
   pid_t ret_p = 0;
 
   ret_p = fork();

@@ -1,7 +1,7 @@
 /***
- Copyright (C) irfan
+  Copyright (C) irfan
 
-**/
+ **/
 
 #include "tul_listen_thread.h"
 #include "tul_tcp_soc.h"
@@ -19,6 +19,7 @@ void run_listener(int port)
   pthread_t _tref;
 
   int *data = (int*) malloc(sizeof(int));
+  *data = port;
 
   /* pthread detached attribute */
   pthread_attr_init(&_tref_attr);

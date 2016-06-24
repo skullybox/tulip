@@ -7,7 +7,7 @@
 #ifndef _tul_globals
 #define _tul_globals
 
-#if defined(__APPLE__) || defined(__LINUX__)
+#if defined(__APPLE__) || defined(__linux__)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #endif
 
+#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
