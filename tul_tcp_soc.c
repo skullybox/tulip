@@ -82,12 +82,8 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   /* get DNS name ***************/
   memset(&_hints, 0, sizeof(_hints));
   _hints.ai_socktype = SOCK_STREAM;
-#if defined(__APPLE__) || defined(__LINUX__)
   _hints.ai_family = AF_INET6;
   _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
-#else
-  _hints.ai_family = AF_UNSPEC;
-#endif
 
   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
   {

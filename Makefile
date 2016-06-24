@@ -22,3 +22,5 @@ win: ${objects}
 clean:
 	-@rm *.o
 	-@rm tulip
+	-@del *.o
+	-@del tulip.exe

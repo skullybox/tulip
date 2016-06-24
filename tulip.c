@@ -21,9 +21,8 @@ int usage(int argc)
 {
   if(argc == 1)
   {
-    printf("usage: <tulip> <port> <udp [0|1]>\n\n\
-    \tport: listening port\n\
-    \t udp: a flag to enable UDP\n");
+    printf("usage: <tulip> <port>\n\
+    \tport: listening port\n\n");
     return 1;
   }
   return 0;
@@ -38,28 +37,26 @@ void parseParams(int argc, char **argv)
     exit(ret);
   }
 
-  if(argc == 2)
+  if(argc == 2 && !strcmp(argv[1], "-D"))
   {
-    if(!strcmp(argv[1], "-D"))
-    {
+      #if !defined(__APPLE__) && !defined(__LINUX__)
+        WSADATA wsaData;
+        ZeroMemory(&wsaData,sizeof(wsaData));
+        WSAStartup(MAKEWORD(2,2),&wsaData);
+      #endif
       run_tests();
+      #if !defined(__APPLE__) && !defined(__LINUX__)
+        WSACleanup();
+      #endif
       exit(0);
-    }
-    usage(1);
-    exit(-1);
   }
-
-  if(argc == 3)
+  else if(argc == 2 && (port = atoi(argv[1])) > 0)
   {
-    port = atoi(argv[1]);
-    udp_flag = atoi(argv[2]);
-
-    if(port <= 0 || (strcmp(argv[2], "0") && strcmp(argv[2], "1")))
-    {
-      usage(1);
-      exit(-1);
-    }
+    return;
   }
+
+  usage(1);
+  exit(-1);
 }
 
 int main(int argc, char **argv)
@@ -74,7 +71,7 @@ int main(int argc, char **argv)
     WSAStartup(MAKEWORD(2,2),&wsaData);
 #endif
   tul_global_signal_handle_init();
-  run_listener(port, udp_flag);
+  run_listener(port);
 
   while(!TUL_SIGNAL_INT)
   {
@@ -92,7 +89,4 @@ void run_tests()
 {
   _tcp_listen_test();
   _tcp_connect_test();
-  _udp_listen_test();
-  _udp_connect_test();
-
 }
