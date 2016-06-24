@@ -18,9 +18,6 @@
 #define UNICODE 1
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_WINNT 0x0501
-#ifndef AI_V4MAPPED
-#define AI_V4MAPPED AI_NUMERICHOST
-#endif
 #include <ws2tcpip.h>
 #include <winsock2.h>
 #include <fcntl.h>
