@@ -5,15 +5,7 @@ Listening TCP socket api
 **/
 
 #include "tul_tcp_soc.h"
-
-#include <sys/fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "tul_globals.h"
 
 int tul_tcp_listen_init(const int port, int *sock)
 {
@@ -57,10 +49,15 @@ int tul_tcp_listen_init(const int port, int *sock)
   }
 
   /* set non-blocking */
-  _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
-  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
-  *sock = _ret_sock;
+  #if defined(__APPLE__) || defined(__LINUX__)
+    _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
+    fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+  #else
+    ULONG NON_BLOCK = 1;
+    ioctlsocket(_ret_sock, FIONBIO, &NON_BLOCK);
+  #endif
 
+  *sock = _ret_sock;
   return 0;
 }
 
@@ -84,9 +81,13 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
 
   /* get DNS name ***************/
   memset(&_hints, 0, sizeof(_hints));
-  _hints.ai_family = AF_INET6;
   _hints.ai_socktype = SOCK_STREAM;
+#if defined(__APPLE__) || defined(__LINUX__)
+  _hints.ai_family = AF_INET6;
   _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
+#else
+  _hints.ai_family = AF_UNSPEC;
+#endif
 
   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
   {
@@ -125,8 +126,13 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   }
 
   /* set non-blocking */
+#if defined(__APPLE__) || defined(__LINUX__)
   _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
   fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+#else
+  ULONG NON_BLOCK = 1;
+  ioctlsocket(_ret_sock, FIONBIO, &NON_BLOCK);
+#endif
   *sock = _ret_sock;
 
   return 0;

@@ -5,19 +5,7 @@ Copyright (C) irfan
 #include "tul_tests.h"
 #include "tul_tcp_soc.h"
 #include "tul_udp_soc.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <sys/fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "tul_globals.h"
 
 
 void _tcp_listen_test()
@@ -72,7 +60,7 @@ void _udp_connect_test()
 {
   int _sock;
   struct sockaddr_in6 addr;
-  
+
   if(tul_udp_connect("8.8.8.8", 53, &_sock, &addr))
   {
     fprintf(stderr, "FAIL: udp_connect_test\n");

@@ -5,14 +5,7 @@ Listening TCP socket api
 **/
 
 #include "tul_udp_soc.h"
-
-#include <sys/fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "tul_globals.h"
 
 int tul_udp_listen_init(const int port, int *sock, struct sockaddr_in6 *addr)
 {
@@ -51,8 +44,13 @@ int tul_udp_listen_init(const int port, int *sock, struct sockaddr_in6 *addr)
   memcpy(addr, &_serv, sizeof(struct sockaddr_in));
 
   /* set non-blocking */
-  _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
-  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+  #if defined(__APPLE__) || defined(__LINUX__)
+    _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
+    fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+  #else
+    ULONG NON_BLOCK = 1;
+    ioctlsocket(_ret_sock, FIONBIO, &NON_BLOCK);
+  #endif
   *sock = _ret_sock;
 
   return 0;
@@ -79,9 +77,13 @@ int tul_udp_connect(const char *host, const int port,
 
   /* get DNS name ***************/
   memset(&_hints, 0, sizeof(_hints));
-  _hints.ai_family = AF_INET6;
   _hints.ai_socktype = SOCK_STREAM;
-  _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
+  #if defined(__APPLE__) || defined(__LINUX__)
+    _hints.ai_family = AF_INET6;
+    _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
+  #else
+    _hints.ai_family = AF_UNSPEC;
+  #endif
 
   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
   {
@@ -108,8 +110,13 @@ int tul_udp_connect(const char *host, const int port,
   memcpy(addr, &_serv, sizeof(struct sockaddr_in));
 
   /* set non-blocking */
-  _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
-  fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+  #if defined(__APPLE__) || defined(__LINUX__)
+    _fd_flags = fcntl(_ret_sock, F_GETFL, 0);
+    fcntl(_ret_sock, F_SETFL, _fd_flags | O_NONBLOCK);
+  #else
+    ULONG NON_BLOCK = 1;
+    ioctlsocket(_ret_sock, FIONBIO, &NON_BLOCK);
+  #endif
   *sock = _ret_sock;
 
   return 0;

@@ -4,16 +4,13 @@
 **/
 
 #include "tul_daemon.h"
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/stat.h>
+#include "tul_globals.h"
 
 void tul_make_daemon()
 {
+#if defined(__APPLE__) || defined(__LINUX__)
   pid_t ret_p = 0;
-  
+
   ret_p = fork();
   if(ret_p < 0)
   {
@@ -25,11 +22,11 @@ void tul_make_daemon()
     fprintf(stdout, "launching deamon ..done.\n");
     exit(0);
   }
-  
+
   umask(0);
   chdir("/tmp/");
   //close(STDIN_FILENO);
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
+#endif
 }
-

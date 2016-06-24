@@ -8,9 +8,6 @@
 #include "tul_udp_soc.h"
 
 #include <pthread.h>
-#include <stdlib.h>
-#include <sys/select.h>
-
 
 extern int TUL_SIGNAL_INT;
 
@@ -30,17 +27,17 @@ void run_listener(int port, int udp)
 {
   pthread_attr_t _tref_attr;
   pthread_t _tref;
-  
-  internal_list_s *data = 
+
+  internal_list_s *data =
     (internal_list_s*) malloc(sizeof(internal_list_s));
-  
+
   data->port = port;
   data->udp = udp;
-  
+
   /* pthread detached attribute */
   pthread_attr_init(&_tref_attr);
   pthread_attr_setdetachstate(&_tref_attr, PTHREAD_CREATE_DETACHED);
-  
+
   pthread_create(&_tref, &_tref_attr, _run_listener, data);
   pthread_attr_destroy(&_tref_attr);
 }
@@ -51,13 +48,13 @@ void *_run_listener(void *data)
   struct sockaddr_in6 addr;
   int udp_mode = 0;
   internal_list_s *d = (internal_list_s*)data;
-  
+
   udp_mode = d->udp;
   if(udp_mode)
   {
     if(tul_udp_listen_init(d->port, &sock, &addr))
     {
-      
+
       /* listen failed exit */
       free(d);
       TUL_SIGNAL_INT = 1;
@@ -68,7 +65,7 @@ void *_run_listener(void *data)
   {
     if(tul_tcp_listen_init(d->port, &sock))
     {
-      
+
       /* listen failed exit */
       free(d);
       TUL_SIGNAL_INT = 1;
@@ -76,7 +73,7 @@ void *_run_listener(void *data)
     }
   }
   free(d);
-  
+
   _run_core(sock, udp_mode);
 
   return NULL;
@@ -89,12 +86,12 @@ void _run_core(int fd, int mode)
   struct sockaddr_in client;
   fd_set active_fd_set;
   fd_set read_fd_set;
-  
+
   size = sizeof(client);
-  
+
   FD_ZERO(&active_fd_set);
   FD_SET(fd, &active_fd_set);
-  
+
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
@@ -104,7 +101,7 @@ void _run_core(int fd, int mode)
       TUL_SIGNAL_INT = 1;
       return;
     }
-    
+
     for(int i = 0; i < FD_SETSIZE; i++)
     {
       if(FD_ISSET(i, &read_fd_set))
@@ -123,10 +120,10 @@ void _run_core(int fd, int mode)
         else
         {
           /* do read on connected socket */
-          
+
         }
       }
     }
-    
+
   }
 }
