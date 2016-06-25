@@ -72,29 +72,31 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   struct addrinfo _hints;
   short timeout = 0;
 
+#if defined(__APPLE__) || defined(__linux__)
   _ret_sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if(_ret_sock < 1)
   {
     fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
     return -1;
   }
+#endif
 
   /* get DNS name ***************/
   memset(&_hints, 0, sizeof(_hints));
   _hints.ai_socktype = SOCK_STREAM;
-#if defined(__APPLE__) || defined(__linux__)
   _hints.ai_family = AF_INET6;
+#if defined(__APPLE__) || defined(__linux__)
   _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
-  if (getaddrinfo(host, NULL, &_hints, &_addr_result))
 #else
-    _hints.ai_family = AF_INET6;
-  if (getaddrinfo(host, NULL, NULL, &_addr_result))
+    _hints.ai_family = AF_UNSPEC;
 #endif
+  if (getaddrinfo(host, NULL, &_hints, &_addr_result))
   {
     freeaddrinfo(_addr_result);
     fprintf(stderr, "DNS ERROR: %s(%d)\n", __FILE__, __LINE__);
     return -1;
   }
+#if defined(__APPLE__) || defined(__linux__)
   _addr_ptr = (struct sockaddr_in6 *) _addr_result->ai_addr;
   inet_ntop(AF_INET6, &(_addr_ptr->sin6_addr), _ipaddr, 40);
   freeaddrinfo(_addr_result);
@@ -110,14 +112,46 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   {
     return -1;
   }
+#else
+  void *addr = NULL;
+  if(_addr_result->ai_family == AF_INET)
+  {
+    struct sockaddr_in *ipv4 = (struct sockaddr_in *)_addr_result->ai_addr;
+    addr = &(ipv4->sin_addr);
+    ipv4->sin_port = htons(port);
 
+  }
+  else /* IPv6 */
+  {
+    struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)_addr_result->ai_addr;
+    addr = &(ipv6->sin6_addr);
+    ipv6->sin6_port = htons(port);
+  }
+
+  freeaddrinfo(_addr_result);
+#endif
+#if defined(__APPLE__) || defined(__linux__)
   /* socket connect to resource ***************/
   while(connect(_ret_sock, (struct sockaddr *)&_serv, sizeof(_serv)))
+#else
+
+    _ret_sock = socket(_addr_result->ai_family,
+                  _addr_result->ai_socktype,
+                  _addr_result->ai_protocol);
+
+  if(_ret_sock < 1)
+  {
+    fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+    return -1;
+  }
+
+  while(connect(_ret_sock, _addr_result->ai_addr, _addr_result->ai_addrlen))
+#endif
   {
     usleep(1000);
     timeout++;
 
-    if(timeout >= 10000)
+    if(timeout >= 1000)
     {
       fprintf(stderr, "CONNECT TIMEOUT ERROR: %s(%d) - %s\n", __FILE__,
           __LINE__, _ipaddr);

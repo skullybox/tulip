@@ -42,11 +42,9 @@ const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
     case AF_INET:
       ((struct sockaddr_in *)&ss)->sin_addr = *(struct in_addr *)src;
       break;
-    case AF_INET6:
+    default:
       ((struct sockaddr_in6 *)&ss)->sin6_addr = *(struct in6_addr *)src;
       break;
-    default:
-      return NULL;
   }
   /* cannot direclty use &size because of strict aliasing rules */
   return (WSAAddressToString((struct sockaddr *)&ss, sizeof(ss), NULL, dst, &s) == 0)?
