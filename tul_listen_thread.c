@@ -6,7 +6,6 @@
 #include "tul_listen_thread.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
-#include <pthread.h>
 
 extern int TUL_SIGNAL_INT;
 

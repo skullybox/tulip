@@ -6,7 +6,7 @@ objects := $(patsubst %.c, %.o, ${sources})
 
 ldflgs :=
 incflgs := -I.
-cflgs := -Werror -Wno-incompatible-pointer-types -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
+cflgs := -O3 -Werror -Wno-incompatible-pointer-types -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
 
 all: main
 

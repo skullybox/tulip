@@ -23,12 +23,13 @@
 #include <fcntl.h>
 #endif
 
+#include <pthread.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
-
+#include <sys/types.h>
 
 #define DEF_SOCK_BUFF_SIZE 2048
 #define DEF_CTX_LIST_SZ 120
