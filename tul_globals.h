@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <sys/select.h>
 #include <sys/fcntl.h>
+#define SYSLOG_USE
 #else
 #define UNICODE 1
 #define WIN32_LEAN_AND_MEAN

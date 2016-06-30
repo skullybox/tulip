@@ -83,6 +83,11 @@ int main(int argc, char **argv)
 #if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif
+#ifdef SYSLOG_USE
+syslog(LOG_INFO, "%s", "exiting (sleeping 2 seconds)");
+#else
+fprintf(stderr, "LOG_INFO: %s\n", "exiting");
+#endif
   return 0;
 }
 

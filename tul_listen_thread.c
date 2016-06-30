@@ -6,6 +6,7 @@
 #include "tul_listen_thread.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
+#include "tul_net_context.h"
 
 extern int TUL_SIGNAL_INT;
 
@@ -37,6 +38,12 @@ void *_run_listener(void *data)
 
   if(tul_tcp_listen_init(*d, &sock))
   {
+    #ifdef SYSLOG_USE
+    syslog(LOG_ERROR, "%s", "network listener failed");
+    #else
+    fprintf(stderr, "LOG_ERROR: %s\n", "network listener failed");
+    #endif
+
     /* listen failed exit */
     free(d);
     TUL_SIGNAL_INT = 1;
@@ -44,6 +51,11 @@ void *_run_listener(void *data)
   }
 
   free(d);
+  #ifdef SYSLOG_USE
+  syslog(LOG_INFO, "%s", "starting core");
+  #else
+  fprintf(stderr, "LOG_INFO: %s\n", "starting core");
+  #endif
   _run_core(sock);
   return NULL;
 }
@@ -60,6 +72,8 @@ void _run_core(int fd)
 
   FD_ZERO(&active_fd_set);
   FD_SET(fd, &active_fd_set);
+
+  tul_init_context_list();
 
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
@@ -85,6 +99,7 @@ void _run_core(int fd)
             return;
           }
           FD_SET(fd_new, &active_fd_set);
+          tul_add_context(fd_new);
         }
         else
         {
@@ -93,6 +108,6 @@ void _run_core(int fd)
         }
       }
     }
-
   }
+  tul_dest_context_list();
 }
