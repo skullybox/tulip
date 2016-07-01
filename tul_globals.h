@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <sys/select.h>
 #include <sys/fcntl.h>
+#include <syslog.h>
 #define SYSLOG_USE
 #else
 #define UNICODE 1
@@ -28,6 +29,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>

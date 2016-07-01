@@ -39,9 +39,9 @@ void *_run_listener(void *data)
   if(tul_tcp_listen_init(*d, &sock))
   {
     #ifdef SYSLOG_USE
-    syslog(LOG_ERROR, "%s", "network listener failed");
+    syslog(LOG_ERR, "%s", "network listener failed");
     #else
-    fprintf(stderr, "LOG_ERROR: %s\n", "network listener failed");
+    fprintf(stderr, "LOG_ERR: %s\n", "network listener failed");
     #endif
 
     /* listen failed exit */
