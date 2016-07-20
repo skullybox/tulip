@@ -8,7 +8,7 @@ ldflgs :=
 incflgs := -I.
 cflgs := -O3 -Werror -Wno-incompatible-pointer-types -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
 
-all: main
+all: crypt main
 
 main: ${objects}
 	${C} -lpthread -o tulip ${objects}
@@ -24,3 +24,9 @@ clean:
 	-@rm tulip
 	-@del *.o
 	-@del tulip.exe
+
+crypt:
+	if [ ! -d "lib/libgcrypt-1.7.2" ]; then \
+		tar jxf "lib/libgcrypt-1.7.2.tar.bz2" -C "lib";\
+		cd "lib/libgcrypt-1.7.2" && ./configure --disable-shared && ${MAKE};\
+	fi
