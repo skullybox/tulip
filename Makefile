@@ -4,17 +4,17 @@ C = gcc
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 
-ldflgs :=
+ldflgs := -L./lib/libgcrypt-1.7.2/lib/
 incflgs := -I. -I./lib/libgcrypt-1.7.2/include
 cflgs := -O3 -Werror -Wno-incompatible-pointer-types -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
 
 all: crypt main
 
 main: ${objects}
-	${C} -lpthread -o tulip ${objects} ./lib/libgcrypt-1.7.2/lib/libgcrypt.a
+	${C} -lpthread -lgcrypt ${ldflags} -o tulip ${objects} ${incflgs}
 
 win: ${objects}
-		${C} -o tulip ${objects} ./lib/libgcrypt-1.7.2/lib/libgcrypt.a -lpthread -lws2_32
+		${C} -o tulip ${objects} -lpthread -lws2_32
 
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o $@

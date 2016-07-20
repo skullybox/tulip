@@ -1,6 +1,6 @@
 /***
   Copyright (C) irfan
-
+  Socket thread handler
  **/
 
 #include "tul_listen_thread.h"

@@ -3,4 +3,9 @@
  Crypto functions referecing libgcrypt
 **/
 
-#include "gcrypt.h"
+#ifndef _tul_crypto_ref
+#define _tul_crypto_ref
+
+int crypto_init();
+
+#endif
