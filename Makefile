@@ -11,10 +11,10 @@ cflgs := -O3 -Werror -Wno-incompatible-pointer-types -Wno-implicit-function-decl
 all: crypt main
 
 main: ${objects}
-	${C} -lpthread -lgcrypt ${ldflags} -o tulip ${objects} ${incflgs}
+	${C} -lpthread -lgcrypt ${ldflgs} -o tulip ${objects} ${incflgs}
 
 win: ${objects}
-		${C} -o tulip ${objects} -lpthread -lws2_32
+	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 -lgcrypt -lgpg-error 
 
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o $@
@@ -22,16 +22,11 @@ win: ${objects}
 clean:
 	-@rm *.o
 	-@rm tulip
-	-@del *.o
-	-@del tulip.exe
 
 clean-all:
 	-@rm *.o
 	-@rm tulip
-	-@del *.o
-	-@del tulip.exe
 	-@rm -rf lib/libgcrypt-1.7.2
-	-@del /s /q lib/libgcrypt-1.7.2
 
 
 crypt:
