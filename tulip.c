@@ -84,6 +84,14 @@ int main(int argc, char **argv)
 #endif    
   return -1;
   }
+  else
+  {
+#ifdef SYSLOG_USE
+  syslog(LOG_ERR, "%s", "crypto provider initialized");
+#else
+  fprintf(stdout, "LOG_INFO: %s\n", "crypto provider initialized");
+#endif    
+  }
 
   run_listener(port);
 
