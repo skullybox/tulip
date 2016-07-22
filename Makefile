@@ -23,13 +23,13 @@ win: crypt ${objects}
 	${C} ${cflgs} ${incflgs} $^ -o $@
 
 clean:
-	-@rm *.o
-	-@rm tulip
+	@-rm -f *.o || true
+	@-rm -f tulip || true
 
 clean-all:
-	-@rm *.o
-	-@rm tulip
-	-@rm -rf lib/libgcrypt-1.7.2
+	@-rm -f *.o || true
+	@-rm -f tulip || true
+	@-rm -rf lib/libgcrypt-1.7.2 || true
 
 
 crypt:
