@@ -78,9 +78,9 @@ int main(int argc, char **argv)
   if(crypto_init())
   {
 #ifdef SYSLOG_USE
-  syslog(LOG_ERROR, "%s", "Initializing crypto provider failed!");
+  syslog(LOG_ERR, "%s", "Initializing crypto provider failed!");
 #else
-  fprintf(stderr, "LOG_ERROR: %s\n", "Initializing crypto provider failed!");
+  fprintf(stderr, "LOG_ERR: %s\n", "Initializing crypto provider failed!");
 #endif    
   return -1;
   }
