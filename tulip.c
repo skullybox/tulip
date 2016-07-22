@@ -84,9 +84,9 @@ int main(int argc, char **argv)
   WSACleanup();
 #endif
 #ifdef SYSLOG_USE
-syslog(LOG_INFO, "%s", "exiting (sleeping 2 seconds)");
+  syslog(LOG_INFO, "%s", "exiting (sleeping 2 seconds)");
 #else
-fprintf(stderr, "LOG_INFO: %s\n", "exiting");
+  fprintf(stderr, "LOG_INFO: %s\n", "exiting");
 #endif
   return 0;
 }

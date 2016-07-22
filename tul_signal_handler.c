@@ -1,6 +1,5 @@
 /***
   Copyright (C) irfan
-
   Generically handle (ignore) most signals
  **/
 
@@ -12,11 +11,11 @@ int TUL_SIGNAL_INT = 0;
 void tul_global_signal_handle_init()
 {
 
-  #ifdef SYSLOG_USE
+#ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "adding signal handlers");
-  #else
+#else
   fprintf(stderr, "LOG_INFO: %s\n", "adding signal handlers");
-  #endif
+#endif
 
   for(int i = 1; i < 32; i++)
   {
@@ -42,10 +41,10 @@ void tul_signal_handler_interupt(int i)
   if(!TUL_SIGNAL_INT)
   {
     TUL_SIGNAL_INT = 1;
-    #ifdef SYSLOG_USE
+#ifdef SYSLOG_USE
     syslog(LOG_INFO, "%s", "signal to shutdown");
-    #else
+#else
     fprintf(stderr, "LOG_INFO: %s\n", "signal to shutdown");
-    #endif
+#endif
   }
 }

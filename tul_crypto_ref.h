@@ -1,7 +1,7 @@
 /***
- Copyright (C) irfan
- Crypto functions referecing libgcrypt
-**/
+  Copyright (C) irfan
+  Crypto functions referecing libgcrypt
+ **/
 
 #ifndef _tul_crypto_ref
 #define _tul_crypto_ref

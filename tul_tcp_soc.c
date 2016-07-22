@@ -1,6 +1,5 @@
 /***
   Copyright (C) irfan
-
   Listening TCP socket api
  **/
 
@@ -88,7 +87,7 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
 #if defined(__APPLE__) || defined(__linux__)
   _hints.ai_flags = _hints.ai_flags | AI_V4MAPPED;
 #else
-    _hints.ai_family = AF_UNSPEC;
+  _hints.ai_family = AF_UNSPEC;
 #endif
   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
   {
@@ -136,8 +135,8 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
 #else
 
     _ret_sock = socket(_addr_result->ai_family,
-                  _addr_result->ai_socktype,
-                  _addr_result->ai_protocol);
+        _addr_result->ai_socktype,
+        _addr_result->ai_protocol);
 
   if(_ret_sock < 1)
   {

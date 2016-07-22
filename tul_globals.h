@@ -1,8 +1,8 @@
 /***
- Copyright (C) irfan
+  Copyright (C) irfan
 
- place globals here
-**/
+  place globals here
+ **/
 
 #ifndef _tul_globals
 #define _tul_globals

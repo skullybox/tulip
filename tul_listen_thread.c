@@ -38,11 +38,11 @@ void *_run_listener(void *data)
 
   if(tul_tcp_listen_init(*d, &sock))
   {
-    #ifdef SYSLOG_USE
+#ifdef SYSLOG_USE
     syslog(LOG_ERR, "%s", "network listener failed");
-    #else
+#else
     fprintf(stderr, "LOG_ERR: %s\n", "network listener failed");
-    #endif
+#endif
 
     /* listen failed exit */
     free(d);
@@ -51,11 +51,11 @@ void *_run_listener(void *data)
   }
 
   free(d);
-  #ifdef SYSLOG_USE
+#ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "starting core");
-  #else
+#else
   fprintf(stderr, "LOG_INFO: %s\n", "starting core");
-  #endif
+#endif
   _run_core(sock);
   return NULL;
 }

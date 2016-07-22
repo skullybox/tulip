@@ -10,6 +10,9 @@ cflgs := -O3 -Werror -Wno-incompatible-pointer-types -Wno-implicit-function-decl
 
 all: crypt main
 
+tags: 
+	ctags -R --append=no .
+
 main: ${objects}
 	${C} -lpthread -lgcrypt ${ldflgs} -o tulip ${objects} ${incflgs}
 
