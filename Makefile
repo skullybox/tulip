@@ -14,7 +14,7 @@ tags:
 	ctags -R --append=no .
 
 main: ${objects}
-	${C} -lpthread -lgcrypt ${ldflgs} -o tulip ${objects} ${incflgs}
+	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lgcrypt -lgpg-error
 
 win: crypt ${objects}
 	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 -lgcrypt -lgpg-error 
