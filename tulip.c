@@ -1,10 +1,11 @@
 /***
   Copyright (C) irfan
-
+  tulip main.
  **/
 
 #include "tulip.h"
 #include "tul_tests.h"
+#include "tul_crypto_ref.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
 #include "tul_listen_thread.h"
@@ -72,6 +73,18 @@ int main(int argc, char **argv)
   WSAStartup(MAKEWORD(2,2),&wsaData);
 #endif
   tul_global_signal_handle_init();
+
+  /* initialize crypto provider */
+  if(crypto_init())
+  {
+#ifdef SYSLOG_USE
+  syslog(LOG_ERROR, "%s", "Initializing crypto provider failed!");
+#else
+  fprintf(stderr, "LOG_ERROR: %s\n", "Initializing crypto provider failed!");
+#endif    
+  return -1;
+  }
+
   run_listener(port);
 
   while(!TUL_SIGNAL_INT)
@@ -86,7 +99,7 @@ int main(int argc, char **argv)
 #ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "exiting (sleeping 2 seconds)");
 #else
-  fprintf(stderr, "LOG_INFO: %s\n", "exiting");
+  fprintf(stdout, "LOG_INFO: %s\n", "exiting");
 #endif
   return 0;
 }

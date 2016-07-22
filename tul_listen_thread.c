@@ -54,7 +54,7 @@ void *_run_listener(void *data)
 #ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "starting core");
 #else
-  fprintf(stderr, "LOG_INFO: %s\n", "starting core");
+  fprintf(stdout, "LOG_INFO: %s\n", "starting core");
 #endif
   _run_core(sock);
   return NULL;

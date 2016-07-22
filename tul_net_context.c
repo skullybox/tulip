@@ -76,7 +76,7 @@ void tul_init_context_list()
 #ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "starting net context");
 #else
-  fprintf(stderr, "LOG_INFO: %s\n", "starting net context");
+  fprintf(stdout, "LOG_INFO: %s\n", "starting net context");
 #endif
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
@@ -112,7 +112,7 @@ void tul_dest_context_list()
 #ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "stopping net context");
 #else
-  fprintf(stderr, "LOG_INFO: %s\n", "stopping net context");
+  fprintf(stdout, "LOG_INFO: %s\n", "stopping net context");
 #endif
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
