@@ -12,6 +12,9 @@ extern int TUL_SIGNAL_INT;
 
 void *_run_listener(void *data);
 void _run_core(int fd);
+void do_read(int i);
+
+static fd_set active_fd_set;
 
 void run_listener(int port)
 {
@@ -65,8 +68,6 @@ void _run_core(int fd)
   int fd_new;
   socklen_t size;
   struct sockaddr_in client;
-  fd_set active_fd_set;
-  fd_set read_fd_set;
 
   size = sizeof(client);
 
@@ -78,8 +79,7 @@ void _run_core(int fd)
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
-    read_fd_set = active_fd_set;
-    if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0)
+    if (select (FD_SETSIZE, &active_fd_set, NULL, NULL, NULL) < 0)
     {
       TUL_SIGNAL_INT = 1;
       return;
@@ -87,7 +87,7 @@ void _run_core(int fd)
 
     for(int i = 0; i < FD_SETSIZE; i++)
     {
-      if(FD_ISSET(i, &read_fd_set))
+      if(FD_ISSET(i, &active_fd_set))
       {
         if(i == fd)
         {
@@ -104,6 +104,7 @@ void _run_core(int fd)
         else
         {
           /* do read on connected socket */
+          do_read(i);
 
         }
       }
@@ -111,3 +112,32 @@ void _run_core(int fd)
   }
   tul_dest_context_list();
 }
+
+void do_read(int i)
+{
+  int bread = 0;
+  tul_net_context *ctx;
+
+  ctx = tul_find_context(i);
+
+  if(ctx->payload_in_cnt < CTX_BLOCK)  
+  {
+    bread = read(ctx->_sock, 
+        &(ctx->payload_in[ctx->payload_in_cnt]),
+        CTX_BLOCK-ctx->payload_in_cnt);           
+
+    /* socket closed */
+    if(bread <= 0)
+    {
+      FD_CLR(i, &active_fd_set);
+      tul_rem_context(i);
+    } 
+    else
+    {
+      /* send to context processor */
+
+    }
+  }
+}
+
+

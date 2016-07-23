@@ -7,11 +7,10 @@
 #include "tul_net_context.h"
 
 static _tul_int_context_struct _glbl_struct_list;
-pthread_mutex_t _glbl_struct_mtx;
+static pthread_mutex_t _glbl_struct_mtx;
 
 void tul_add_context(unsigned sock)
 {
-  pthread_mutex_lock(&_glbl_struct_mtx);
   _tul_int_context_struct *new = NULL;
   _tul_int_context_struct *cur = NULL;
 
@@ -42,12 +41,10 @@ void tul_add_context(unsigned sock)
     cur->next = new;
     new->back = cur;
   }
-  pthread_mutex_unlock(&_glbl_struct_mtx);
 }
 
 void tul_rem_context(unsigned sock)
 {
-  pthread_mutex_lock(&_glbl_struct_mtx);
   _tul_int_context_struct *cur = NULL;
   while(cur->next != NULL && cur->this->_sock != sock)
   {
@@ -66,7 +63,6 @@ void tul_rem_context(unsigned sock)
     memset(cur, 0, sizeof(_tul_int_context_struct));
     free(cur);
   }
-  pthread_mutex_unlock(&_glbl_struct_mtx);
 }
 
 void tul_init_context_list()
@@ -116,3 +112,24 @@ void tul_dest_context_list()
 #endif
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
+
+tul_net_context* tul_find_context(unsigned sock)
+{
+  _tul_int_context_struct* node = &_glbl_struct_list; 
+  tul_net_context* net_ctx = node->this;
+
+  while(net_ctx != NULL && net_ctx->_sock != sock)
+  {
+    if(node->next != NULL)
+    {
+      node = node->next;
+      net_ctx = node->this;
+    }
+    else
+      return NULL;
+  }
+
+  return net_ctx;
+}
+
+

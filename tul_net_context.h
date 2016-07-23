@@ -6,6 +6,8 @@
 #ifndef _tul_net_context
 #define _tul_net_context
 
+#include "tul_globals.h"
+
 #define CTX_BLOCK 20000
 
 typedef struct __tul_net_context
@@ -29,5 +31,6 @@ void tul_add_context(unsigned sock);
 void tul_rem_context(unsigned sock);
 void tul_init_context_list();
 void tul_dest_context_list();
+tul_net_context* tul_find_context(unsigned sock);
 
 #endif
