@@ -87,7 +87,7 @@ int main(int argc, char **argv)
   else
   {
 #ifdef SYSLOG_USE
-  syslog(LOG_ERR, "%s", "crypto provider initialized");
+  syslog(LOG_INFO, "%s", "crypto provider initialized");
 #else
   fprintf(stdout, "LOG_INFO: %s\n", "crypto provider initialized");
 #endif    
