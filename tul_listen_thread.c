@@ -4,6 +4,7 @@
  **/
 
 #include "tul_listen_thread.h"
+#include "tul_service.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
 #include "tul_net_context.h"
@@ -135,7 +136,7 @@ void do_read(int i)
     else
     {
       /* send to context processor */
-
+      tul_service(ctx);
     }
   }
 }
