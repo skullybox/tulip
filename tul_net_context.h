@@ -14,6 +14,7 @@ typedef struct __tul_net_context
 {
   unsigned _sock;
   unsigned long long _tsend;
+  unsigned long long _trecv;
   unsigned payload_out_cnt;
   unsigned payload_in_cnt;
   unsigned char payload_in[CTX_BLOCK];

@@ -14,8 +14,10 @@ extern int TUL_SIGNAL_INT;
 void *_run_listener(void *data);
 void _run_core(int fd);
 void do_read(int i);
+void do_write(int i);
 
-static fd_set active_fd_set;
+static fd_set read_fd_set;
+static fd_set write_fd_set;
 
 void run_listener(int port)
 {
@@ -72,15 +74,16 @@ void _run_core(int fd)
 
   size = sizeof(client);
 
-  FD_ZERO(&active_fd_set);
-  FD_SET(fd, &active_fd_set);
+  FD_ZERO(&read_fd_set);
+  FD_ZERO(&write_fd_set);
+  FD_SET(fd, &read_fd_set);
 
   tul_init_context_list();
 
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
-    if (select (FD_SETSIZE, &active_fd_set, NULL, NULL, NULL) < 0)
+    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
     {
       TUL_SIGNAL_INT = 1;
       return;
@@ -88,7 +91,7 @@ void _run_core(int fd)
 
     for(int i = 0; i < FD_SETSIZE; i++)
     {
-      if(FD_ISSET(i, &active_fd_set))
+      if(FD_ISSET(i, &read_fd_set))
       {
         if(i == fd)
         {
@@ -99,7 +102,7 @@ void _run_core(int fd)
             TUL_SIGNAL_INT=1;
             return;
           }
-          FD_SET(fd_new, &active_fd_set);
+          FD_SET(fd_new, &read_fd_set);
           tul_add_context(fd_new);
         }
         else
@@ -108,6 +111,12 @@ void _run_core(int fd)
           do_read(i);
 
         }
+      }
+      else if(FD_ISSET(i, &write_fd_set))
+      {
+        /* do write on connected socket if data on buffer */ 
+        do_write(i);
+          
       }
     }
   }
@@ -121,7 +130,7 @@ void do_read(int i)
 
   ctx = tul_find_context(i);
 
-  if(ctx->payload_in_cnt < CTX_BLOCK)  
+  if(ctx->_trecv < CTX_BLOCK)  
   {
     bread = read(ctx->_sock, 
         &(ctx->payload_in[ctx->payload_in_cnt]),
@@ -130,13 +139,47 @@ void do_read(int i)
     /* socket closed */
     if(bread <= 0)
     {
-      FD_CLR(i, &active_fd_set);
+      FD_CLR(i, &read_fd_set);
+      FD_CLR(i, &write_fd_set);
       tul_rem_context(i);
     } 
     else
     {
+      /* update bytes read */
+      ctx->_trecv += bread;
+
       /* send to context processor */
       tul_service(ctx);
+    }
+  }
+}
+
+void do_write(int i)
+{
+  int bwrite = 0;
+  tul_net_context *ctx;
+
+  ctx = tul_find_context(i);
+
+  if(ctx->payload_out_cnt > 0 && ctx->payload_out_cnt < CTX_BLOCK + 1 )  
+  {
+    bwrite = write(ctx->_sock, 
+        &(ctx->payload_out[ctx->_tsend]),
+        ctx->payload_out_cnt-ctx->_tsend);
+    if(bwrite <= 0)
+    {
+      FD_CLR(i, &read_fd_set);
+      FD_CLR(i, &write_fd_set);
+      tul_rem_context(i);
+    }
+    else
+    {
+      /* update bytes read */
+      ctx->_tsend += bwrite;
+
+      /* send to context processor */
+      tul_service(ctx);
+
     }
   }
 }
