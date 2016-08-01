@@ -133,8 +133,8 @@ void do_read(int i)
   if(ctx->_trecv < CTX_BLOCK)  
   {
     bread = read(ctx->_sock, 
-        &(ctx->payload_in[ctx->payload_in_cnt]),
-        CTX_BLOCK-ctx->payload_in_cnt);           
+        &(ctx->payload_in[ctx->_trecv]),
+        CTX_BLOCK-ctx->_trecv);           
 
     /* socket closed */
     if(bread <= 0)
@@ -149,7 +149,7 @@ void do_read(int i)
       ctx->_trecv += bread;
 
       /* send to context processor */
-      tul_service(ctx);
+      tul_service(ctx, 0);
     }
   }
 }
@@ -176,12 +176,11 @@ void do_write(int i)
     {
       /* update bytes read */
       ctx->_tsend += bwrite;
-
-      /* send to context processor */
-      tul_service(ctx);
-
     }
   }
+
+  /* send to context processor */
+  tul_service(ctx, 1);
 }
 
 
