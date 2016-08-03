@@ -161,11 +161,14 @@ void do_write(int i)
 
   ctx = tul_find_context(i);
 
-  if(ctx->payload_out_cnt > 0 && ctx->payload_out_cnt < CTX_BLOCK + 1 )  
+  if(ctx->payload_out_cnt > 0 && 
+      ctx->payload_out_cnt <= CTX_BLOCK && 
+      ctx->_tsend < ctx->payload_out_cnt )  
   {
     bwrite = write(ctx->_sock, 
         &(ctx->payload_out[ctx->_tsend]),
         ctx->payload_out_cnt-ctx->_tsend);
+
     if(bwrite <= 0)
     {
       FD_CLR(i, &read_fd_set);
@@ -176,11 +179,11 @@ void do_write(int i)
     {
       /* update bytes read */
       ctx->_tsend += bwrite;
+
+      /* send to context processor */
+      tul_service(ctx, 1);
     }
   }
-
-  /* send to context processor */
-  tul_service(ctx, 1);
 }
 
 
