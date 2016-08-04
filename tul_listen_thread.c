@@ -145,6 +145,8 @@ void do_read(int i)
     } 
     else
     {
+      ctx->timestamp = time(NULL);
+
       /* update bytes read */
       ctx->_trecv += bread;
 
@@ -177,6 +179,8 @@ void do_write(int i)
     }
     else
     {
+      ctx->timestamp = time(NULL);
+
       /* update bytes read */
       ctx->_tsend += bwrite;
 
