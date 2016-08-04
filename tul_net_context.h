@@ -16,8 +16,8 @@ typedef struct __tul_net_context
   unsigned _tsend;
   unsigned _trecv;
   unsigned payload_out_cnt;
-  unsigned char payload_in[CTX_BLOCK];
-  unsigned char payload_out[CTX_BLOCK];
+  char payload_in[CTX_BLOCK];
+  char payload_out[CTX_BLOCK];
 } tul_net_context;
 
 typedef struct __tul_int_context_struct

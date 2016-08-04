@@ -10,8 +10,8 @@ extern tul_write_callback tul_WR_callback;
 
 void chat_configure_module()
 {
-  tul_RD_callback = chat_read;
-  tul_WR_callback = chat_write;
+  tul_RD_callback = (tul_read_callback) &chat_read;
+  tul_WR_callback = (tul_write_callback) &chat_write;
 }
 
 void chat_read(char *buff, unsigned *recv)

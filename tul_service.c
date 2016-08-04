@@ -16,7 +16,7 @@ void tul_service(tul_net_context *ctx, short send_flg)
      * call back function will reset buffers
      * and counters after processing recieved data */
     if(tul_WR_callback)
-      tul_WR_callback(&(ctx->payload_out), 
+      tul_WR_callback(ctx->payload_out, 
           &(ctx->_tsend),
           &(ctx->payload_out_cnt));
   }
@@ -26,7 +26,7 @@ void tul_service(tul_net_context *ctx, short send_flg)
      * call back function will reset buffers
      * and counters after processing recieved data */
     if(tul_RD_callback)
-      tul_RD_callback(&(ctx->payload_in), &(ctx->_trecv));
+      tul_RD_callback(ctx->payload_in, &(ctx->_trecv));
   }
 }
 
