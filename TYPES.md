@@ -24,32 +24,32 @@
 #  the first one listed takes owner ship and can modify
 #  this object's modifiable members
 
-[user]
-pass+
-id
-fname
-email
+-user
+ pass+
+ id
+ fname
+ email
 
-[group]
-a:user+
-id
-name
-id:user
+-group
+ a:user+
+ id
+ name
+ id:user
 
-[msggroup]
-id:user
-id
-id:group
-message
+-msggroup
+ id:user
+ id
+ id:group
+ message
 
-[msguser]
-id
-id:user
-id:user
-message
+-msguser
+ id
+ id:user
+ id:user
+ message
 
-[contacts]
-id:user
-a:user+
+-contacts
+ id:user
+ a:user+
 
 

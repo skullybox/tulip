@@ -34,9 +34,26 @@ int main(int argc, char **argv)
   /* load object definitions into memory */
   while( ( bytes_read = getline(&readbuf, &bytes_read, fp) ) != -1 )
   {
+    /* skip lines beginning with \n or \r */
+    if( bytes_read > 0 && (readbuf[0] == '\n' || readbuf[0] == '\r' ))
+    {
+      free(readbuf);
+      readbuf = NULL;
+      continue;
+
+    }
+
+    /* skip lines beginning with spaces */
+    if( bytes_read > 0 && ( readbuf[0] == ' ' && (readbuf[0] == '\n'
+            || readbuf[0] == '\r') ) )
+    {
+      free(readbuf);
+      readbuf = NULL;
+      continue;
+    }
+
     /* skip comment lines */
-    if( bytes_read > 0 && ( readbuf[0] == '#' || readbuf[0] == '\n' 
-          || readbuf[0] == '\r' || readbuf[0] == ' ' ) )
+    if( bytes_read > 0 && readbuf[0] == '#' )
     {
       free(readbuf);
       readbuf = NULL;
@@ -54,14 +71,12 @@ int main(int argc, char **argv)
   }
 
   /* print parsed contents */
-  printf("--- objects ---\n");
   for( int i = 0; i < count; i++)
   {
-    if( objectDefs[i][0] == '[' )
+    if( objectDefs[i][0] == '-' )
       printf("\n");
     printf("%s\n", objectDefs[i]);  
   }
-  printf("--------------------\n");
 
   fclose(fp);
   fp = NULL;
