@@ -43,9 +43,18 @@ int main(int argc, char **argv)
 
     }
 
+    /* validate the object name def. */
+    if( bytes_read > 0 && readbuf[0] == '-' && 
+        (readbuf[1] < 'A' || readbuf[1] > 'z'))
+    {
+      free(readbuf);
+      readbuf = NULL;
+      continue;
+    }
+
     /* skip lines beginning with spaces */
     if( bytes_read > 0 && ( readbuf[0] == ' ' && (readbuf[0] == '\n'
-            || readbuf[0] == '\r') ) )
+            || readbuf[0] == '\r' || readbuf[0] == '-') ) )
     {
       free(readbuf);
       readbuf = NULL;

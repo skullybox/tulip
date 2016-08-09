@@ -16,7 +16,10 @@ int crypto_init()
 #endif
   gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
 
-  if( !gcry_check_version(GCRYPT_VERSION) || gcry_cipher_open(&handle_test, GCRY_CIPHER_AES256, GCRY_CIPHER_MODE_CBC, 0))
+  if( !gcry_check_version(GCRYPT_VERSION) || gcry_cipher_open(&handle_test, 
+        GCRY_CIPHER_AES256, 
+        GCRY_CIPHER_MODE_CBC, 
+        0))
     return 1;
   else
     gcry_cipher_close(handle_test);
