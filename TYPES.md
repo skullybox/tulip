@@ -21,7 +21,7 @@
 # Objects that are owned by other objects
 #  can only have one owner but multiple object references
 #  in the case where multiple id:[object] are listed
-#  the first one listed takes owner ship and can modify
+#  the first one listed takes ownership and can modify
 #  this object's modifiable members
 
 -user

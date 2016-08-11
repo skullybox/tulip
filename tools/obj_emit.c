@@ -11,7 +11,7 @@ short count = 0;
 char *objectDefs[500] = {0};
 char *readbuf = NULL;
 ssize_t bytes_read = 0;
-
+ssize_t MAX_LINE = 100;
 
 void cleanup();
 void emitObjects();
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     }
 
     /* defining new object */
-    if( bytes_read > 0 )
+    if( bytes_read > 0 && bytes_read < MAX_LINE+1)
     {
       objectDefs[count] = readbuf;
       objectDefs[count][strlen(objectDefs[count])-1] = '\0';
@@ -80,12 +80,12 @@ int main(int argc, char **argv)
   }
 
   /* print parsed contents */
-  for( int i = 0; i < count; i++)
+  /*for( int i = 0; i < count; i++)
   {
     if( objectDefs[i][0] == '-' )
       printf("\n");
     printf("%s\n", objectDefs[i]);  
-  }
+  }*/
 
   fclose(fp);
   fp = NULL;
@@ -107,6 +107,56 @@ void cleanup()
 
 void emitObjects()
 {
+  unsigned tip,cur,end = 0;
+  for( int i = 0; i < count; i++)
+  {
+    if( objectDefs[i][0] == '-' )
+    {
+      tip = i;
+      end = tip+1;
+      while( end < count && objectDefs[end][0] != '-' )
+      {
+        end++;
+      }
 
+      if( end < count && objectDefs[end][0] != '-' )
+        continue;
+
+      end--;
+      cur = tip;
+      while(cur != end)
+      {
+        /* emit objects structure */
+        switch( objectDefs[cur][0] ){
+          
+          case '-':
+            printf("typedef struct __%s {\n", &objectDefs[cur][1]);
+            break;
+
+          case ' ':
+            if( !strcmp("  id", &objectDefs[cur][1]) )
+            {
+              printf("  unsigned id;\n");
+            }
+            else if( !strncmp("id:", &objectDefs[cur][1], 3 ) )
+            {
+              if(strlen(objectDefs[cur]) > 4)
+                printf("  unsigned id_%d_%s;\n", cur, &objectDefs[cur][4]);
+            }
+            else if( !strncmp("a:", &objectDefs[cur][1], 2 ) )
+            {
+
+            }
+
+          default:
+            break;
+
+        }
+
+        cur++;
+      }
+      printf("} %s;\n\n", &objectDefs[tip][1]);
+    }
+  }
 }
 
