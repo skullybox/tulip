@@ -107,7 +107,9 @@ void cleanup()
 
 void emitObjects()
 {
+  short modify_set = 0;
   unsigned tip,cur,end = 0;
+  char s_tmp[50] = {0};
   for( int i = 0; i < count; i++)
   {
     if( objectDefs[i][0] == '-' )
@@ -119,13 +121,27 @@ void emitObjects()
         end++;
       }
 
-      if( end < count && objectDefs[end][0] != '-' )
+      if( end >= count )
         continue;
 
-      end--;
+      if(end > 0)
+        end--;
+
       cur = tip;
-      while(cur != end)
+      while(cur <= end)
       {
+        modify_set = 0;
+        short len = strlen(objectDefs[cur]);
+        if( objectDefs[cur][len-1] == '+' )
+        {
+          memset(s_tmp, 0, 50);
+          if( !strncmp("a:", &objectDefs[cur][1], 2) )
+            strncpy(s_tmp, &objectDefs[cur][3], len-4);
+          else
+            strncpy(s_tmp, &objectDefs[cur][1], len-2);
+          modify_set = 1;
+        }
+
         /* emit objects structure */
         switch( objectDefs[cur][0] ){
           
@@ -134,7 +150,7 @@ void emitObjects()
             break;
 
           case ' ':
-            if( !strcmp("  id", &objectDefs[cur][1]) )
+            if( !strcmp("id", &objectDefs[cur][1]) )
             {
               printf("  unsigned id;\n");
             }
@@ -145,8 +161,21 @@ void emitObjects()
             }
             else if( !strncmp("a:", &objectDefs[cur][1], 2 ) )
             {
+              if( modify_set )
+                printf("  char *%s[500];\n", s_tmp);
+              else
+                printf("  char *%s[500];\n", &objectDefs[cur][3]);
 
             }
+            else 
+            {
+              if( modify_set )
+                printf("  char %s[50];\n", s_tmp);
+              else
+                printf("  char %s[50];\n", &objectDefs[cur][1]);
+
+            }
+            break;
 
           default:
             break;
