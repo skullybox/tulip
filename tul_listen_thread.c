@@ -77,48 +77,36 @@ void _run_core(int fd)
   FD_ZERO(&read_fd_set);
   FD_ZERO(&write_fd_set);
   FD_SET(fd, &read_fd_set);
+  FD_SET(fd, &write_fd_set);
 
   tul_init_context_list();
 
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
-    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
+    if (select (FD_SETSIZE+1, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
     {
       TUL_SIGNAL_INT = 1;
       return;
     }
 
-    for(int i = 0; i < FD_SETSIZE; i++)
+    if(FD_ISSET(fd, &read_fd_set))
     {
-      if(FD_ISSET(i, &read_fd_set))
+      /* new socket */
+      fd_new = accept(fd, (struct sockaddr *)&client, &size);
+      if(fd_new < 0)
       {
-        if(i == fd)
-        {
-          /* new socket */
-          fd_new = accept(fd, (struct sockaddr *)&client, &size);
-          if(fd_new < 0)
-          {
-            TUL_SIGNAL_INT=1;
-            return;
-          }
-          FD_SET(fd_new, &read_fd_set);
-          tul_add_context(fd_new);
-        }
-        else
-        {
-          /* do read on connected socket */
-          do_read(i);
+        TUL_SIGNAL_INT=1;
+        return;
+      }
+      FD_SET(fd_new, &read_fd_set);
+      tul_add_context(fd_new);
 
-        }
-      }
-      else if(FD_ISSET(i, &write_fd_set))
-      {
-        /* do write on connected socket if data on buffer */ 
-        do_write(i);
-          
-      }
+      /* do read on connected socket */
+      do_read(fd_new);
     }
+
+
   }
   tul_dest_context_list();
 }

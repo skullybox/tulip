@@ -18,12 +18,13 @@
 
 int port = 0;
 int udp_flag = 0;
+char GLOBAL_PATH[257] = {0};
 
 int usage(int argc)
 {
   if(argc == 1)
   {
-    printf("usage: <tulip> <port>\n\
+    printf("usage: <tulip> <port> <path>\n\
         \tport: listening port\n\n");
     return 1;
   }
@@ -52,8 +53,9 @@ void parseParams(int argc, char **argv)
 #endif
     exit(0);
   }
-  else if(argc == 2 && (port = atoi(argv[1])) > 0)
+  else if(argc == 3 && (port = atoi(argv[1])) > 0)
   {
+    strcpy(GLOBAL_PATH, argv[2]);
     return;
   }
 
