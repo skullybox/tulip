@@ -18,6 +18,7 @@ void do_write(int i);
 
 static fd_set read_fd_set;
 static fd_set write_fd_set;
+static fd_set active_set;
 
 void run_listener(int port)
 {
@@ -74,45 +75,52 @@ void _run_core(int fd)
 
   size = sizeof(client);
 
+  tul_init_context_list();
+
   FD_ZERO(&read_fd_set);
   FD_ZERO(&write_fd_set);
-  FD_SET(fd, &read_fd_set);
-  FD_SET(fd, &write_fd_set);
-
-  tul_init_context_list();
+  FD_SET(fd, &active_set);
 
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
-    if (select (FD_SETSIZE+1, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
+    read_fd_set = active_set;
+    write_fd_set = active_set;
+    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
     {
       TUL_SIGNAL_INT = 1;
       return;
     }
 
-    if(FD_ISSET(fd, &read_fd_set))
+    for(int i = 0; i < FD_SETSIZE; ++i)
     {
-      /* new socket */
-      fd_new = accept(fd, (struct sockaddr *)&client, &size);
-      if(fd_new < 0)
+      if(FD_ISSET(i, &read_fd_set) && i == fd )
       {
-        TUL_SIGNAL_INT=1;
-        return;
+        /* new socket */
+        fd_new = accept(fd, (struct sockaddr *)&client, &size);
+        if(fd_new < 0)
+        {
+          TUL_SIGNAL_INT=1;
+          return;
+        }
+        FD_SET(fd_new, &active_set);
+        tul_add_context(fd_new);
+
+        /* do read on connected socket */
+        do_read(fd_new);
       }
-      FD_SET(fd_new, &read_fd_set);
-      tul_add_context(fd_new);
-
-      /* do read on connected socket */
-      do_read(fd_new);
+      else if(FD_ISSET(i, &read_fd_set))
+        do_read(i);
+      else if(FD_ISSET(i, &write_fd_set))
+        do_write(i);
     }
-
-
   }
   tul_dest_context_list();
 }
 
 void do_read(int i)
 {
+  printf("RRR\n");
   int bread = 0;
   tul_net_context *ctx;
 
@@ -127,8 +135,7 @@ void do_read(int i)
     /* socket closed */
     if(bread <= 0)
     {
-      FD_CLR(i, &read_fd_set);
-      FD_CLR(i, &write_fd_set);
+      FD_CLR(i, &active_set);
       tul_rem_context(i);
     } 
     else
@@ -146,6 +153,7 @@ void do_read(int i)
 
 void do_write(int i)
 {
+  printf("WWW\n");
   int bwrite = 0;
   tul_net_context *ctx;
 
@@ -161,8 +169,7 @@ void do_write(int i)
 
     if(bwrite <= 0)
     {
-      FD_CLR(i, &read_fd_set);
-      FD_CLR(i, &write_fd_set);
+      FD_CLR(i, &active_set);
       tul_rem_context(i);
     }
     else
