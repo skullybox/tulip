@@ -69,6 +69,7 @@ void *_run_listener(void *data)
 
 void _run_core(int fd)
 {
+  int ref_sock;
   int fd_new;
   socklen_t size;
   struct sockaddr_in client;
@@ -94,7 +95,11 @@ void _run_core(int fd)
 
     for(int i = 0; i < FD_SETSIZE; ++i)
     {
-      if(FD_ISSET(i, &read_fd_set) && i == fd )
+      ref_sock = tul_get_sock(i+1);
+      if(ref_sock == -1)
+        continue;
+
+      if(FD_ISSET(ref_sock, &read_fd_set) && ref_sock == fd )
       {
         /* new socket */
         fd_new = accept(fd, (struct sockaddr *)&client, &size);
@@ -109,10 +114,10 @@ void _run_core(int fd)
         /* do read on connected socket */
         do_read(fd_new);
       }
-      else if(FD_ISSET(i, &read_fd_set))
-        do_read(i);
-      else if(FD_ISSET(i, &write_fd_set))
-        do_write(i);
+      else if(FD_ISSET(ref_sock, &read_fd_set))
+        do_read(ref_sock);
+      else if(FD_ISSET(ref_sock, &write_fd_set))
+        do_write(ref_sock);
     }
   }
   tul_dest_context_list();
@@ -120,24 +125,23 @@ void _run_core(int fd)
 
 void do_read(int i)
 {
-  printf("RRR\n");
   int bread = 0;
   tul_net_context *ctx;
 
   ctx = tul_find_context(i);
 
-  if(ctx->_trecv < CTX_BLOCK)  
+  if(ctx->_trecv < CTX_BLOCK)
   {
-    bread = read(ctx->_sock, 
+    bread = read(ctx->_sock,
         &(ctx->payload_in[ctx->_trecv]),
-        CTX_BLOCK-ctx->_trecv);           
+        CTX_BLOCK-ctx->_trecv);
 
     /* socket closed */
     if(bread <= 0)
     {
       FD_CLR(i, &active_set);
       tul_rem_context(i);
-    } 
+    }
     else
     {
       ctx->timestamp = time(NULL);
@@ -153,17 +157,16 @@ void do_read(int i)
 
 void do_write(int i)
 {
-  printf("WWW\n");
   int bwrite = 0;
   tul_net_context *ctx;
 
   ctx = tul_find_context(i);
 
-  if(ctx->payload_out_cnt > 0 && 
-      ctx->payload_out_cnt <= CTX_BLOCK && 
-      ctx->_tsend < ctx->payload_out_cnt )  
+  if(ctx->payload_out_cnt > 0 &&
+      ctx->payload_out_cnt <= CTX_BLOCK &&
+      ctx->_tsend < ctx->payload_out_cnt )
   {
-    bwrite = write(ctx->_sock, 
+    bwrite = write(ctx->_sock,
         &(ctx->payload_out[ctx->_tsend]),
         ctx->payload_out_cnt-ctx->_tsend);
 
@@ -184,5 +187,3 @@ void do_write(int i)
     }
   }
 }
-
-

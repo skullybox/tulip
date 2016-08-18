@@ -28,6 +28,7 @@ typedef struct __tul_int_context_struct
   struct __tul_int_context_struct *back;
 } _tul_int_context_struct;
 
+int tul_get_sock(unsigned pos);
 void tul_add_context(unsigned sock);
 void tul_rem_context(unsigned sock);
 void tul_init_context_list();

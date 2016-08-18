@@ -12,7 +12,7 @@ static pthread_mutex_t _glbl_struct_mtx;
 void tul_add_context(unsigned sock)
 {
   _tul_int_context_struct *new = NULL;
-  _tul_int_context_struct *cur = NULL;
+  _tul_int_context_struct *cur = &_glbl_struct_list;
 
   /* find the end of the list */
   while(cur->next != NULL && cur->this->_sock != sock)
@@ -43,9 +43,32 @@ void tul_add_context(unsigned sock)
   }
 }
 
+int tul_get_sock(unsigned pos)
+{
+  int count = 1;
+  int ret = -1;
+  _tul_int_context_struct *cur = &_glbl_struct_list;
+
+  for( int i = 0; i < pos; i++)
+  {
+    if(cur->next != NULL)
+    {
+      cur = cur->next;
+      count++;
+    }
+    else
+      break;
+  }
+
+  if(count == pos)
+    ret = cur->this->_sock;
+
+  return ret;
+}
+
 void tul_rem_context(unsigned sock)
 {
-  _tul_int_context_struct *cur = NULL;
+  _tul_int_context_struct *cur = &_glbl_struct_list;
   while(cur->next != NULL && cur->this->_sock != sock)
   {
     cur = cur->next;
@@ -82,7 +105,7 @@ void tul_dest_context_list()
 {
   pthread_mutex_lock(&_glbl_struct_mtx);
 
-  _tul_int_context_struct *cur = NULL;
+  _tul_int_context_struct *cur = &_glbl_struct_list;
   _tul_int_context_struct *tmp = NULL;
   cur = &_glbl_struct_list;
 
@@ -115,7 +138,7 @@ void tul_dest_context_list()
 
 tul_net_context* tul_find_context(unsigned sock)
 {
-  _tul_int_context_struct* node = &_glbl_struct_list; 
+  _tul_int_context_struct* node = &_glbl_struct_list;
   tul_net_context* net_ctx = node->this;
 
   while(net_ctx != NULL && net_ctx->_sock != sock)
@@ -131,5 +154,3 @@ tul_net_context* tul_find_context(unsigned sock)
 
   return net_ctx;
 }
-
-
