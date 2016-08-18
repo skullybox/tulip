@@ -24,7 +24,7 @@ void tul_add_context(unsigned sock)
    * this should never happen.
    * we should never try to add a socket already in the list
    */
-  if(cur->this->_sock == sock)
+  if(cur->this != NULL && cur->this->_sock == sock)
   {
 #ifdef SYSLOG_USE
     syslog(LOG_WARNING, "%s", "skipping adding socket; already in list");
@@ -60,7 +60,7 @@ int tul_get_sock(unsigned pos)
       break;
   }
 
-  if(count == pos)
+  if(count == pos && cur->this != NULL)
     ret = cur->this->_sock;
 
   return ret;

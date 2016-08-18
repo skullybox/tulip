@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
   parseParams(argc, argv);
 #if defined(__APPLE__) || defined(__linux__)
-  tul_make_daemon();
+  //tul_make_daemon();
 #else
   WSADATA wsaData;
   ZeroMemory(&wsaData,sizeof(wsaData));

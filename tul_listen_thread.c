@@ -95,9 +95,16 @@ void _run_core(int fd)
 
     for(int i = 0; i < FD_SETSIZE; ++i)
     {
-      ref_sock = tul_get_sock(i+1);
-      if(ref_sock == -1)
-        continue;
+      if( i == 0 )
+      {
+        ref_sock = fd;  
+      }
+      else
+      {
+        ref_sock = tul_get_sock(i);
+        if(ref_sock == -1)
+          continue;
+      }
 
       if(FD_ISSET(ref_sock, &read_fd_set) && ref_sock == fd )
       {
@@ -130,12 +137,13 @@ void do_read(int i)
 
   ctx = tul_find_context(i);
 
-  if(ctx->_trecv < CTX_BLOCK)
+  if(ctx != NULL && ctx->_trecv < CTX_BLOCK)
   {
     bread = read(ctx->_sock,
         &(ctx->payload_in[ctx->_trecv]),
         CTX_BLOCK-ctx->_trecv);
 
+    printf("DEBUG: %s\n", &(ctx->payload_in));
     /* socket closed */
     if(bread <= 0)
     {
