@@ -35,11 +35,18 @@ void tul_add_context(unsigned sock)
   }
   else /* we add the network context here */
   {
-    new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
-    new->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
-    new->this->_sock = sock;
-    cur->next = new;
-    new->back = cur;
+    if(cur->this == NULL)
+    {
+      cur->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
+      cur->this->_sock = sock;
+    }
+    else
+    {
+      new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
+      new->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
+      new->this->_sock = sock;
+      cur->next = new;
+    }
   }
 }
 
