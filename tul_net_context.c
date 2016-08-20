@@ -91,7 +91,6 @@ void tul_rem_context(unsigned sock)
     memset(cur->this, 0, sizeof(tul_net_context));
     free(cur->this);
     memset(cur, 0, sizeof(_tul_int_context_struct));
-    free(cur);
   }
 }
 

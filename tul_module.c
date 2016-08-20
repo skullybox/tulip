@@ -16,7 +16,7 @@ void configure_module()
 
 void module_read(char *buff, unsigned *recv)
 {
-  printf("RECV: %d bytes\n%s\n", buff);
+
 }
 
 
