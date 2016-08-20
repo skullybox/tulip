@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="8080 /tmp" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -30,10 +31,55 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="lib/libgcrypt-1.7.2/include" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Linker>
+			<Add option="-L./lib/libgcrypt-1.7.2/lib/" />
+			<Add library="pthread" />
+			<Add library="gcrypt" />
+			<Add library="gpg-error" />
+		</Linker>
+		<Unit filename="tul_crypto_ref.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="tul_crypto_ref.h" />
+		<Unit filename="tul_daemon.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_daemon.h" />
+		<Unit filename="tul_globals.h" />
+		<Unit filename="tul_listen_thread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_listen_thread.h" />
+		<Unit filename="tul_module.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_module.h" />
+		<Unit filename="tul_net_context.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_net_context.h" />
+		<Unit filename="tul_service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_service.h" />
+		<Unit filename="tul_signal_handler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_signal_handler.h" />
+		<Unit filename="tul_tcp_soc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_tcp_soc.h" />
+		<Unit filename="tul_tests.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tul_tests.h" />
+		<Unit filename="tulip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tulip.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

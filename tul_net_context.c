@@ -83,8 +83,8 @@ void tul_rem_context(unsigned sock)
 
   if(cur->this->_sock == sock)
   {
-    cur->back->next = cur->next;
-    cur->next->back = cur->back;
+    cur->back = cur->next;
+    cur->next = cur->back;
 
     /* close the socket */
     close(cur->this->_sock);

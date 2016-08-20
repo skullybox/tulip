@@ -40,7 +40,6 @@ void *_run_listener(void *data)
 {
   int sock;
   struct sockaddr_in6 addr;
-  int udp_mode = 0;
   int *d = (int*)data;
 
   if(tul_tcp_listen_init(*d, &sock))
@@ -97,7 +96,7 @@ void _run_core(int fd)
     {
       if( i == 0 )
       {
-        ref_sock = fd;  
+        ref_sock = fd;
       }
       else
       {
@@ -143,7 +142,6 @@ void do_read(int i)
         &(ctx->payload_in[ctx->_trecv]),
         CTX_BLOCK-ctx->_trecv);
 
-    printf("DEBUG: %s\n", &(ctx->payload_in));
     /* socket closed */
     if(bread <= 0)
     {
