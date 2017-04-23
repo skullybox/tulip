@@ -1,8 +1,8 @@
 /***
- Copyright (C) irfan
+  Copyright (C) irfan
 
- Generically handle (ignore) most signals
-**/
+  Generically handle (ignore) most signals
+ **/
 
 #ifndef _tul_signal_handler
 #define _tul_signal_handler
