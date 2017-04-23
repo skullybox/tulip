@@ -6,8 +6,8 @@ objects := $(patsubst %.c, %.o, ${sources})
 
 ldflgs := -L./lib/libgcrypt-1.7.2/lib/
 incflgs := -I. -I./lib/libgcrypt-1.7.2/include
-# cflgs := -O3 -Werror -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
-cflgs := -O0 -g -Werror -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
+cflgs := -O3 -Werror -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
+#cflgs := -O0 -g -Werror -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -std=gnu11 -c
 
 all: crypt main
 

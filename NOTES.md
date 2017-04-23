@@ -1,20 +1,40 @@
+DEVELOPMENT ENVIRONMENT SETUP
+
 VIM Settings
 ============
 
-color ron
+set number
+syntax on
+color elflord
 set tabstop =2
 set softtabstop =2
 set shiftwidth =2
 set expandtab
+set autoindent
 
 ENV Settings
 ============
 
-export PS1='\[\e[1;33m\]\u@\h \w ->\n\[\e[1;36m\] \@ \d\$\[\e[m\] '
-export PS2='\[\e[1;33m\]\u@\h \w ->\n\[\e[1;36m\] \@ \d\$\[\e[m\] '
-alias P='cd ~/Desktop/tulip'
-alias SKULL='git config --global user.email "skullybox@gmx.com" && git config --global user.name "skullybox"'
 
+GIT Settings
+============
+
+[user]
+	name = 
+	email = 
 [alias]
-  ls = log --color --graph --pretty=format:'%C(white)%h%Creset -%C(red)%d%Creset %s %C(cyan)(%cr) %C(bold red)<%an>%Creset' --abbrev-commit --
+	ls = log --color --graph --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+
+Prompt Settings
+============
+
+LIGHT="$(tput setaf 8)"
+FUSIA="$(tput setaf 5)"
+RESET="$(tput sgr0)"
+
+export PS1='${LIGHT}\u@\h \w${RESET} ->\n ${FUSIA}\d \@ ${RESET}\$ '
+export PS2='${LIGHT}\u@\h \w${RESET} ->\n ${FUSIA}\d \@ ${RESET}\$ '
+alias SKULL='git config user.email "skullybox@gmx.com" && git config user.name "skullybox"'#
+
 
