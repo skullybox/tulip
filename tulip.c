@@ -76,6 +76,12 @@ int main(int argc, char **argv)
 #endif
   tul_global_signal_handle_init();
 
+  /* open syslog */
+#ifdef SYSLOG_USE
+  char syslog_ident[] = "TULIP";
+  openlog(syslog_ident, LOG_PID|LOG_NDELAY, LOG_LOCAL1);
+#endif
+
   /* initialize crypto provider */
   if(crypto_init())
   {
