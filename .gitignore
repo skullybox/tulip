@@ -37,3 +37,5 @@ tulip
 lib/libgcrypt-1.7.2
 tags
 *.swp
+
+.DS_Store

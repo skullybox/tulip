@@ -12,8 +12,21 @@ set shiftwidth =2
 set expandtab
 set autoindent
 
-ENV Settings
+TMUX Settings
 ============
+# theme
+set -g status-bg cyan
+set -g status-fg black
+set -g window-status-current-bg black
+set -g window-status-current-fg cyan
+
+# Shift arrow to switch windows
+bind -n S-Left  previous-window
+bind -n S-Right next-window
+
+# No delay for escape key press
+set -sg escape-time 0
+
 
 
 GIT Settings
