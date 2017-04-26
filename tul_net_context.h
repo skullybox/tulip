@@ -8,7 +8,7 @@
 
 #include "tul_globals.h"
 
-#define CTX_BLOCK 20000
+#define CTX_BLOCK 32768
 
 typedef struct __tul_net_context
 {

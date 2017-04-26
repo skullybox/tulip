@@ -116,9 +116,6 @@ void _run_core(int fd)
         }
         FD_SET(fd_new, &active_set);
         tul_add_context(fd_new);
-
-        /* do read on connected socket */
-        do_read(fd_new);
       }
       else if(FD_ISSET(ref_sock, &read_fd_set))
         do_read(ref_sock);
