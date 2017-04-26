@@ -11,6 +11,7 @@ set softtabstop =2
 set shiftwidth =2
 set expandtab
 set autoindent
+autocmd VimResized * wincmd =
 
 TMUX Settings
 ============
