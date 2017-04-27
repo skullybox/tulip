@@ -3,11 +3,12 @@
   Socket thread handler
  **/
 
-#include "tul_listen_thread.h"
+#include "tul_log.h"
 #include "tul_service.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
 #include "tul_net_context.h"
+#include "tul_listen_thread.h"
 
 extern int TUL_SIGNAL_INT;
 extern int daemon_mode;
@@ -45,11 +46,7 @@ void *_run_listener(void *data)
 
   if(tul_tcp_listen_init(*d, &sock))
   {
-#ifdef SYSLOG_USE
-    syslog(LOG_ERR, "%s", "network listener failed");
-#endif
-    if(!daemon_mode)
-      fprintf(stdout, "network listener failed\n");
+    LOG("network listener failed");
 
     /* listen failed exit */
     free(d);
@@ -58,11 +55,7 @@ void *_run_listener(void *data)
   }
 
   free(d);
-#ifdef SYSLOG_USE
-  syslog(LOG_INFO, "%s", "starting core");
-#endif
-  if(!daemon_mode)
-    fprintf(stdout, "starting core\n");
+  LOG("starting core");
   _run_core(sock);
   return NULL;
 }

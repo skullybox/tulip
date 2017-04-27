@@ -1,6 +1,6 @@
 /***
   Copyright (C) irfan
-  chat module callbacks
+  module callbacks
  **/
 
 #ifndef _tul_module

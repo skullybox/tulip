@@ -4,6 +4,7 @@
  **/
 
 #include "tulip.h"
+#include "tul_log.h"
 #include "tul_tests.h"
 #include "tul_crypto_ref.h"
 #include "tul_daemon.h"
@@ -86,17 +87,11 @@ int main(int argc, char **argv)
 #if defined(__APPLE__) || defined(__linux__)
   if(daemon_mode)
   {
-#ifdef SYSLOG_USE
-    syslog(LOG_INFO, "%s", "starting in daemon mode");
-#endif
+    LOG("starting in daemon mode");
     tul_make_daemon();
   }
-#ifdef SYSLOG_USE
   else
-    syslog(LOG_INFO, "%s", "starting in foreground");
-#endif
-    if(!daemon_mode)
-      fprintf(stdout, "starting in foreground\n");
+    LOG("starting in foreground");
 
 #else
   WSADATA wsaData;
@@ -107,36 +102,18 @@ int main(int argc, char **argv)
   /* initialize crypto provider */
   if(crypto_init())
   {
-#ifdef SYSLOG_USE
-    syslog(LOG_ERR, "%s", "Initializing crypto provider failed!");
-#endif    
-    if(!daemon_mode)
-      fprintf(stderr, "Initializing crypto provider failed!\n");
+    LOG("Initializing crypto provider failed!");
     return -1;
   }
   else
-  {
-#ifdef SYSLOG_USE
-    syslog(LOG_INFO, "%s", "crypto provider initialized");
-#endif    
-    if(!daemon_mode)
-      fprintf(stdout, "crypto provider initialized\n");
-  }
+    LOG("crypto provider initialized");
 
-#ifdef SYSLOG_USE
-  syslog(LOG_INFO, "%s", "starting listener");
-#endif   
-  if(!daemon_mode)
-    fprintf(stdout, "starting listener\n");
+  LOG("starting listener");
   run_listener(port);
 
-#ifdef SYSLOG_USE
-  syslog(LOG_INFO, "%s", "loading module callbacks");
-#endif   
-  if(!daemon_mode)
-    fprintf(stdout, "loading module callbacks\n");
+  LOG("loading module callbacks");
   configure_module();
- 
+
 
   while(!TUL_SIGNAL_INT)
   {
@@ -147,12 +124,7 @@ int main(int argc, char **argv)
 #if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif
-#ifdef SYSLOG_USE
-  syslog(LOG_INFO, "%s", "exiting (sleeping 2 seconds)");
-#else
-  if(!daemon_mode)
-    fprintf(stdout, "exiting (sleeping 2 seconds)");
-#endif
+  LOG("exiting (sleeping 2seconds)");
   return 0;
 }
 
