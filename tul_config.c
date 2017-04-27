@@ -15,7 +15,7 @@ void generate_behavior(char *c);
 void load_config()
 {
   char *fp_buff = NULL;
-  FILE *fp = fopen("./config", "r");
+  FILE *fp = fopen("./config.cfg", "r");
   
   /* config failed to open */
   if(!fp)
