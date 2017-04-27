@@ -3,6 +3,7 @@
 
  **/
 
+#include "tul_log.h"
 #include "tul_globals.h"
 #include "tul_net_context.h"
 

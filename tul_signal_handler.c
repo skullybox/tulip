@@ -3,6 +3,7 @@
   Generically handle (ignore) most signals
  **/
 
+#include "tul_log.h"
 #include "tul_globals.h"
 #include "tul_signal_handler.h"
 

@@ -6,6 +6,7 @@
 #include "tulip.h"
 #include "tul_log.h"
 #include "tul_tests.h"
+#include "tul_module.h"
 #include "tul_crypto_ref.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
