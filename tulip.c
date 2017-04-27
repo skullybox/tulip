@@ -17,15 +17,15 @@
 #include <stdlib.h>
 
 int port = 0;
-int udp_flag = 0;
-char GLOBAL_PATH[257] = {0};
+int daemon_mode = 0;
 
 int usage(int argc)
 {
   if(argc == 1)
   {
-    printf("usage: <tulip> <port> <path>\n\
-        \tport: listening port\n\n");
+    printf("usage: <tulip> <port> [-d]\n\
+        \tport: listening port\n\
+        \t  -d: run as daemon\n\n");
     return 1;
   }
   return 0;
@@ -53,9 +53,16 @@ void parseParams(int argc, char **argv)
 #endif
     exit(0);
   }
-  else if(argc == 3 && (port = atoi(argv[1])) > 0)
+  else if(argc == 2 && (port = atoi(argv[1])) > 0)
   {
-    strcpy(GLOBAL_PATH, argv[2]);
+    return;
+  }
+  else if(argc == 3 && (port = atoi(argv[1])) > 0 &&
+      !strcmp(argv[2],"-d"))
+  {
+#if defined(__APPLE__) || defined(__linux__)
+    daemon_mode = 1;
+#endif
     return;
   }
 
@@ -67,13 +74,7 @@ int main(int argc, char **argv)
 {
 
   parseParams(argc, argv);
-#if defined(__APPLE__) || defined(__linux__)
-  tul_make_daemon();
-#else
-  WSADATA wsaData;
-  ZeroMemory(&wsaData,sizeof(wsaData));
-  WSAStartup(MAKEWORD(2,2),&wsaData);
-#endif
+
   tul_global_signal_handle_init();
 
   /* open syslog */
@@ -82,26 +83,59 @@ int main(int argc, char **argv)
   openlog(syslog_ident, LOG_PID|LOG_NDELAY, LOG_LOCAL1);
 #endif
 
+#if defined(__APPLE__) || defined(__linux__)
+  if(daemon_mode)
+  {
+#ifdef SYSLOG_USE
+    syslog(LOG_INFO, "%s", "starting in daemon mode");
+#endif
+    tul_make_daemon();
+  }
+#ifdef SYSLOG_USE
+  else
+    syslog(LOG_INFO, "%s", "starting in foreground");
+#endif
+    if(!daemon_mode)
+      fprintf(stdout, "starting in foreground\n");
+
+#else
+  WSADATA wsaData;
+  ZeroMemory(&wsaData,sizeof(wsaData));
+  WSAStartup(MAKEWORD(2,2),&wsaData);
+#endif
+
   /* initialize crypto provider */
   if(crypto_init())
   {
 #ifdef SYSLOG_USE
     syslog(LOG_ERR, "%s", "Initializing crypto provider failed!");
-#else
-    fprintf(stderr, "LOG_ERR: %s\n", "Initializing crypto provider failed!");
 #endif    
+    if(!daemon_mode)
+      fprintf(stderr, "Initializing crypto provider failed!\n");
     return -1;
   }
   else
   {
 #ifdef SYSLOG_USE
     syslog(LOG_INFO, "%s", "crypto provider initialized");
-#else
-    fprintf(stdout, "LOG_INFO: %s\n", "crypto provider initialized");
 #endif    
+    if(!daemon_mode)
+      fprintf(stdout, "crypto provider initialized\n");
   }
 
+#ifdef SYSLOG_USE
+  syslog(LOG_INFO, "%s", "starting listener");
+#endif   
+  if(!daemon_mode)
+    fprintf(stdout, "starting listener\n");
   run_listener(port);
+
+#ifdef SYSLOG_USE
+  syslog(LOG_INFO, "%s", "loading module callbacks");
+#endif   
+  if(!daemon_mode)
+    fprintf(stdout, "loading module callbacks\n");
+ 
 
   while(!TUL_SIGNAL_INT)
   {
@@ -115,7 +149,8 @@ int main(int argc, char **argv)
 #ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", "exiting (sleeping 2 seconds)");
 #else
-  fprintf(stdout, "LOG_INFO: %s\n", "exiting");
+  if(!daemon_mode)
+    fprintf(stdout, "exiting (sleeping 2 seconds)");
 #endif
   return 0;
 }
@@ -125,3 +160,5 @@ void run_tests()
   _tcp_listen_test();
   _tcp_connect_test();
 }
+
+

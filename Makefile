@@ -12,7 +12,7 @@ cflgs := -O3 -Werror -Wno-implicit-function-declaration -D_FILE_OFFSET_BITS=64 -
 all: crypt main
 
 tags: 
-	ctags -R --append=no .
+	ctags -td *.h *.c
 
 main: ${objects}
 	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lgcrypt -lgpg-error
