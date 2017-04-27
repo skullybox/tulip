@@ -135,6 +135,7 @@ int main(int argc, char **argv)
 #endif   
   if(!daemon_mode)
     fprintf(stdout, "loading module callbacks\n");
+  configure_module();
  
 
   while(!TUL_SIGNAL_INT)
