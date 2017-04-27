@@ -80,19 +80,19 @@ int main(int argc, char **argv)
   tul_global_signal_handle_init();
 
   /* open syslog */
-#ifdef SYSLOG_USE
+#ifdef SYStul_log_USE
   char syslog_ident[] = "TULIP";
-  openlog(syslog_ident, LOG_PID|LOG_NDELAY, LOG_LOCAL1);
+  openlog(syslog_ident, tul_log_PID|tul_log_NDELAY, tul_log_LOCAL1);
 #endif
 
 #if defined(__APPLE__) || defined(__linux__)
   if(daemon_mode)
   {
-    LOG("starting in daemon mode");
+    tul_log("starting in daemon mode");
     tul_make_daemon();
   }
   else
-    LOG("starting in foreground");
+    tul_log("starting in foreground");
 
 #else
   WSADATA wsaData;
@@ -103,16 +103,16 @@ int main(int argc, char **argv)
   /* initialize crypto provider */
   if(crypto_init())
   {
-    LOG("Initializing crypto provider failed!");
+    tul_log("Initializing crypto provider failed!");
     return -1;
   }
   else
-    LOG("crypto provider initialized");
+    tul_log("crypto provider initialized");
 
-  LOG("starting listener");
+  tul_log("starting listener");
   run_listener(port);
 
-  LOG("loading module callbacks");
+  tul_log("loading module callbacks");
   configure_module();
 
 
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 #if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif
-  LOG("exiting (sleeping 2seconds)");
+  tul_log("exiting (sleeping 2seconds)");
   return 0;
 }
 

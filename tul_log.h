@@ -5,6 +5,6 @@
 
 #ifndef _tul_log
 #define _tul_log
-void LOG(char *x);
+void tul_log(char *x);
 #endif
 

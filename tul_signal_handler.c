@@ -12,7 +12,7 @@ int TUL_SIGNAL_INT = 0;
 void tul_global_signal_handle_init()
 {
 
-  LOG("adding signal handlers");
+  tul_log("adding signal handlers");
 
   for(int i = 1; i < 32; i++)
   {
@@ -38,6 +38,6 @@ void tul_signal_handler_interupt(int i)
   if(!TUL_SIGNAL_INT)
   {
     TUL_SIGNAL_INT = 1;
-    LOG("signal to shutdown");
+    tul_log("signal to shutdown");
   }
 }

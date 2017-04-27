@@ -6,7 +6,7 @@
 #include <stdio.h>
 extern int daemon_mode;
 
-void LOG(char *x)
+void tul_log(char *x)
 {
 #ifdef SYSLOG_USE
   syslog(LOG_INFO, "%s", x);

@@ -27,7 +27,7 @@ void tul_add_context(unsigned sock)
    */
   if(cur->this != NULL && cur->this->_sock == sock)
   {
-    LOG("skipping adding socket; already in list");
+    tul_log("skipping adding socket; already in list");
   }
   else /* we add the network context here */
   {
@@ -94,7 +94,7 @@ void tul_init_context_list()
 {
   pthread_mutex_lock(&_glbl_struct_mtx);
   memset(&_glbl_struct_list, 0, sizeof(_tul_int_context_struct));
-  LOG("starting net context");
+  tul_log("starting net context");
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
 
@@ -126,7 +126,7 @@ void tul_dest_context_list()
     free(cur);
     cur = tmp;
   }
-  LOG("stopping net context");
+  tul_log("stopping net context");
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
 

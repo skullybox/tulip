@@ -46,7 +46,7 @@ void *_run_listener(void *data)
 
   if(tul_tcp_listen_init(*d, &sock))
   {
-    LOG("network listener failed");
+    tul_log("network listener failed");
 
     /* listen failed exit */
     free(d);
@@ -55,7 +55,7 @@ void *_run_listener(void *data)
   }
 
   free(d);
-  LOG("starting core");
+  tul_log("starting core");
   _run_core(sock);
   return NULL;
 }
