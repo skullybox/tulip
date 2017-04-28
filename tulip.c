@@ -5,11 +5,11 @@
 
 #include "tulip.h"
 #include "tul_log.h"
-#include "tul_tests.h"
 #include "tul_module.h"
-#include "tul_crypto_ref.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
+#include "tul_crypto_ref.h"
+#include "tul_parseparams.h"
 #include "tul_listen_thread.h"
 #include "tul_signal_handler.h"
 
@@ -21,56 +21,6 @@
 int port = 0;
 int daemon_mode = 0;
 
-int usage(int argc)
-{
-  if(argc == 1)
-  {
-    printf("usage: <tulip> <port> [-d]\n\
-        \tport: listening port\n\
-        \t  -d: run as daemon\n\n");
-    return 1;
-  }
-  return 0;
-}
-
-void parseParams(int argc, char **argv)
-{
-  int ret = 0;
-
-  if((ret = usage(argc)))
-  {
-    exit(ret);
-  }
-
-  if(argc == 2 && !strcmp(argv[1], "-D"))
-  {
-#if !defined(__APPLE__) && !defined(__linux__)
-    WSADATA wsaData;
-    ZeroMemory(&wsaData,sizeof(wsaData));
-    WSAStartup(MAKEWORD(2,2),&wsaData);
-#endif
-    run_tests();
-#if !defined(__APPLE__) && !defined(__linux__)
-    WSACleanup();
-#endif
-    exit(0);
-  }
-  else if(argc == 2 && (port = atoi(argv[1])) > 0)
-  {
-    return;
-  }
-  else if(argc == 3 && (port = atoi(argv[1])) > 0 &&
-      !strcmp(argv[2],"-d"))
-  {
-#if defined(__APPLE__) || defined(__linux__)
-    daemon_mode = 1;
-#endif
-    return;
-  }
-
-  usage(1);
-  exit(-1);
-}
 
 int main(int argc, char **argv)
 {
@@ -129,10 +79,5 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void run_tests()
-{
-  _tcp_listen_test();
-  _tcp_connect_test();
-}
 
 
