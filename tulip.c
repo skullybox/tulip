@@ -6,6 +6,7 @@
 #include "tulip.h"
 #include "tul_log.h"
 #include "tul_module.h"
+#include "tul_config.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
 #include "tul_crypto_ref.h"
@@ -49,6 +50,9 @@ int main(int argc, char **argv)
   ZeroMemory(&wsaData,sizeof(wsaData));
   WSAStartup(MAKEWORD(2,2),&wsaData);
 #endif
+
+  /* load configuration */
+  load_config();
 
   /* initialize crypto provider */
   if(crypto_init())

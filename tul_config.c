@@ -6,14 +6,16 @@
 #include "tul_log.h"
 #include "tul_config.h"
 #include <stdio.h>
+#include <string.h>
 
 
 /* forward declaration */
-char tul_config_context[81920000] = {0};
+char tul_config_context[819201] = {0};
 void generate_behavior(char *c);
 
 void load_config()
 {
+  size_t bytes_read = 0;
   char *fp_buff = NULL;
   FILE *fp = fopen("./config.cfg", "r");
   
@@ -25,12 +27,20 @@ void load_config()
   }
 
   /* load config context here */
-  fread(tul_config_context, 1, 81920000, fp);
+  bytes_read = fread(tul_config_context, 1, 819201, fp);
   fclose(fp);
   fp = NULL;
-  tul_log("configuration loaded"); 
 
-  generate_behavior(tul_config_context);
+  if(bytes_read > 819200)
+  {
+    tul_log("config file too large. unloading.");
+    memset(tul_config_context, 0, 819201);
+  }
+  else
+  {
+    tul_log("configuration loaded"); 
+    generate_behavior(tul_config_context);
+  }
 
 }
 

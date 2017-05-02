@@ -37,7 +37,7 @@ GIT Settings
 	name = 
 	email = 
 [alias]
-	ls = log --color --graph --pretty=format:'%C(yellow)%h%Creset -%C(red)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	ls = log --color --graph --pretty=format:'%C(white)%h%Creset -%C(green)%d%Creset %C(magenta)%s %C(white)(%cr) %C(white)<%an>%Creset' --abbrev-commit
 
 
 Prompt Settings
