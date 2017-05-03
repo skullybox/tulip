@@ -5,6 +5,7 @@
 
 #include "tul_log.h"
 #include "tul_config.h"
+#include "iniparser.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -47,6 +48,10 @@ void load_config()
 
 void generate_behavior(char *c)
 {
+  dictionary *ini  = iniparser_load("./config.cfg");
+  iniparser_dump(ini, stdout);
+  iniparser_freedict(ini);
+
   if(!c)
     return;
 }
