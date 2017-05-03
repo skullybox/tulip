@@ -5,7 +5,6 @@
 
 #include "tul_log.h"
 #include "tul_config.h"
-#include "iniparser.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -48,11 +47,31 @@ void load_config()
 
 void generate_behavior(char *c)
 {
-  dictionary *ini  = iniparser_load("./config.cfg");
-  iniparser_dump(ini, stdout);
-  iniparser_freedict(ini);
 
   if(!c)
     return;
 }
+
+int parse_config(char *c)
+{
+  if(!c)
+  {
+    tul_log("config parse error!");
+    return 1;
+  }
+
+  return 0;
+}
+
+/* read a line from the buffer stop when
+ * \n|\r|\0is read
+ */
+int read_line(char *c, int *offset)
+{
+
+  return 1;
+}
+
+
+
 
