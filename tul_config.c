@@ -10,7 +10,7 @@
 
 
 /* forward declaration */
-char tul_config_context[819201] = {0};
+char tul_config_context[81921] = {0};
 void generate_behavior(char *c);
 
 void load_config()
@@ -27,14 +27,14 @@ void load_config()
   }
 
   /* load config context here */
-  bytes_read = fread(tul_config_context, 1, 819201, fp);
+  bytes_read = fread(tul_config_context, 1, 81921, fp);
   fclose(fp);
   fp = NULL;
 
-  if(bytes_read > 819200)
+  if(bytes_read > 81920)
   {
     tul_log("config file too large. unloading.");
-    memset(tul_config_context, 0, 819201);
+    memset(tul_config_context, 0, 81921);
   }
   else
   {
