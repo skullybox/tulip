@@ -32,25 +32,46 @@ void load_config()
   fclose(fp);
   fp = NULL;
 
-  if(bytes_read > TUL_MAX_FIELD_SIZE)
+  if(bytes_read > TUL_MAX_CONFIG_FILE)
   {
     tul_log("config file too large. unloading.");
     memset(tul_config_context, 0, TUL_MAX_CONFIG_FILE+1);
+    return;
   }
   else
-  {
     tul_log("configuration loaded"); 
-    generate_behavior(tul_config_context);
-  }
 
+  generate_behavior(tul_config_context);
 }
 
 
 void generate_behavior(char *c)
 {
-
+  int offset = 0;
+  char *ret_line = NULL;
   if(!c)
     return;
+
+  while(!read_line(c, &offset, &ret_line))
+  {
+
+    /* config line check */
+    if(strlen(ret_line) > TUL_MAX_FIELD_SIZE)
+    {
+      tul_log("config line length exceeded!");
+
+      if(ret_line)
+        free(ret_line);
+      ret_line = NULL;
+    }
+
+    /* process line */
+
+
+    if(ret_line)
+      free(ret_line);
+      ret_line = NULL;
+  }
 }
 
 int parse_config(char *c)
@@ -80,21 +101,22 @@ int read_line(char *c, int *offset, char **ret_line)
 
   /* set pointer to offset length */
   c_point = c;
-  for(int i = 0; i < TUL_MAX_LINE_LENGTH+1; i++)
+  for(int i = 0; i < TUL_MAX_CONFIG_FILE  +1; i++)
   {
     if(i == *offset)
       break;
     c_point++;
   }
 
+  c_point_h = c_point;
   while(1)
   {
     /* max line length exceeded */
-    if(cpos > TUL_MAX_LINE_LENGTH)
+    if(cpos > TUL_MAX_CONFIG_FILE)
       return TUL_CONFIG_ERROR;
 
     /* line didn't end before end off file */
-    if(*offset + cpos >= TUL_MAX_CONFIG_FILE+1)
+    if(*offset + cpos > TUL_MAX_CONFIG_FILE)
       return TUL_CONFIG_ERROR;
 
     /* end of the line */
@@ -103,8 +125,15 @@ int read_line(char *c, int *offset, char **ret_line)
       line = calloc(1, cpos);
       memcpy(line, c_point_h, cpos);
       *ret_line = line;
+
+      cpos++;
       *offset += cpos;
-      return cpos;
+
+      if( *c_point == '\n' || *c_point == '\r')
+        return TUL_CONFIG_LINE;
+
+      if( *c_point == '\0' )
+        return TUL_CONFIG_EOF;
     }
     else
     {

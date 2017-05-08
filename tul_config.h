@@ -19,7 +19,9 @@
 
 #define TUL_MAX_LINE_LENGTH 512
 
-#define TUL_CONFIG_ERROR -2
+#define TUL_CONFIG_ERROR -1
+#define TUL_CONFIG_EOF 1
+#define TUL_CONFIG_LINE 0
 
 
 /* structure to hold flow definitions */
