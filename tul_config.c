@@ -11,6 +11,8 @@
 
 
 /* forward declaration */
+tul_flowdef *FLOW_LIST[TUL_MAX_FLOW_LIST] = {0};
+int FLOW_COUNT = 0;
 char tul_config_context[TUL_MAX_CONFIG_FILE+1] = {0};
 void generate_behavior(char *c);
 
@@ -49,6 +51,8 @@ void generate_behavior(char *c)
 {
   int offset = 0;
   char *ret_line = NULL;
+
+
   if(!c)
     return;
 
@@ -66,24 +70,47 @@ void generate_behavior(char *c)
     }
 
     /* process line */
+    if(!FLOW_LIST[FLOW_COUNT])
+      FLOW_LIST[FLOW_COUNT] = malloc(sizeof(tul_flowdef));
+
+    /* check if comment line */
+    if(cmment_line(ret_line))
+      goto NEXT_LINE;
+
+    /* remove extra spaces from line */
+    remove_extra_spaces(ret_line);
+
+    /* process instruction line */
 
 
+NEXT_LINE:
     if(ret_line)
       free(ret_line);
-      ret_line = NULL;
+    ret_line = NULL;
   }
 }
 
-int parse_config(char *c)
+void remove_extra_spaces(char *l)
 {
-  if(!c)
+
+}
+
+int comment_line(char *l)
+{
+  int char_flag = 0;
+  int len = strlen(l);
+
+  for(int i = 0; i < len; i++)
   {
-    tul_log("config parse error!");
-    return 1;
+    if(l[i] == ';' && !char_flag)
+      return 1;
+
+    if(l[i] != ' ' && l[i] != ';' && l[i] !='\t' && l[i] != '\r' l[i] != '\n')
+      return 0;
   }
 
-  return 0;
 }
+
 
 /* read a line from the buffer stop when
  * \n|\r|\0is read
@@ -98,6 +125,10 @@ int read_line(char *c, int *offset, char **ret_line)
   char *c_point_h = NULL;
   char *c_point = NULL;
   char *line = NULL;
+
+  /* make sure ret_line is null */
+  if(*ret_line)
+    return TUL_CONFIG_ERROR;
 
   /* set pointer to offset length */
   c_point = c;
