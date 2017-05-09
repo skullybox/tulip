@@ -74,7 +74,7 @@ void generate_behavior(char *c)
       FLOW_LIST[FLOW_COUNT] = malloc(sizeof(tul_flowdef));
 
     /* check if comment line */
-    if(cmment_line(ret_line))
+    if(comment_line(ret_line))
       goto NEXT_LINE;
 
     /* remove extra spaces from line */
@@ -105,10 +105,12 @@ int comment_line(char *l)
     if(l[i] == ';' && !char_flag)
       return 1;
 
-    if(l[i] != ' ' && l[i] != ';' && l[i] !='\t' && l[i] != '\r' l[i] != '\n')
+    if(l[i] != ' ' && l[i] != ';' && 
+        l[i] !='\t' && l[i] != '\r' && l[i] != '\n')
       return 0;
   }
 
+  return 0;
 }
 
 
