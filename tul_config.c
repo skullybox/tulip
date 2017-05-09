@@ -92,8 +92,49 @@ NEXT_LINE:
 
 void remove_extra_spaces(char *l)
 {
+  char *space_pos = NULL;
+  int space_found = 0;
+  char *tmp = NULL;
+  char *cur = l;
+  char *cur_new = NULL;
+  int len = 0;
 
+  if(!cur)
+    return;
+
+  len = strlen(l);
+
+  tmp = calloc(1, len);
+  cur_new = tmp;
+
+  for(int i = 0; i < len-1; i++)
+  {
+    if(*cur == ';')
+      break;
+
+    if(*cur == '\t' || *cur == ' ' || *cur == '\t' || *cur == '\r')
+    {
+      if(!space_found)
+      {
+        *cur_new = ' ';
+        cur_new++;
+      }
+      space_found = 1;
+      cur++;
+    }
+    else
+    {
+      *cur_new = *cur;
+      cur_new++;
+      cur++;
+    }
+
+  }
+  strcpy(l, tmp);
+  free(tmp);
+  tmp = NULL;
 }
+
 
 int comment_line(char *l)
 {
