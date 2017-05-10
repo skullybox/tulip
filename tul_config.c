@@ -79,6 +79,8 @@ void generate_behavior(char *c)
 
     /* remove extra spaces from line */
     remove_extra_spaces(ret_line);
+    if(!strlen(ret_line))
+      goto NEXT_LINE;
 
     /* process instruction line */
 
@@ -107,10 +109,14 @@ void remove_extra_spaces(char *l)
   tmp = calloc(1, len);
   cur_new = tmp;
 
-  for(int i = 0; i < len-1; i++)
+  for(int i = 0; i < len; i++)
   {
     if(*cur == ';')
+    {
+      *cur_new = ';';
+      cur_new++;
       break;
+    }
 
     if(*cur == '\t' || *cur == ' ' || *cur == '\t' || *cur == '\r')
     {
@@ -124,13 +130,15 @@ void remove_extra_spaces(char *l)
     }
     else
     {
+      space_found = 0;
       *cur_new = *cur;
       cur_new++;
       cur++;
     }
 
   }
-  strcpy(l, tmp);
+  if(strlen(tmp))
+    strcpy(l, tmp);
   free(tmp);
   tmp = NULL;
 }
@@ -216,7 +224,6 @@ int read_line(char *c, int *offset, char **ret_line)
     }
 
   }
-
 }
 
 
