@@ -119,14 +119,17 @@ void tul_dest_context_list()
     tmp = cur->back;
 
     /* clear data & close socket */
-    close(cur->this->_sock);
-    memset(cur->this, 0, sizeof(tul_net_context));
-    free(cur->this);
-    memset(cur, 0, sizeof(_tul_int_context_struct));
-    free(cur);
+    if(cur && cur->this && cur->this->_sock)
+      close(cur->this->_sock);
+    if(cur && cur->this)
+    {
+      memset(cur->this, 0, sizeof(tul_net_context));
+      free(cur->this);
+      memset(cur, 0, sizeof(_tul_int_context_struct));
+      free(cur);
+    }
     cur = tmp;
   }
-  tul_log("stopping net context");
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
 
@@ -148,3 +151,5 @@ tul_net_context* tul_find_context(unsigned sock)
 
   return net_ctx;
 }
+
+

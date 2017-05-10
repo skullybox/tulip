@@ -46,7 +46,7 @@ void *_run_listener(void *data)
 
   if(tul_tcp_listen_init(*d, &sock))
   {
-    tul_log("network listener failed");
+    tul_log("ERROR: network listener failed");
 
     /* listen failed exit */
     free(d);

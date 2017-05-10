@@ -10,6 +10,9 @@
 #include <string.h>
 
 
+
+extern int TUL_SIGNAL_INT;
+
 /* forward declaration */
 tul_flowdef *FLOW_LIST[TUL_MAX_FLOW_LIST] = {0};
 int FLOW_COUNT = 0;
@@ -49,7 +52,7 @@ void load_config()
 
 void generate_behavior(char *c)
 {
-  char str_tmp[TUL_MAX_LINE_LENGTH] = {0};
+  char str_tmp[TUL_MAX_LINE_LENGTH+1] = {0};
   int expect_config_ident= 1;
   int offset = 0;
   char *ret_line = NULL;
@@ -96,6 +99,9 @@ void generate_behavior(char *c)
         else
         {
           /* error state for identity */
+          snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "CONFIG ERROR: %s", ret_line);
+          tul_log(str_tmp);
+          TUL_SIGNAL_INT = 1;
           return;
         }
     }
@@ -135,7 +141,6 @@ int get_config_ident(char *l, char *ident)
   if(head == NULL || offset == 0 || offset > TUL_MAX_FIELD_SIZE)
   {
 IDENT_ERR_STATE:
-    tul_log("error in config!");
     return 1;
   }
 
@@ -169,7 +174,7 @@ void remove_extra_spaces(char *l)
       break;
     }
 
-    if(*cur == '\t' || *cur == ' ' || *cur == '\t' || *cur == '\r')
+    if(*cur == '\t' || *cur == ' ' || *cur == '\n' || *cur == '\r')
     {
       if(!space_found)
       {

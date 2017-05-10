@@ -57,7 +57,7 @@ int main(int argc, char **argv)
   /* initialize crypto provider */
   if(crypto_init())
   {
-    tul_log("Initializing crypto provider failed!");
+    tul_log("ERROR INITIALIZING: crypto provider!");
     return -1;
   }
   else
@@ -79,7 +79,8 @@ int main(int argc, char **argv)
 #if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif
-  tul_log("exiting (sleeping 2seconds)");
+  tul_log("exiting (sleeping 2s)");
+  usleep(2000000);
   return 0;
 }
 
