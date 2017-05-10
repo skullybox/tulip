@@ -49,6 +49,8 @@ void load_config()
 
 void generate_behavior(char *c)
 {
+  char str_tmp[TUL_MAX_LINE_LENGTH] = {0};
+  int expect_config_ident= 1;
   int offset = 0;
   char *ret_line = NULL;
 
@@ -83,6 +85,20 @@ void generate_behavior(char *c)
       goto NEXT_LINE;
 
     /* process instruction line */
+    if(expect_config_ident)
+    {
+      if(get_config_ident(
+        ret_line,
+        FLOW_LIST[FLOW_COUNT]->name) == 0)
+        {
+          expect_config_ident = 0;
+        }
+        else
+        {
+          /* error state for identity */
+          return;
+        }
+    }
 
 
 NEXT_LINE:
@@ -90,6 +106,41 @@ NEXT_LINE:
       free(ret_line);
     ret_line = NULL;
   }
+}
+
+int get_config_ident(char *l, char *ident)
+{
+  char *head = NULL;
+  int offset = 0;
+  int len = strlen(l);
+
+  if(len == 0)
+    return -1;
+
+  for(int i = 0; i < len-1; i++)
+  {
+    if( l[i] != ' ' && head == NULL )
+      head = &l[i];
+
+    if( l[i] != ' ' && head != NULL && offset > 0 )
+      goto IDENT_ERR_STATE;
+
+    if(l[i] == ' ' && l[i+1] == '{')
+    {
+      offset = i;
+      break;
+    }
+  }
+
+  if(head == NULL || offset == 0 || offset > TUL_MAX_FIELD_SIZE)
+  {
+IDENT_ERR_STATE:
+    tul_log("error in config!");
+    return 1;
+  }
+
+  strncpy(ident, head, offset); 
+  return 0;
 }
 
 void remove_extra_spaces(char *l)

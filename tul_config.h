@@ -23,7 +23,7 @@
 #define TUL_CONFIG_EOF 1
 #define TUL_CONFIG_LINE 0
 
-#define TUL_MAX_FLOW_LIST 1000
+#define TUL_MAX_FLOW_LIST 100
 
 /* structure to hold flow definitions */
 typedef struct _flowdef {
@@ -34,9 +34,10 @@ typedef struct _flowdef {
 } tul_flowdef;
 
 void load_config();
-int read_line(char *c, int *offset, char **ret_line);
 int comment_line(char *l);
 void remove_extra_spaces(char *l);
+int get_config_ident(char *l, char *ident);
+int read_line(char *c, int *offset, char **ret_line);
 
 #endif
 
