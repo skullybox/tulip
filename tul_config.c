@@ -92,7 +92,7 @@ void generate_behavior(char *c)
     {
       if(get_config_ident(
         ret_line,
-        FLOW_LIST[FLOW_COUNT]->name) == 0)
+        FLOW_LIST[FLOW_COUNT]) == 0)
         {
           expect_config_ident = 0;
         }
@@ -105,6 +105,10 @@ void generate_behavior(char *c)
           return;
         }
     }
+    else
+    {
+      get_config(ret_line, FLOW_LIST[FLOW_COUNT]); 
+    }
 
 
 NEXT_LINE:
@@ -114,7 +118,14 @@ NEXT_LINE:
   }
 }
 
-int get_config_ident(char *l, char *ident)
+int get_config(char *l, tul_flowdef *f)
+{
+
+
+  return 0;
+}
+
+int get_config_ident(char *l, tul_flowdef *f)
 {
   char *head = NULL;
   int offset = 0;
@@ -144,7 +155,7 @@ IDENT_ERR_STATE:
     return 1;
   }
 
-  strncpy(ident, head, offset); 
+  strncpy(f->name, head, offset); 
   return 0;
 }
 

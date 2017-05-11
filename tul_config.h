@@ -36,7 +36,8 @@ typedef struct _flowdef {
 void load_config();
 int comment_line(char *l);
 void remove_extra_spaces(char *l);
-int get_config_ident(char *l, char *ident);
+int get_config_ident(char *l, tul_flowdef *f);
+int get_config(char *l, tul_flowdef *f);
 int read_line(char *c, int *offset, char **ret_line);
 
 #endif
