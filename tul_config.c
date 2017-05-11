@@ -105,9 +105,21 @@ void generate_behavior(char *c)
           return;
         }
     }
-    else
+    else /* expect config line */
     {
-      get_config(ret_line, FLOW_LIST[FLOW_COUNT]); 
+      if(get_config(ret_line, FLOW_LIST[FLOW_COUNT]) == 1)
+      {
+        expect_config_ident = 1;
+        goto NEXT_LINE;
+      }
+      if(get_config(ret_line, FLOW_LIST[FLOW_COUNT]) == 0)
+        goto NEXT_LINE;
+
+      snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "CONFIG ERROR: %s", ret_line);
+      tul_log(str_tmp);
+      TUL_SIGNAL_INT = 1;
+      return;
+
     }
 
 
@@ -118,9 +130,60 @@ NEXT_LINE:
   }
 }
 
+
+/* get_config gets the config values
+ * after parsing the config identiy
+ * return 0 on config parse
+ * return 1 on end of config section
+ * return -1 on config error
+ */
 int get_config(char *l, tul_flowdef *f)
 {
+  char k[TUL_MAX_FIELD_SIZE+1] = {0};
+  char v[TUL_MAX_FIELD_SIZE+1] = {0};
+  char *ptr = l;
+  char *tail = NULL;
+  int offset = 0;
+  int len = 0;
 
+  if(!ptr)
+    return -1;
+
+  len = strlen(l);
+   
+  /* get key */
+  for(int i = 0; i < len; i++)
+  {
+    if(l[i] != ' ')
+    {
+      offset = i;
+      ptr = &l[i];
+      break;
+    }
+  }
+
+  /* find offset for end of key */
+  for(int i = offset; i < len; i++)
+  {
+   if(l[i] == ' ')
+   {
+     offset = i - offset;;
+     break;
+   }
+  }
+
+  /* if offset is wrong */
+  if(offset <= 0)
+    return -1;
+
+  /* copy the key */
+  strncpy(k, ptr, offset);
+
+  if(offset+1 >= len || ptr[offset+1] != ' ')
+    return -1;
+
+
+//  printf("str: %s\n", k);
 
   return 0;
 }
