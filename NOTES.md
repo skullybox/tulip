@@ -47,8 +47,8 @@ LIGHT="$(tput setaf 8)"
 FUSIA="$(tput setaf 5)"
 RESET="$(tput sgr0)"
 
-export PS1='${LIGHT}\u@\h \w${RESET} ->\n ${FUSIA}\d \@ ${RESET}\$ '
-export PS2='${LIGHT}\u@\h \w${RESET} ->\n ${FUSIA}\d \@ ${RESET}\$ '
+export PS1='${LIGHT}\u@\h \w${RESET} ->\n${FUSIA}\d \@ ${RESET}\n---\n\$ '
+export PS2='${LIGHT}\u@\h \w${RESET} ->\n${FUSIA}\d \@ ${RESET}\n---\n\$ '
 alias SKULL='git config user.email "skullybox@gmx.com" && git config user.name "skullybox"'#
 
 
