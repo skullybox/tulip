@@ -54,6 +54,7 @@ void generate_behavior(char *c)
 {
   char str_tmp[TUL_MAX_LINE_LENGTH+1] = {0};
   int expect_config_ident= 1;
+  int ret = 0;
   int offset = 0;
   char *ret_line = NULL;
 
@@ -107,13 +108,17 @@ void generate_behavior(char *c)
     }
     else /* expect config line */
     {
-      if(get_config(ret_line, FLOW_LIST[FLOW_COUNT]) == 1)
+      ret = get_config(ret_line, FLOW_LIST[FLOW_COUNT]);
+
+      if(ret == 1)
       {
         expect_config_ident = 1;
         goto NEXT_LINE;
       }
-      if(get_config(ret_line, FLOW_LIST[FLOW_COUNT]) == 0)
+      else if(ret == 0)
+      {
         goto NEXT_LINE;
+      }
 
       snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "CONFIG ERROR: %s", ret_line);
       tul_log(str_tmp);
@@ -179,9 +184,16 @@ int get_config(char *l, tul_flowdef *f)
   /* copy the key */
   strncpy(k, ptr, offset);
 
+  if(k == '}')
+  {
+    if(!strcmp("}", k))
+      return 1;
+    else
+      return -1;
+  }
+
   if(offset+1 >= len || ptr[offset+1] != ' ')
     return -1;
-
 
 //  printf("str: %s\n", k);
 
@@ -205,7 +217,7 @@ int get_config_ident(char *l, tul_flowdef *f)
     if( l[i] != ' ' && head != NULL && offset > 0 )
       goto IDENT_ERR_STATE;
 
-    if(l[i] == ' ' && l[i+1] == '{')
+    if(l[i] == ' ' && l[i+1] == '{' && (i+1)==(len-1))
     {
       offset = i;
       break;
