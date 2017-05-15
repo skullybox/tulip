@@ -178,13 +178,13 @@ int get_config(char *l, tul_flowdef *f)
   }
 
   /* if offset is wrong */
-  if(offset <= 0)
+  if(offset <= 0 && *ptr !='}')
     return -1;
 
   /* copy the key */
-  strncpy(k, ptr, offset);
+  strncpy(k, ptr, offset+1);
 
-  if(k == '}')
+  if(*k == '}')
   {
     if(!strcmp("}", k))
       return 1;
@@ -192,10 +192,12 @@ int get_config(char *l, tul_flowdef *f)
       return -1;
   }
 
-  if(offset+1 >= len || ptr[offset+1] != ' ')
+  if(offset+1 >= len || ptr[offset] != ' ')
     return -1;
 
-//  printf("str: %s\n", k);
+  ptr = &ptr[offset+1];
+  /* get value of key */
+  printf("str: %s\n", ptr);
 
   return 0;
 }
