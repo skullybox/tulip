@@ -92,19 +92,19 @@ void generate_behavior(char *c)
     if(expect_config_ident)
     {
       if(get_config_ident(
-        ret_line,
-        FLOW_LIST[FLOW_COUNT]) == 0)
-        {
-          expect_config_ident = 0;
-        }
-        else
-        {
-          /* error state for identity */
-          snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "CONFIG ERROR: %s", ret_line);
-          tul_log(str_tmp);
-          TUL_SIGNAL_INT = 1;
-          return;
-        }
+            ret_line,
+            FLOW_LIST[FLOW_COUNT]) == 0)
+      {
+        expect_config_ident = 0;
+      }
+      else
+      {
+        /* error state for identity */
+        snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "CONFIG ERROR: %s", ret_line);
+        tul_log(str_tmp);
+        TUL_SIGNAL_INT = 1;
+        return;
+      }
     }
     else /* expect config line */
     {
@@ -113,6 +113,7 @@ void generate_behavior(char *c)
       if(ret == 1)
       {
         expect_config_ident = 1;
+        FLOW_COUNT++;
         goto NEXT_LINE;
       }
       else if(ret == 0)
@@ -133,6 +134,9 @@ NEXT_LINE:
       free(ret_line);
     ret_line = NULL;
   }
+
+  snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "read %d flows", FLOW_COUNT);
+  tul_log(str_tmp);
 }
 
 
@@ -155,7 +159,7 @@ int get_config(char *l, tul_flowdef *f)
     return -1;
 
   len = strlen(l);
-   
+
   /* get key */
   for(int i = 0; i < len; i++)
   {
@@ -170,11 +174,11 @@ int get_config(char *l, tul_flowdef *f)
   /* find offset for end of key */
   for(int i = offset; i < len; i++)
   {
-   if(l[i] == ' ')
-   {
-     offset = i - offset;;
-     break;
-   }
+    if(l[i] == ' ')
+    {
+      offset = i - offset;
+      break;
+    }
   }
 
   /* if offset is wrong */
@@ -192,12 +196,49 @@ int get_config(char *l, tul_flowdef *f)
       return -1;
   }
 
-  if(offset+1 >= len || ptr[offset] != ' ')
+  if(offset+1 >= strlen(&ptr[offset]) || ptr[offset] != ' ')
     return -1;
 
   ptr = &ptr[offset+1];
+
+  if( ptr[strlen(ptr)-1] != ';')
+    return -1;
+
   /* get value of key */
-  printf("str: %s\n", ptr);
+  strncpy(v, ptr, strlen(ptr)-1);
+
+  /* auth user */
+  if(!strcmp(k, "auth"))
+  {
+    if(!strcmp(v, "user"))
+    {
+      f->auth = TUL_AUTH_USER;      
+    }
+    else if(!strcmp(v, "token"))
+    {
+      f->auth = TUL_AUTH_TOKEN;
+    }
+  }
+
+  /* dest */
+  if(!strcmp(k, "dest"))
+  {
+    if(!strcmp(v, "user"))
+    {
+      f->auth = TUL_DEST_USER;
+    }
+    else if(!strncmp(v, "disk:", 5))
+    {
+      f->auth = TUL_DEST_DISK;
+      strcpy(f->disk_path, &v[5]);
+    }
+  }
+
+  /* IP filter */
+  if(!strcmp(k, "ip"))
+    strcpy(f->ip, v);
+
+
 
   return 0;
 }

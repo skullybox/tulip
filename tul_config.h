@@ -29,6 +29,7 @@
 typedef struct _flowdef {
   int  auth;
   int  dest;
+  char ip[TUL_MAX_FIELD_SIZE+1];
   char name[TUL_MAX_FIELD_SIZE+1];
   char disk_path[TUL_MAX_LINE_LENGTH+1];
 } tul_flowdef;
