@@ -5,6 +5,7 @@
 
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
+#include <unistd.h>
 
 int tul_tcp_listen_init(const int port, int *sock)
 {

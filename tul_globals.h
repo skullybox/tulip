@@ -12,8 +12,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <sys/select.h>
-#include <sys/fcntl.h>
 #include <syslog.h>
 #define SYSLOG_USE
 #else
