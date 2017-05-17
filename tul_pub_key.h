@@ -10,6 +10,7 @@
 
 typedef gcry_sexp_t tul_keypair;
 
+void tul_kill_keys(tul_keypair *k);
 int tul_gen_keypair(tul_keypair *k);
 int tul_write_keys(tul_keypair *par, char *path, char *fn);
 

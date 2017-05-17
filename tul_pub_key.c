@@ -60,4 +60,8 @@ int tul_write_keys(tul_keypair *k, char *path, char *fn)
   return 0;
 }
 
+void tul_kill_keys(tul_keypair *k)
+{
+ gcry_free(k); 
+}
 
