@@ -5,7 +5,7 @@
 #include "tul_tests.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
-
+#include "tul_pub_key.h"
 
 void _tcp_listen_test()
 {
@@ -34,3 +34,34 @@ void _tcp_connect_test()
   fprintf(stdout, "PASS: tcp_connect_test\n");
   close(_sock);
 }
+
+void _rsa_keygen_test()
+{
+  tul_keypair k;
+
+  if(tul_gen_keypair(&k))
+  {
+    fprintf(stderr, "FAIL: tul_gen_keypair\n");
+    return;
+  }
+  fprintf(stdout, "PASS: tul_gen_keypair\n");
+}
+
+void _rsa_writekey_test()
+{
+  tul_keypair k;
+  tul_gen_keypair(&k);
+
+  if(tul_write_keys(&k, "/tmp/", "key"))
+  {
+    fprintf(stderr, "FAIL: tul_write_keys\n");
+    return;
+  }
+  fprintf(stdout, "PASS: tul_write_keys\n");
+
+
+}
+
+
+
+
