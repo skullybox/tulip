@@ -77,7 +77,7 @@ void generate_behavior(char *c)
 
     /* process line */
     if(!FLOW_LIST[FLOW_COUNT])
-      FLOW_LIST[FLOW_COUNT] = malloc(sizeof(tul_flowdef));
+      FLOW_LIST[FLOW_COUNT] = calloc(1, sizeof(tul_flowdef));
 
     /* check if comment line */
     if(comment_line(ret_line))
@@ -186,14 +186,20 @@ int get_config(char *l, tul_flowdef *f)
     return -1;
 
   /* copy the key */
-  strncpy(k, ptr, offset+1);
+  memset(k, 0, TUL_MAX_FIELD_SIZE+1);
+  if(offset)
+    strncpy(k, ptr, offset);
+  else
+    strncpy(k, ptr, offset+1);
 
   if(*k == '}')
   {
     if(!strcmp("}", k))
       return 1;
     else
+    {
       return -1;
+      }
   }
 
   if(offset+1 >= strlen(&ptr[offset]) || ptr[offset] != ' ')
@@ -205,6 +211,7 @@ int get_config(char *l, tul_flowdef *f)
     return -1;
 
   /* get value of key */
+  memset(v, 0, TUL_MAX_FIELD_SIZE+1);
   strncpy(v, ptr, strlen(ptr)-1);
 
   /* auth user */
@@ -212,10 +219,14 @@ int get_config(char *l, tul_flowdef *f)
   {
     if(!strcmp(v, "user"))
     {
+      if(f->auth)
+        return -1;
       f->auth = TUL_AUTH_USER;      
     }
     else if(!strcmp(v, "token"))
     {
+      if(f->auth)
+        return -1;
       f->auth = TUL_AUTH_TOKEN;
     }
   }
@@ -225,20 +236,28 @@ int get_config(char *l, tul_flowdef *f)
   {
     if(!strcmp(v, "user"))
     {
-      f->auth = TUL_DEST_USER;
+      if(f->dest)
+        return -1;
+
+      f->dest = TUL_DEST_USER;
     }
     else if(!strncmp(v, "disk:", 5))
     {
-      f->auth = TUL_DEST_DISK;
+      if(f->dest)
+        return -1;
+
+      f->dest = TUL_DEST_DISK;
       strcpy(f->disk_path, &v[5]);
     }
   }
 
   /* IP filter */
   if(!strcmp(k, "ip"))
+  {
+    if(f->ip[0] !='\0')
+      return -1;
     strcpy(f->ip, v);
-
-
+  }
 
   return 0;
 }
