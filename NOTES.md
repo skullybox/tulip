@@ -52,3 +52,35 @@ export PS2='${LIGHT}\u@\h \w${RESET} ->\n${FUSIA}\d \@ ${RESET}\n---\n\$ '
 alias SKULL='git config user.email "skullybox@gmx.com" && git config user.name "skullybox"'#
 
 
+MISC. NOTES
+============
+--
+RSA
+--
+p,q = primes
+e = 3
+d = decryption key
+n = pq
+T = totient
+M = message
+C = cipher
+
+public = e,n
+private = d
+
+steps: mult, mod, exponentiate
+
+enc: M^e mod(n) = C
+dec: c^d mod(n) = M
+
+selecting a large prime requires some testing to determine likelyhood of
+prime. use fermat's theorm. 
+select prime and test with A in range of 1 < A < prime -1
+
+A^(prime-1) != 1 mod(prime) (likely prime)
+
+
+
+
+
+
