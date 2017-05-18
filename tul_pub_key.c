@@ -12,7 +12,7 @@ int tul_gen_keypair(tul_keypair *k)
   int rc = 0;
 
   rc = gcry_sexp_new (&key_spec,
-      "(genkey (rsa (nbits 4:2048)(rsa-use-e 1:3)))", 0, 1);
+      "(genkey (rsa (nbits 4:4096)(rsa-use-e 1:3)))", 0, 1);
 
   /* RSA param error */
   if(rc)
