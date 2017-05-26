@@ -4,21 +4,19 @@ C = gcc
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 
-ldflgs := -L./lib/libgcrypt-1.7.2/lib/
-incflgs := -I. -I./lib/libgcrypt-1.7.2/include
 cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 -c
 #cflgs := -O0 -g -Werror -D_FILE_OFFSET_BITS=64 -std=c99 -c
 
-all: crypt main
+all: main
 
 tags: 
 	ctags -td *.h *.c
 
 main: ${objects}
-	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lgcrypt -lgpg-error
+	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread 
 
 win: crypt ${objects}
-	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 -lgcrypt -lgpg-error 
+	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 
 
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o $@
@@ -30,11 +28,6 @@ clean:
 clean-all:
 	@-rm -f *.o || true
 	@-rm -f tulip || true
-	@-rm -rf lib/libgcrypt-1.7.2 || true
 
 
-crypt:
-	if [ ! -d "lib/libgcrypt-1.7.2" ]; then \
-		tar jxf "lib/libgcrypt-1.7.2.tar.bz2" -C "lib";\
-		cd "lib/libgcrypt-1.7.2" && ./configure --disable-shared --prefix=`pwd` && ${MAKE} && ${MAKE} install;\
-	fi
+

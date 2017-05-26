@@ -9,7 +9,6 @@
 #include "tul_config.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
-#include "tul_crypto_ref.h"
 #include "tul_parseparams.h"
 #include "tul_listen_thread.h"
 #include "tul_signal_handler.h"
@@ -53,15 +52,6 @@ int main(int argc, char **argv)
 
   /* load configuration */
   load_config();
-
-  /* initialize crypto provider */
-  if(crypto_init())
-  {
-    tul_log("ERROR INITIALIZING: crypto provider!");
-    return -1;
-  }
-  else
-    tul_log("crypto provider initialized");
 
   tul_log("starting listener");
   run_listener(port);
