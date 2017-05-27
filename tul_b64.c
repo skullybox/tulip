@@ -13,6 +13,16 @@ static char B[64] = {
   '8', '9', '+', '/'
 };
 
+int getIndex(char c)
+{
+  for(int i = 0; i < 64; i++)
+  {
+    if(c == B[i])
+      return i;
+  }
+  return -1;
+}
+
 char * base64_enc(char *d, size_t sz)
 {
   char *n = NULL;
@@ -54,23 +64,34 @@ char * base64_dec(char *d, size_t sz)
   char *n = NULL;
   size_t n_sz = 0;
   int b_count = 0;
+  int a,b,c,e;
+  int offset = 0;
 
   /* check for padding --- */
   if( d[sz-1] == '=' && d[sz-2] == '=' )
-    n_sz = ((sz - 2)/4) *3;
+    offset = 2;
   else  if(d[sz-1] == '=' )
-    n_sz = ((sz - 1)/4) *3;
-  else
-    n_sz = (sz/4)*3;
+    offset = 1;
+
+  n_sz = ((sz-offset)/4)*3;
 
   n = calloc(1, n_sz+1);
 
-  for(int i = 0; i < sz; i+=4)
+  for(int i = 0; i < sz-offset; i+=4)
   {
+   a = getIndex(d[i]);
+   b = getIndex(d[i+1]);
+   c = getIndex(d[i+2]);
+   e = getIndex(d[i+3]);
 
+   n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
+   n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
+   n[b_count+2] =  ((c<<6)&0xc0)|((e)&0x03f);
+    
+    b_count+=3;
   }
 
-  return NULL;
+  return n;
 }
 
 

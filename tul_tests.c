@@ -68,8 +68,35 @@ void _b64_test()
   }
 
   /* decoding test --- */
+  free(r); 
+  r = base64_dec("YW55IGNhcm5hbCBwbGVhc3Vy", 
+      strlen("YW55IGNhcm5hbCBwbGVhc3Vy"));
+  if(strcmp(r, v))
+  {
+    fprintf(stderr, "FAIL: base64_test\n");
+    return;
+  }
 
+  free(r); 
+  r = base64_dec("YW55IGNhcm5hbCBwbGVhc3VyZQ==", 
+      strlen("YW55IGNhcm5hbCBwbGVhc3VyZQ=="));
+  printf("RET: %s\n", r);
+  if(strcmp(r, u))
+  {
+    fprintf(stderr, "FAIL: base64_test\n");
+    return;
+  }
 
+  free(r); 
+  r = base64_dec("YW55IGNhcm5hbCBwbGVhc3VyZS4=", 
+      strlen("YW55IGNhcm5hbCBwbGVhc3VyZS4="));
+  if(strcmp(r, t))
+  {
+    fprintf(stderr, "FAIL: base64_test\n");
+    return;
+  }
+
+    fprintf(stdout, "PASS: base64_test\n");
 
 
 }
