@@ -19,10 +19,11 @@ char * base64_enc(char *d, size_t sz)
   size_t n_sz = 4 * (sz / 3);
   int b_count = 0;
 
+  n = calloc(1, n_sz+1);
   if(sz % 3)
-    n = calloc(1, n_sz+4);
+    n = calloc(1, n_sz+4+1);
   else
-    n = calloc(1, n_sz);
+    n = calloc(1, n_sz+1);
 
   for(int i = 0; i < sz; i += 3)
   {
@@ -33,20 +34,16 @@ char * base64_enc(char *d, size_t sz)
     b_count +=4;
   }
 
+  b_count = n_sz + (sz%3)+1;
   if( (sz % 3) == 1)
   {
-    n[b_count + 0] = B[d[sz]>>2]; 
-    n[b_count + 1] = B[ ((d[sz]&0x03)<<4)]; 
-    n[b_count + 2] = '=';
-    n[b_count + 3] = '=';
+    n[b_count + 0] = '=';
+    n[b_count + 1] = '=';
  
   }
   else if( (sz % 3) == 2)
   {
-    n[b_count + 0] = B[d[sz]>>2]; 
-    n[b_count + 1] = B[ ((d[sz]&0x03)<<4) | ((d[sz+1]&0xf0)>>4)];
-    n[b_count + 2] = B[ ((d[sz]&0x0f)<<2)];
-    n[b_count + 3] = '=';
+    n[b_count] = '=';
   }
   
   return n;
@@ -55,8 +52,23 @@ char * base64_enc(char *d, size_t sz)
 char * base64_dec(char *d, size_t sz)
 {
   char *n = NULL;
-  size_t n_sz = 3* (sz / 4);
+  size_t n_sz = 0;
   int b_count = 0;
+
+  /* check for padding --- */
+  if( d[sz-1] == '=' && d[sz-2] == '=' )
+    n_sz = ((sz - 2)/4) *3;
+  else  if(d[sz-1] == '=' )
+    n_sz = ((sz - 1)/4) *3;
+  else
+    n_sz = (sz/4)*3;
+
+  n = calloc(1, n_sz+1);
+
+  for(int i = 0; i < sz; i+=4)
+  {
+
+  }
 
   return NULL;
 }
