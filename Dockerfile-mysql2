@@ -1,5 +1,10 @@
 
+# build with the following parameters
+# docker build -f Dockerfile-master  -t financeit:master .
+
+
 FROM ubuntu:16.04
+MAINTAINER irfan 
 ENV DEBIAN_FRONTEND noninteractive
 
 # ------------------------
@@ -23,24 +28,18 @@ ENV DEBIAN_FRONTEND noninteractive
 # master-info-repository = TABLE
 # ------------------------
 
-RUN apt update 
-RUN apt-get install -y wget
-RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.6-1_all.deb
-RUN dpkg -i *.deb
-RUN rm *.deb
+# mysqlreplicate --slave=root:password@172.17.0.1:3307  --master=root:password@172.17.0.1:3306 --rpl-user=root -vv --pedantic
 RUN apt-get update
 RUN apt-get install -y mysql-server mysql-utilities openssl sudo
 
 RUN if [ -f "/etc/mysql/my.cnf" ];then rm "/etc/mysql/my.cnf"; fi;
-COPY my.cnf /etc/mysql/my.cnf
+COPY my2.cnf /etc/mysql/my.cnf
 COPY mysql.sh /usr/local/bin/mysql.sh
 RUN chmod 755 /usr/local/bin/mysql.sh
 RUN rm -rf /var/lib/mysql/*
-RUN /usr/local/bin/mysql.sh 
-RUN rm "/usr/local/bin/mysql.sh"
-EXPOSE 3306
+EXPOSE 3307
 
-ENTRYPOINT ["sudo", "-umysql","mysqld"]
+ENTRYPOINT ["/usr/local/bin/mysql.sh"]
 
 
 
