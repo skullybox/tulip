@@ -17,7 +17,9 @@ then
 
   echo "Configure root password on mysql..."
   sleep 40;
-  "${mysql[@]}" -e "delete from mysql.user; create user 'root'@'%' identified by 'password'; GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;shutdown;"
+  "${mysql[@]}" -e "delete from mysql.user; create user 'root'@'%' identified by 'password'; \
+  GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION; \
+  create user 'repl'@'%' identified by 'password'; GRANT REPLICATION SLAVE,REPLICATION CLIENT ON *.* TO 'repl'@'%';FLUSH PRIVILEGES;shutdown;"
 else
   sudo -umysql mysqld --datadir="$DATADIR"
 
