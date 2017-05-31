@@ -4,6 +4,7 @@
  **/
 
 #include "tul_b64.h"
+#include <stdio.h>
 
 static char B[64] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
@@ -77,17 +78,45 @@ char * base64_dec(char *d, size_t sz)
 
   n = calloc(1, n_sz+1);
 
-  for(int i = 0; i < sz-offset; i+=4)
+  for(int i = 0; i < sz; i+=4)
   {
-   a = getIndex(d[i]);
-   b = getIndex(d[i+1]);
-   c = getIndex(d[i+2]);
-   e = getIndex(d[i+3]);
 
-   n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
-   n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
-   n[b_count+2] =  ((c<<6)&0xc0)|((e)&0x03f);
-    
+    if( i + 4 < sz )
+    {
+      a = getIndex(d[i]);
+      b = getIndex(d[i+1]);
+      c = getIndex(d[i+2]);
+      e = getIndex(d[i+3]);
+
+      n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
+      n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
+      n[b_count+2] =  ((c<<6)&0xc0)|((e)&0x03f);
+    }
+    else 
+    {
+      a = getIndex(d[i]);
+      b = getIndex(d[i+1]);
+      c = getIndex(d[i+2]);
+      e = getIndex(d[i+3]);
+
+      if ( offset == 2)
+      {
+        c = 0;
+        d = 0;
+        e = 0;
+      }
+      else if ( offset == 1 )
+      {
+        d = 0;
+        e = 0;
+      }
+
+      n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
+      n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
+      n[b_count+2] =  ((c<<6)&0xc0)|((e)&0x03f);
+
+    }
+        
     b_count+=3;
   }
 
