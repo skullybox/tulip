@@ -4,8 +4,9 @@ C = gcc
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 
-cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 -c
-#cflgs := -O0 -g -Werror -D_FILE_OFFSET_BITS=64 -std=c99 -c
+inc := -I./tls/mbedtls-2.4.2/include
+libs := -L./tls/mbedtls-2.4.2/library -lmbedcrypto -lmbedtls -lmbedx509
+cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 .PHONY: tls
 all: tls main
@@ -14,7 +15,7 @@ tags:
 	ctags -td *.h *.c
 
 main: ${objects}
-	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread 
+	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread ${libs}
 
 win: crypt ${objects}
 	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 
@@ -25,10 +26,7 @@ win: crypt ${objects}
 clean:
 	@-rm -f *.o || true
 	@-rm -f tulip || true
-
-clean-all:
-	@-rm -f *.o || true
-	@-rm -f tulip || true
+	@-rm -rf tls/mbedtls-2.4.2 || true
 
 tls:
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
