@@ -34,7 +34,7 @@
 
 # project specific
 tulip
-lib/libgcrypt-1.7.2
+tls/mbedtls-2.4.2
 tags
 *.swp
 
