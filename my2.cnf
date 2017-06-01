@@ -1,7 +1,7 @@
 [mysqld]
 bind-address = "0.0.0.0"
 port = 3307
-log-bin = mysql-bin
+log-bin = /var/lib/mysql/mysql-replication.log
 server-id = 101
 relay-log = relay-log-slave
 enforce-gtid-consistency = true
@@ -10,8 +10,19 @@ datadir=/var/lib/mysql/
 socket=/var/lib/mysql/mysql.sock
 default_storage_engine = innodb
 binlog_format = row
-innodb_autoinc_lock_mode = 2
-innodb_flush_log_at_trx_commit = 0
 query_cache_size = 0
 query_cache_type = 0
+report-host=db1
+master-info-repository=table
+sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER
+user=mysql
+
+# Disabling symbolic-links is recommended to prevent assorted security risks;
+# to do so, uncomment this line:
+symbolic-links=0
+
+[mysqld_save]
+replicate-wild-ignore-table=mysql.%
+innodb_file_per_table=1
+innodb_flush_method=O_DSYNC
 

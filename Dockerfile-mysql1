@@ -3,9 +3,8 @@
 # docker build -f Dockerfile-master  -t financeit:master .
 
 
-FROM ubuntu:16.04
+FROM centos:centos7
 MAINTAINER irfan 
-ENV DEBIAN_FRONTEND noninteractive
 
 # ------------------------
 # /etc/mysql/my.cnf
@@ -29,9 +28,10 @@ ENV DEBIAN_FRONTEND noninteractive
 # ------------------------
 
 # mysqlreplicate --slave=root:password@172.17.0.1:3307  --master=root:password@172.17.0.1:3306 --rpl-user=repl -vv --pedantic
-# change master to master_host='172.17.0.1', master_user='root', master_password='password', master_log_file='mysql-bin.000003', master_log_pos=532, master_auto_position=0;
-RUN apt-get update
-RUN apt-get install -y mysql-server mysql-utilities openssl sudo
+# change master to master_host='172.17.0.1', master_user='root', master_password='password', master_auto_position=1; 
+RUN rpm -Uvh https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+RUN yum -y update
+RUN yum -y install mysql-server mysql-utilities openssl sudo
 
 RUN if [ -f "/etc/mysql/my.cnf" ];then rm "/etc/mysql/my.cnf"; fi;
 COPY my1.cnf /etc/mysql/my.cnf
