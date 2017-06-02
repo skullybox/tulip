@@ -34,7 +34,7 @@ int tls_client_init(tul_tls_ctx *c)
   CHECK_RET;
 
   ret = mbedtls_net_connect( &(c->server_fd), 
-      "apple.com", "443", MBEDTLS_NET_PROTO_TCP );
+      c->host, "443", MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
 
 #if defined(MBEDTLS_SSL_CACHE_C)
@@ -57,14 +57,25 @@ int tls_client_init(tul_tls_ctx *c)
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+  mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
+
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
   CHECK_RET;
 
   ret = mbedtls_ssl_set_hostname(&(c->ssl), "tls-c");
   CHECK_RET;
+ 
+  mbedtls_ssl_set_bio( &(c->ssl), 
+      &(c->server_fd), mbedtls_net_send, mbedtls_net_recv, NULL );
+
+  ret = mbedtls_ssl_handshake( &(c->ssl) );
+  CHECK_RET;
+
+  ret = mbedtls_ssl_get_verify_result(&(c->ssl));
+  CHECK_RET;
 
   return 0;
-
 }
 
 int tls_server_init(tul_tls_ctx *c)
@@ -143,4 +154,47 @@ int tls_client_free(tul_tls_ctx *c)
   return tls_server_free(c);
   return 0;
 }
+
+/* returns bytes read. -1 closed connection 
+ * -2 error
+ */
+int tls_read(tul_tls_ctx *c, char *buf, unsigned len)
+{
+  int ret = 0;
+  
+  ret = mbedtls_ssl_read( &(c->ssl), (unsigned char *)buf, len );
+
+  if( ret == MBEDTLS_ERR_SSL_WANT_READ )
+    printf("READ\n");
+
+  if( ret == MBEDTLS_ERR_SSL_WANT_WRITE )
+    printf("WRITE\n");
+
+  if(ret < 0)
+    return -2;
+
+  return ret;
+}
+
+/* returns bytes written. -1 closed connection 
+ * -2 error
+ */
+int tls_write(tul_tls_ctx *c, char *buf, unsigned len)
+{
+  int ret = 0;
+  
+  ret = mbedtls_ssl_write( &(c->ssl), (unsigned char *)buf, len );
+  if( ret == MBEDTLS_ERR_SSL_WANT_READ )
+    printf("READ\n");
+
+  if( ret == MBEDTLS_ERR_SSL_WANT_WRITE )
+    printf("WRITE\n");
+
+  if(ret < 0)
+    return -2;
+
+  return ret;
+}
+
+
 
