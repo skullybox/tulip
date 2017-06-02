@@ -24,7 +24,7 @@ void tul_make_daemon()
   }
 
   umask(0);
-  chdir("/tmp/");
+  int ret = chdir("/tmp/");
   //close(STDIN_FILENO);
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
