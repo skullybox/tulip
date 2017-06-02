@@ -34,7 +34,7 @@ RUN yum -y update
 RUN yum -y install mysql-server mysql-utilities openssl sudo
 
 RUN if [ -f "/etc/mysql/my.cnf" ];then rm "/etc/mysql/my.cnf"; fi;
-COPY my2.cnf /etc/mysql/my.cnf
+COPY my.cnf /etc/mysql/my.cnf
 COPY mysql.sh /usr/local/bin/mysql.sh
 RUN chmod 755 /usr/local/bin/mysql.sh
 RUN rm -rf /var/lib/mysql/*
