@@ -9,7 +9,8 @@
 
 void _tcp_listen_test();
 void _tcp_connect_test();
-void _rsa_keygen_test();
-void  _rsa_writekey_test();
+void _b64_test();
+void _tls_server_test();
+void _tls_client_test();
 
 #endif
