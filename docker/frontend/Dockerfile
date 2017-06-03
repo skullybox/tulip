@@ -3,7 +3,9 @@ MAINTAINER terry
 
 #RUN yum -y update
 RUN yum -y install httpd mysql-utilities openssl sudo php mod_ssl
+RUN rm -f /var/www/html/index.*
 COPY entrypoint.sh / 
+COPY html/* /var/www/html/
 
 #ENTRYPOINT ["/entrypoint.sh"]
 #ENTRYPOINT ["/usr/sbin/httpd -DFOREGROUND"]
