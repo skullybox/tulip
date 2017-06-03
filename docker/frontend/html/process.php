@@ -1,4 +1,4 @@
-<?php include 'database.php';>
+<?php include 'database.php';?>
 
 <?php
 
@@ -11,3 +11,4 @@ $email=$_POST['email'];
 //Execute the query
 
 mysqli_query($connect"INSERT INTO employees1(first_name,last_name,department,email)VALUES('$first_name','$last_name','$department','$email')");
+?>
