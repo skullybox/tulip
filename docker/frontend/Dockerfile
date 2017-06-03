@@ -2,7 +2,7 @@ FROM centos:centos7
 MAINTAINER terry 
 
 #RUN yum -y update
-RUN yum -y install httpd mysql-utilities openssl sudo php mod_ssl
+RUN yum -y install httpd mysql-utilities openssl sudo php mod_ssl php-mysql
 RUN rm -f /var/www/html/index.*
 COPY entrypoint.sh / 
 COPY html/* /var/www/html/
