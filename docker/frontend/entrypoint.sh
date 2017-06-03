@@ -20,6 +20,7 @@ set -e
 if [ -z "$1" ]
 then
     /usr/sbin/httpd
+    tail -fn300 /var/log/httpd/ssl_*
 #   service httpd start
 #   systemctl start httpd
 
