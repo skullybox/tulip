@@ -10,7 +10,7 @@ label{display:inline-block;width:100px;margin-bottom:10px;}
 </head>
 <body>
 
-<form method="post" action="process.php">
+<form method="post" action="insert.php">
 <label>First Name</label>
 <input type="text" name="first_name" />
 <br />
