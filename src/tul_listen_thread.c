@@ -22,13 +22,14 @@ static fd_set read_fd_set;
 static fd_set write_fd_set;
 static fd_set active_set;
 
-void run_listener(int port)
+void run_listener(int port, int tls)
 {
   pthread_attr_t _tref_attr;
   pthread_t _tref;
 
-  int *data = (int*) malloc(sizeof(int));
+  int *data = (int*) malloc(sizeof(int)*2);
   *data = port;
+  data[1] = tls;
 
   /* pthread detached attribute */
   pthread_attr_init(&_tref_attr);
@@ -43,6 +44,10 @@ void *_run_listener(void *data)
   int sock;
   struct sockaddr_in6 addr;
   int *d = (int*)data;
+  int tls = ((int*)data)[1];
+
+  if(tls)
+    tul_log("enabling tls");
 
   if(tul_tcp_listen_init(*d, &sock))
   {
