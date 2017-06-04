@@ -10,8 +10,9 @@
 static _tul_int_context_struct _glbl_struct_list;
 static pthread_mutex_t _glbl_struct_mtx;
 
-void tul_add_context(unsigned sock)
+void tul_add_context(unsigned sock, int tls)
 {
+  int ret = 0;
   _tul_int_context_struct *new = NULL;
   _tul_int_context_struct *cur = &_glbl_struct_list;
 
@@ -42,6 +43,19 @@ void tul_add_context(unsigned sock)
       new->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
       new->this->_sock = sock;
       cur->next = new;
+
+      /* do tls setup */
+      if(tls)
+      {
+        new->this->_use_tls = 1;
+
+        mbedtls_ssl_set_bio( 
+            &(new->this->ssl), &(new->this->net_c), 
+            mbedtls_net_send, mbedtls_net_recv, NULL );
+
+        ret = mbedtls_ssl_handshake( &(new->this->ssl) );
+
+      }
     }
   }
 }

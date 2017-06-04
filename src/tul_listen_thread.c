@@ -14,7 +14,7 @@ extern int TUL_SIGNAL_INT;
 extern int daemon_mode;
 
 void *_run_listener(void *data);
-void _run_core(int fd);
+void _run_core(int fd, int tls);
 void do_read(int i);
 void do_write(int i);
 
@@ -61,11 +61,11 @@ void *_run_listener(void *data)
 
   free(d);
   tul_log("starting core");
-  _run_core(sock);
+  _run_core(sock, tls);
   return NULL;
 }
 
-void _run_core(int fd)
+void _run_core(int fd, int tls)
 {
   int ref_sock;
   int fd_new;
@@ -114,7 +114,7 @@ void _run_core(int fd)
           return;
         }
         FD_SET(fd_new, &active_set);
-        tul_add_context(fd_new);
+        tul_add_context(fd_new, tls);
       }
       else if(FD_ISSET(ref_sock, &read_fd_set))
         do_read(ref_sock);
