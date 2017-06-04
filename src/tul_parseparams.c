@@ -25,9 +25,9 @@ void parseParams(int argc, char **argv)
   /* check for tls enablement */
   for(int i = 1; i < argc; i++)
   {
-    if(!strcmp("-t", argv[i]))
+    if(!strcmp("-n", argv[i]))
     {
-      tls = 1;
+      tls = 0;
       break;
     }
   }
@@ -50,7 +50,7 @@ void parseParams(int argc, char **argv)
     return;
   }
   else if(argc == 3 && (port = atoi(argv[1])) > 0 &&
-      !strcmp(argv[2],"-t"))
+      !strcmp(argv[2],"-n"))
   {
     return;
   }
@@ -63,7 +63,7 @@ void parseParams(int argc, char **argv)
     return;
   }
   else if(argc == 4 && (port = atoi(argv[1])) > 0 &&
-      !strcmp(argv[2],"-d") && !strcmp(argv[3],"-t"))
+      !strcmp(argv[2],"-d") && !strcmp(argv[3],"-n"))
   {
 #if defined(__APPLE__) || defined(__linux__)
     daemon_mode = 1;

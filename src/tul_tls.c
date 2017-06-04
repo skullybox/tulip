@@ -123,9 +123,15 @@ int tls_server_init(tul_tls_ctx *c)
       MBEDTLS_SSL_TRANSPORT_STREAM,
       MBEDTLS_SSL_PRESET_DEFAULT );
   CHECK_RET;
-
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
+
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_OPTIONAL);
+  mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
+
+  ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
+  CHECK_RET;
+
 
   ret = mbedtls_ssl_set_hostname(&(c->ssl), "tultls");
   CHECK_RET;

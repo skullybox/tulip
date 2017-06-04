@@ -67,6 +67,7 @@ void *_run_listener(void *data)
 
 void _run_core(int fd, int tls)
 {
+  int ret = 0;
   int ref_sock;
   int fd_new;
   socklen_t size;
@@ -107,19 +108,27 @@ void _run_core(int fd, int tls)
       if(FD_ISSET(ref_sock, &read_fd_set) && ref_sock == fd )
       {
         /* new socket */
+        printf("IACC\n");
         fd_new = accept(fd, (struct sockaddr *)&client, &size);
+        printf("ACC\n");
         if(fd_new < 0)
         {
           TUL_SIGNAL_INT=1;
           return;
         }
         FD_SET(fd_new, &active_set);
-        tul_add_context(fd_new, tls);
+        ret = tul_add_context(fd_new, tls);
       }
       else if(FD_ISSET(ref_sock, &read_fd_set))
-        do_read(ref_sock);
+      {
+        if(!ret)
+          do_read(ref_sock);
+      }
       else if(FD_ISSET(ref_sock, &write_fd_set))
-        do_write(ref_sock);
+      {
+        if(!ret)
+          do_write(ref_sock);
+      }
     }
   }
   tul_dest_context_list();

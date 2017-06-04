@@ -10,9 +10,9 @@
 static _tul_int_context_struct _glbl_struct_list;
 static pthread_mutex_t _glbl_struct_mtx;
 
-void tul_add_context(unsigned sock, int tls)
+int tul_add_context(unsigned sock, int tls)
 {
-  int ret = 0;
+  int ret = 1;
   _tul_int_context_struct *new = NULL;
   _tul_int_context_struct *cur = &_glbl_struct_list;
 
@@ -36,15 +36,14 @@ void tul_add_context(unsigned sock, int tls)
     {
       cur->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
       cur->this->_sock = sock;
-    }
-    else
-    {
       new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
       new->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
       new->this->_sock = sock;
       cur->next = new;
 
+      ret = 0;
       /* do tls setup */
+      printf("TLS IT: %d\n", tls);
       if(tls)
       {
         new->this->_use_tls = 1;
@@ -53,11 +52,31 @@ void tul_add_context(unsigned sock, int tls)
             &(new->this->ssl), &(new->this->net_c), 
             mbedtls_net_send, mbedtls_net_recv, NULL );
 
-        ret = mbedtls_ssl_handshake( &(new->this->ssl) );
+        mbedtls_debug_set_threshold(4);
 
+        while( (ret = mbedtls_ssl_handshake( &(new->this->ssl))) != 0)
+        {
+          if(ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
+          {
+            ret = 1;
+            break;
+          }
+        }
+        printf("TLS ret: %d\n", ret);
+
+        /* TLS handshake failure */
+        if(ret)
+        {
+          mbedtls_net_free( &(new->this->net_c));
+          mbedtls_ssl_session_reset( &(new->this->ssl) );
+
+          free(new);
+          cur->next = NULL;
+        }
       }
     }
   }
+  return ret;
 }
 
 int tul_get_sock(unsigned pos)

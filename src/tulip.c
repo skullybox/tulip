@@ -18,10 +18,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-int tls = 0;
+int tls = 1;
 int port = 0;
 int daemon_mode = 0;
-
 
 int main(int argc, char **argv)
 {

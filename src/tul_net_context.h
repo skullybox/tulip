@@ -45,7 +45,7 @@ typedef struct __tul_int_context_struct
 } _tul_int_context_struct;
 
 int tul_get_sock(unsigned pos);
-void tul_add_context(unsigned sock, int tls);
+int tul_add_context(unsigned sock, int tls);
 void tul_rem_context(unsigned sock);
 void tul_init_context_list();
 void tul_dest_context_list();
