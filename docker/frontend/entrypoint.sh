@@ -16,10 +16,13 @@ set -e
 #a2ensite mysite.conf
 #a2dissite 000-default.conf
 #service httpd reload
+echo "loading tulip.sql into database"
+mysql -h percona -u tulip -ptulip tulip < /tulip.sql
 
 if [ -z "$1" ]
 then
     /usr/sbin/httpd
+    tail -fn300 /var/log/httpd/ssl_*
 #   service httpd start
 #   systemctl start httpd
 
