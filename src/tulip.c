@@ -18,9 +18,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+int tls = 1;
 int port = 0;
 int daemon_mode = 0;
-
 
 int main(int argc, char **argv)
 {
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
   load_config();
 
   tul_log("starting listener");
-  run_listener(port);
+  run_listener(port, tls);
 
   tul_log("loading module callbacks");
   configure_module();

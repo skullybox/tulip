@@ -34,7 +34,7 @@
 
 # project specific
 tulip
-tls/mbedtls-2.4.2
+src/tls/mbedtls-2.4.2
 tags
 *.swp
 

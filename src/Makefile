@@ -23,10 +23,14 @@ win: crypt ${objects}
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o $@
 
-clean:
+clean-all:
 	@-rm -f *.o || true
 	@-rm -f tulip || true
 	@-rm -rf tls/mbedtls-2.4.2 || true
+
+clean:
+	@-rm -f *.o || true
+	@-rm -f tulip || true
 
 tls:
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \

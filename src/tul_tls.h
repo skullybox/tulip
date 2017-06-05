@@ -34,9 +34,9 @@ typedef struct _tls_ctx
 } tul_tls_ctx;
 
 
-int tls_client_init(tul_tls_ctx *c);
+int tls_client_init(tul_tls_ctx *c, int lport);
 int tls_client_free(tul_tls_ctx *c);
-int tls_server_init(tul_tls_ctx *c);
+int tls_server_init(tul_tls_ctx *c, int lport);
 int tls_server_free(tul_tls_ctx *c);
 int tls_read(tul_tls_ctx *c, char *buf, unsigned len);
 int tls_write(tul_tls_ctx *c, char *buf, unsigned len);
