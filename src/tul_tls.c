@@ -8,9 +8,12 @@
 
 #define CHECK_RET if(ret) return -1; 
 
-int tls_client_init(tul_tls_ctx *c)
+int tls_client_init(tul_tls_ctx *c, int lport)
 {
   int ret = 0;
+  char buff[13] = {0};
+  printf(buff, "%d", lport);
+
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
   mbedtls_ssl_config_init( &(c->conf) );
@@ -34,7 +37,7 @@ int tls_client_init(tul_tls_ctx *c)
   CHECK_RET;
 
   ret = mbedtls_net_connect( &(c->server_fd), 
-      c->host, "443", MBEDTLS_NET_PROTO_TCP );
+      c->host, buff, MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
 
 #if defined(MBEDTLS_SSL_CACHE_C)
@@ -78,9 +81,12 @@ int tls_client_init(tul_tls_ctx *c)
   return 0;
 }
 
-int tls_server_init(tul_tls_ctx *c)
+int tls_server_init(tul_tls_ctx *c, int lport)
 {
   int ret = 0;
+  char buff[13] = {0};
+  sprintf(buff, "%d", lport);
+
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
   mbedtls_ssl_config_init( &(c->conf) );
@@ -104,7 +110,7 @@ int tls_server_init(tul_tls_ctx *c)
   CHECK_RET;
 
   ret = mbedtls_net_bind( &(c->server_fd), 
-      NULL, "9443", MBEDTLS_NET_PROTO_TCP );
+      NULL, buff, MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
 
 #if defined(MBEDTLS_SSL_CACHE_C)
@@ -131,7 +137,6 @@ int tls_server_init(tul_tls_ctx *c)
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
   CHECK_RET;
-
 
   ret = mbedtls_ssl_set_hostname(&(c->ssl), "tultls");
   CHECK_RET;

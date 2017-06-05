@@ -104,7 +104,7 @@ void _tls_server_test()
   int ret = 0;
   tul_tls_ctx c;
 
-  ret = tls_server_init(&c);
+  ret = tls_server_init(&c, 9443);
   tls_server_free(&c);
 
   if(ret)
@@ -122,7 +122,7 @@ void _tls_client_test()
   tul_tls_ctx c;
 
   strcpy(c.host, "apple.com");
-  tls_client_init(&c);
+  tls_client_init(&c, 443);
   tls_write(&c, "GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n", 
       strlen("GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n"));
   ret = tls_read(&c, buf, 1024);
