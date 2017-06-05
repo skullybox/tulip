@@ -71,11 +71,8 @@ int tul_add_context(unsigned sock, int tls)
       /* TLS handshake failure */
       if(ret)
       {
-        mbedtls_net_free( &(new->this->net_c));
-        mbedtls_ssl_session_reset( &(new->this->ssl) );
-
-        free(new);
-        cur->next = NULL;
+       // mbedtls_net_free( &(new->this->net_c));
+       // mbedtls_ssl_session_reset( &(new->this->ssl) );
       }
     }
   }
