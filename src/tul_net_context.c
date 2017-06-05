@@ -4,11 +4,13 @@
  **/
 
 #include "tul_log.h"
+#include "tul_tls.h"
 #include "tul_globals.h"
 #include "tul_net_context.h"
 
 static _tul_int_context_struct _glbl_struct_list;
 static pthread_mutex_t _glbl_struct_mtx;
+extern tul_tls_ctx tls_serv;
 
 int tul_add_context(unsigned sock, int tls)
 {
@@ -52,13 +54,15 @@ int tul_add_context(unsigned sock, int tls)
     {
       new->this->_use_tls = 1;
 
+      new->this->net_c.fd = sock;
+
       mbedtls_ssl_set_bio( 
-          &(new->this->ssl), &(new->this->net_c), 
+          &(tls_serv.ssl), &(new->this->net_c), 
           mbedtls_net_send, mbedtls_net_recv, NULL );
 
-      mbedtls_debug_set_threshold(4);
+      // mbedtls_debug_set_threshold(4);
 
-      while( (ret = mbedtls_ssl_handshake( &(new->this->ssl))) != 0)
+      while( (ret = mbedtls_ssl_handshake( &(tls_serv.ssl))) != 0)
       {
         if(ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
@@ -71,6 +75,7 @@ int tul_add_context(unsigned sock, int tls)
       /* TLS handshake failure */
       if(ret)
       {
+        mbedtls_ssl_session_reset(&(tls_serv.ssl));
        // mbedtls_net_free( &(new->this->net_c));
        // mbedtls_ssl_session_reset( &(new->this->ssl) );
       }

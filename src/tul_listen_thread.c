@@ -22,7 +22,7 @@ void do_write(int i);
 static fd_set read_fd_set;
 static fd_set write_fd_set;
 static fd_set active_set;
-static tul_tls_ctx tls_serv;
+tul_tls_ctx tls_serv;
 
 void run_listener(int port, int tls)
 {
@@ -62,6 +62,7 @@ void *_run_listener(void *data)
   {
     tul_log("enabling tls");
     ret = tls_server_init(&tls_serv, *lport);
+    sock = tls_serv.server_fd.fd;
 
     if(ret)
     {
@@ -89,6 +90,9 @@ void _run_core(int fd, int tls)
   size = sizeof(client);
 
   tul_init_context_list();
+
+  if(tls && fd != tls_serv.server_fd.fd)
+    tls_serv.server_fd.fd = fd;
 
   FD_ZERO(&read_fd_set);
   FD_ZERO(&write_fd_set);
@@ -121,12 +125,7 @@ void _run_core(int fd, int tls)
       if(FD_ISSET(ref_sock, &read_fd_set) && ref_sock == fd )
       {
         /* new socket */
-        if(!tls)
-          fd_new = accept(fd, (struct sockaddr *)&client, &size);
-        else
-          ret = mbedtls_net_accept( &(tls_serv.server_fd), 
-              &client_fd,
-              NULL, 0, NULL );
+        fd_new = accept(fd, (struct sockaddr *)&client, &size);
         
         if(fd_new < 0)
         {
