@@ -108,9 +108,8 @@ void _run_core(int fd, int tls)
       if(FD_ISSET(ref_sock, &read_fd_set) && ref_sock == fd )
       {
         /* new socket */
-        printf("IACC\n");
         fd_new = accept(fd, (struct sockaddr *)&client, &size);
-        printf("ACC\n");
+        
         if(fd_new < 0)
         {
           TUL_SIGNAL_INT=1;
@@ -150,6 +149,7 @@ void do_read(int i)
     /* socket closed */
     if(bread <= 0)
     {
+      printf("SOCK CLOSE\n");
       FD_CLR(i, &active_set);
       tul_rem_context(i);
     }

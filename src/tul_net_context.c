@@ -17,7 +17,7 @@ int tul_add_context(unsigned sock, int tls)
   _tul_int_context_struct *cur = &_glbl_struct_list;
 
   /* find the end of the list */
-  while(cur->next != NULL && cur->this->_sock != sock)
+  while(cur->next != NULL && cur->this != NULL && cur->this->_sock != sock)
   {
     cur = cur->next;
   }
@@ -34,10 +34,11 @@ int tul_add_context(unsigned sock, int tls)
   {
     if(cur->this == NULL)
     {
-      cur->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
+      cur->this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       cur->this->_sock = sock;
+
       new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
-      new->this=(tul_net_context*)calloc(1, sizeof(tul_net_context));
+      new->this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       new->this->_sock = sock;
       cur->next = new;
 
