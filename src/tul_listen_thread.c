@@ -147,7 +147,6 @@ void do_read(int i)
     /* socket closed */
     if(bread <= 0)
     {
-      printf("SOCK CLOSE\n");
       FD_CLR(i, &active_set);
       tul_rem_context(i);
     }

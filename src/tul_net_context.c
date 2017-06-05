@@ -43,14 +43,11 @@ int tul_add_context(unsigned sock, int tls)
       new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
       new->this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       new->this->_sock = sock;
-      if(cur->next != NULL)
-        printf("NOT NULL NEXT\n");
       cur->next = new;
     }
 
     ret = 0;
     /* do tls setup */
-    printf("TLS IT: %d\n", tls);
     if(tls)
     {
       new->this->_use_tls = 1;
