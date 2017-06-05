@@ -1,6 +1,6 @@
 /***
   Copyright (C) irfan
-
+  network context cache
  **/
 
 #include "tul_log.h"
@@ -36,44 +36,49 @@ int tul_add_context(unsigned sock, int tls)
     {
       cur->this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       cur->this->_sock = sock;
-
+      new = cur;
+    }
+    else
+    {
       new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
       new->this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       new->this->_sock = sock;
+      if(cur->next != NULL)
+        printf("NOT NULL NEXT\n");
       cur->next = new;
+    }
 
-      ret = 0;
-      /* do tls setup */
-      printf("TLS IT: %d\n", tls);
-      if(tls)
+    ret = 0;
+    /* do tls setup */
+    printf("TLS IT: %d\n", tls);
+    if(tls)
+    {
+      new->this->_use_tls = 1;
+
+      mbedtls_ssl_set_bio( 
+          &(new->this->ssl), &(new->this->net_c), 
+          mbedtls_net_send, mbedtls_net_recv, NULL );
+
+      mbedtls_debug_set_threshold(4);
+
+      while( (ret = mbedtls_ssl_handshake( &(new->this->ssl))) != 0)
       {
-        new->this->_use_tls = 1;
-
-        mbedtls_ssl_set_bio( 
-            &(new->this->ssl), &(new->this->net_c), 
-            mbedtls_net_send, mbedtls_net_recv, NULL );
-
-        mbedtls_debug_set_threshold(4);
-
-        while( (ret = mbedtls_ssl_handshake( &(new->this->ssl))) != 0)
+        if(ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-          if(ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
-          {
-            ret = 1;
-            break;
-          }
+          ret = 1;
+          break;
         }
-        printf("TLS ret: %d\n", ret);
+      }
+      printf("TLS ret: %d\n", ret);
 
-        /* TLS handshake failure */
-        if(ret)
-        {
-          mbedtls_net_free( &(new->this->net_c));
-          mbedtls_ssl_session_reset( &(new->this->ssl) );
+      /* TLS handshake failure */
+      if(ret)
+      {
+        mbedtls_net_free( &(new->this->net_c));
+        mbedtls_ssl_session_reset( &(new->this->ssl) );
 
-          free(new);
-          cur->next = NULL;
-        }
+        free(new);
+        cur->next = NULL;
       }
     }
   }
@@ -105,21 +110,31 @@ int tul_get_sock(unsigned pos)
 
 void tul_rem_context(unsigned sock)
 {
+  _tul_int_context_struct *tmp = NULL;
   _tul_int_context_struct *cur = &_glbl_struct_list;
-  while(cur->next != NULL && cur->this->_sock != sock)
+
+  while(cur->next != NULL && cur->this != NULL && cur->this->_sock != sock)
   {
+    tmp = cur;
     cur = cur->next;
   }
 
-  if(cur->this->_sock == sock)
+  if(cur->this != NULL && cur->this->_sock == sock)
   {
-    cur->back = cur->next;
-    cur->next = cur->back;
-
     /* close the socket */
     close(cur->this->_sock);
     memset(cur->this, 0, sizeof(tul_net_context));
     free(cur->this);
+    cur->this = NULL;
+
+    if(tmp != NULL)
+    {
+      if(cur->next != NULL)
+        tmp->next = cur->next;
+      else
+        tmp->next = NULL;
+    }
+      
     memset(cur, 0, sizeof(_tul_int_context_struct));
   }
 }
@@ -142,16 +157,16 @@ void tul_dest_context_list()
   cur = &_glbl_struct_list;
 
   /* find the end of the list */
+CHECK_LIST:
   while(cur->next != NULL)
   {
+    tmp = cur;
     cur = cur->next;
   }
 
   /* free from the end to the tip */
-  while(cur != NULL)
+  while(_glbl_struct_list.next != NULL)
   {
-    tmp = cur->back;
-
     /* clear data & close socket */
     if(cur && cur->this && cur->this->_sock)
       close(cur->this->_sock);
@@ -162,7 +177,9 @@ void tul_dest_context_list()
       memset(cur, 0, sizeof(_tul_int_context_struct));
       free(cur);
     }
-    cur = tmp;
+    if(tmp)
+      tmp->next = NULL;
+    goto CHECK_LIST;
   }
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }

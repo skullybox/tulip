@@ -120,13 +120,11 @@ void _run_core(int fd, int tls)
       }
       else if(FD_ISSET(ref_sock, &read_fd_set))
       {
-        if(!ret)
-          do_read(ref_sock);
+        do_read(ref_sock);
       }
       else if(FD_ISSET(ref_sock, &write_fd_set))
       {
-        if(!ret)
-          do_write(ref_sock);
+        do_write(ref_sock);
       }
     }
   }
