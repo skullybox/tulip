@@ -16,8 +16,8 @@ extern int daemon_mode;
 
 void *_run_listener(void *data);
 void _run_core(int fd, int tls);
-void do_read(int i);
-void do_write(int i);
+void do_read(int i, int tls);
+void do_write(int i, int tls);
 
 static fd_set read_fd_set;
 static fd_set write_fd_set;
@@ -137,18 +137,18 @@ void _run_core(int fd, int tls)
       }
       else if(FD_ISSET(ref_sock, &read_fd_set))
       {
-        do_read(ref_sock);
+        do_read(ref_sock, int tls);
       }
       else if(FD_ISSET(ref_sock, &write_fd_set))
       {
-        do_write(ref_sock);
+        do_write(ref_sock, int tls);
       }
     }
   }
   tul_dest_context_list();
 }
 
-void do_read(int i)
+void do_read(int i, int tls)
 {
   int bread = 0;
   tul_net_context *ctx;
@@ -157,9 +157,19 @@ void do_read(int i)
 
   if(ctx != NULL && ctx->_trecv < CTX_BLOCK)
   {
-    bread = read(ctx->_sock,
-        &(ctx->payload_in[ctx->_trecv]),
-        CTX_BLOCK-ctx->_trecv);
+    if(!tls)
+    {
+      bread = read(ctx->_sock,
+          &(ctx->payload_in[ctx->_trecv]),
+          CTX_BLOCK-ctx->_trecv);
+    }
+    else
+    {
+      bread = tls_read(ctx,
+          &(ctx->payload_in[ctx->_trecv]),
+          CTX_BLOCK-ctx->_trecv);
+    }
+
 
     /* socket closed */
     if(bread <= 0)
@@ -180,7 +190,7 @@ void do_read(int i)
   }
 }
 
-void do_write(int i)
+void do_write(int i, int tls)
 {
   int bwrite = 0;
   tul_net_context *ctx;
@@ -191,9 +201,19 @@ void do_write(int i)
       ctx->payload_out_cnt <= CTX_BLOCK &&
       ctx->_tsend < ctx->payload_out_cnt )
   {
-    bwrite = write(ctx->_sock,
-        &(ctx->payload_out[ctx->_tsend]),
-        ctx->payload_out_cnt-ctx->_tsend);
+
+    if(!tls)
+    {
+      bwrite = write(ctx->_sock,
+          &(ctx->payload_out[ctx->_tsend]),
+          ctx->payload_out_cnt-ctx->_tsend);
+    }
+    else
+    {
+      bwrite = tls_write(ctx,
+          &(ctx->payload_out[ctx->_tsend]),
+          ctx->payload_out_cnt-ctx->_tsend);
+    }
 
     if(bwrite <= 0)
     {

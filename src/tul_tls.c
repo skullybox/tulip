@@ -104,9 +104,19 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       NULL, 0);
   CHECK_RET;
 
+  ret = mbedtls_x509_crt_parse( &(c->cert),
+      (const unsigned char *) mbedtls_test_srv_crt,
+      mbedtls_test_srv_crt_len );
+  CHECK_RET;
+
   ret = mbedtls_x509_crt_parse( &(c->cert), 
       (const unsigned char *) mbedtls_test_cas_pem,
       mbedtls_test_cas_pem_len );
+  CHECK_RET;
+
+    ret = mbedtls_pk_parse_key( &(c->pkey), 
+      (const unsigned char *) mbedtls_test_srv_key,
+      mbedtls_test_srv_key_len, NULL, 0 );
   CHECK_RET;
 
   ret = mbedtls_net_bind( &(c->server_fd), 
@@ -119,26 +129,21 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       mbedtls_ssl_cache_set );
 #endif
 
-  ret = mbedtls_pk_parse_key( &(c->pkey), 
-      (const unsigned char *) mbedtls_test_srv_key,
-      mbedtls_test_srv_key_len, NULL, 0 );
-  CHECK_RET;
-
   ret = mbedtls_ssl_config_defaults( &(c->conf),
       MBEDTLS_SSL_IS_SERVER,
       MBEDTLS_SSL_TRANSPORT_STREAM,
       MBEDTLS_SSL_PRESET_DEFAULT );
   CHECK_RET;
+
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
-  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_OPTIONAL);
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
-
-  ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
+  ret = mbedtls_ssl_conf_own_cert( &(c->conf), 
+      &(c->cert), &(c->pkey));  
   CHECK_RET;
 
-  ret = mbedtls_ssl_set_hostname(&(c->ssl), "tultls");
+  ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
   CHECK_RET;
 
   return 0;
@@ -175,12 +180,6 @@ int tls_read(tul_tls_ctx *c, char *buf, unsigned len)
   
   ret = mbedtls_ssl_read( &(c->ssl), (unsigned char *)buf, len );
 
-  if( ret == MBEDTLS_ERR_SSL_WANT_READ )
-    printf("READ\n");
-
-  if( ret == MBEDTLS_ERR_SSL_WANT_WRITE )
-    printf("WRITE\n");
-
   if(ret < 0)
     return -2;
 
@@ -195,11 +194,6 @@ int tls_write(tul_tls_ctx *c, char *buf, unsigned len)
   int ret = 0;
   
   ret = mbedtls_ssl_write( &(c->ssl), (unsigned char *)buf, len );
-  if( ret == MBEDTLS_ERR_SSL_WANT_READ )
-    printf("READ\n");
-
-  if( ret == MBEDTLS_ERR_SSL_WANT_WRITE )
-    printf("WRITE\n");
 
   if(ret < 0)
     return -2;
