@@ -20,7 +20,7 @@ are placed in respective folders here
     openssl req -key test.thincatlabs.com.pem -new -sha256 -out test.thincatlabs.csr.pem
 
 - sign the certificate request (csr)
-    openssl ca -extensions server_cert -days 375 -notext -md sha256 -in test.thincatlabs.csr.pem -out test.thincatlabs.com.cert.pem -CA ca.cert.pem -CAkey ca.key.pem
+    openssl ca -days 370 -in test.thincatlabs.csr.pem
 
 
 
