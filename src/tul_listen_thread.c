@@ -4,7 +4,8 @@
  **/
 
 #include "tul_log.h"
-#include "tul_tls.h"
+#include "tul_tls_common.h"
+#include "tul_tls_server.h"
 #include "tul_service.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
@@ -137,11 +138,11 @@ void _run_core(int fd, int tls)
       }
       else if(FD_ISSET(ref_sock, &read_fd_set))
       {
-        do_read(ref_sock, int tls);
+        do_read(ref_sock, tls);
       }
       else if(FD_ISSET(ref_sock, &write_fd_set))
       {
-        do_write(ref_sock, int tls);
+        do_write(ref_sock, tls);
       }
     }
   }
@@ -159,15 +160,18 @@ void do_read(int i, int tls)
   {
     if(!tls)
     {
+     /*
       bread = read(ctx->_sock,
           &(ctx->payload_in[ctx->_trecv]),
           CTX_BLOCK-ctx->_trecv);
+          */
     }
     else
     {
-      bread = tls_read(ctx,
+      /*bread = tls_read(ctx,
           &(ctx->payload_in[ctx->_trecv]),
           CTX_BLOCK-ctx->_trecv);
+          */
     }
 
 
@@ -204,15 +208,18 @@ void do_write(int i, int tls)
 
     if(!tls)
     {
+      /*
       bwrite = write(ctx->_sock,
           &(ctx->payload_out[ctx->_tsend]),
           ctx->payload_out_cnt-ctx->_tsend);
+          */
     }
     else
     {
-      bwrite = tls_write(ctx,
+      /*bwrite = tls_write(ctx,
           &(ctx->payload_out[ctx->_tsend]),
           ctx->payload_out_cnt-ctx->_tsend);
+          */
     }
 
     if(bwrite <= 0)

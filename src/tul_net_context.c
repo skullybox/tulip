@@ -4,7 +4,7 @@
  **/
 
 #include "tul_log.h"
-#include "tul_tls.h"
+#include "tul_tls_common.h"
 #include "tul_globals.h"
 #include "tul_net_context.h"
 
