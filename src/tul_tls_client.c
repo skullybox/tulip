@@ -5,14 +5,15 @@
 
 #include "tul_tls_client.h"
 #include <string.h>
+#include <assert.h>
 
-#define CHECK_RET if(ret) return -1; 
+#define CHECK_RET if(ret) assert(ret == 0);
 
 int tls_client_init(tul_tls_ctx *c, int lport)
 {
   int ret = 0;
   char buff[13] = {0};
-  printf(buff, "%d", lport);
+  sprintf(buff, "%d", lport);
 
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
@@ -60,7 +61,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
-  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_NONE);
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
@@ -73,9 +74,6 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       &(c->server_fd), mbedtls_net_send, mbedtls_net_recv, NULL );
 
   ret = mbedtls_ssl_handshake( &(c->ssl) );
-  CHECK_RET;
-
-  ret = mbedtls_ssl_get_verify_result(&(c->ssl));
   CHECK_RET;
 
   return 0;
@@ -97,6 +95,4 @@ int tls_client_free(tul_tls_ctx *c)
 
   return 0;
 }
-
-
 

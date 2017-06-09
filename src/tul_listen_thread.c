@@ -127,7 +127,7 @@ void _run_core(int fd, int tls)
       {
         /* new socket */
         fd_new = accept(fd, (struct sockaddr *)&client, &size);
-        
+
         if(fd_new < 0)
         {
           TUL_SIGNAL_INT=1;
@@ -153,25 +153,24 @@ void do_read(int i, int tls)
 {
   int bread = 0;
   tul_net_context *ctx;
+  tul_tls_ctx *tls_ctx;
 
   ctx = tul_find_context(i);
+  tls_ctx = &(ctx->tls);
 
   if(ctx != NULL && ctx->_trecv < CTX_BLOCK)
   {
     if(!tls)
     {
-     /*
       bread = read(ctx->_sock,
           &(ctx->payload_in[ctx->_trecv]),
           CTX_BLOCK-ctx->_trecv);
-          */
     }
     else
     {
-      /*bread = tls_read(ctx,
+      bread = tls_read(tls_ctx,
           &(ctx->payload_in[ctx->_trecv]),
           CTX_BLOCK-ctx->_trecv);
-          */
     }
 
 
@@ -198,8 +197,10 @@ void do_write(int i, int tls)
 {
   int bwrite = 0;
   tul_net_context *ctx;
+  tul_tls_ctx *tls_ctx;
 
   ctx = tul_find_context(i);
+  tls_ctx = &(ctx->tls);
 
   if(ctx->payload_out_cnt > 0 &&
       ctx->payload_out_cnt <= CTX_BLOCK &&
@@ -208,18 +209,15 @@ void do_write(int i, int tls)
 
     if(!tls)
     {
-      /*
       bwrite = write(ctx->_sock,
           &(ctx->payload_out[ctx->_tsend]),
           ctx->payload_out_cnt-ctx->_tsend);
-          */
     }
     else
     {
-      /*bwrite = tls_write(ctx,
+      bwrite = tls_write(tls_ctx,
           &(ctx->payload_out[ctx->_tsend]),
           ctx->payload_out_cnt-ctx->_tsend);
-          */
     }
 
     if(bwrite <= 0)

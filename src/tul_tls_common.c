@@ -15,7 +15,7 @@
 int tls_read(tul_tls_ctx *c, char *buf, unsigned len)
 {
   int ret = 0;
-  
+
   ret = mbedtls_ssl_read( &(c->ssl), (unsigned char *)buf, len );
 
   if(ret < 0)
@@ -30,7 +30,7 @@ int tls_read(tul_tls_ctx *c, char *buf, unsigned len)
 int tls_write(tul_tls_ctx *c, char *buf, unsigned len)
 {
   int ret = 0;
-  
+
   ret = mbedtls_ssl_write( &(c->ssl), (unsigned char *)buf, len );
 
   if(ret < 0)

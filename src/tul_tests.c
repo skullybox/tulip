@@ -124,13 +124,25 @@ void _tls_client_test()
   tul_tls_ctx c;
 
   strcpy(c.host, "apple.com");
-  tls_client_init(&c, 443);
-  tls_write(&c, "GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n", 
+  ret = tls_client_init(&c, 443);
+  if(ret)
+  {
+    fprintf(stderr, "FAIL: tls_client_test\n");
+    return;
+  }
+
+  ret = tls_write(&c, "GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n", 
       strlen("GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n"));
+  if(!ret || ret < 0)
+  {
+    fprintf(stderr, "FAIL: tls_client_test\n");
+    return;
+  }
+
   ret = tls_read(&c, buf, 1024);
   tls_client_free(&c);
 
-  if(!ret)
+  if(!ret || ret < 0)
   {
     fprintf(stderr, "FAIL: tls_client_test\n");
     return;
