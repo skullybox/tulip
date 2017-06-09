@@ -10,6 +10,7 @@ do
  echo "\"$line\\r\\n\"" >> "$1/ca_cert.c"
 done <  "$CA_CERT"
 echo ";" >> "$1/ca_cert.c"
+echo "int CA_CERT_len = sizeof(CA_CERT);" >> "$1/ca_cert.c"
 
 echo "const char SERVER_KEY [] = " > "$1/server_cert.c"
 while read line;
@@ -17,6 +18,7 @@ do
  echo "\"$line\\r\\n\"" >> "$1/server_cert.c"
 done <  "$SERVER_KEY_FILE"
 echo ";">> "$1/server_cert.c"
+echo "int SERVER_KEY_len = sizeof(SERVER_KEY);" >> "$1/server_cert.c"
 
 echo "const char SERVER_CERT [] = " >> "$1/server_cert.c"
 while read line;
@@ -24,6 +26,8 @@ do
  echo "\"$line\\r\\n\"" >> "$1/server_cert.c"
 done <  "$SERVER_CERT"
 echo ";">> "$1/server_cert.c"
+
+echo "int SERVER_CERT_len = sizeof(SERVER_CERT);" >> "$1/server_cert.c"
 
 
 

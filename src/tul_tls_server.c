@@ -10,14 +10,15 @@
 extern const char CA_CERT[];
 extern const char SERVER_CERT[];
 extern const char SERVER_KEY[];
+extern int SERVER_CERT_len;
+extern int CA_CERT_len;
+extern int SERVER_KEY_len;
+
 
 int tls_server_init(tul_tls_ctx *c, int lport)
 {
   int ret = 0;
   char buff[13] = {0};
-  int CA_CERT_len = strlen(CA_CERT);
-  int SERVER_CERT_len = strlen(SERVER_CERT);
-  int SERVER_KEY_len = strlen(SERVER_KEY);
   sprintf(buff, "%d", lport);
 
   mbedtls_net_init( &(c->server_fd) );
