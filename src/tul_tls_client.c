@@ -7,7 +7,8 @@
 #include <string.h>
 #include <assert.h>
 
-#define CHECK_RET if(ret) assert(ret == 0);
+#define CHECK_RET if(ret) return -1;
+extern int RUN_TESTS;
 
 int tls_client_init(tul_tls_ctx *c, int lport)
 {
@@ -61,7 +62,11 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
-  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_NONE);
+  if(RUN_TESTS)
+    mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_NONE);
+  else
+    mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+    
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );

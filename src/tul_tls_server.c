@@ -70,6 +70,8 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       &(c->cert), &(c->pkey));  
   CHECK_RET;
 
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
   CHECK_RET;
 
