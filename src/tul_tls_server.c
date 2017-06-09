@@ -41,9 +41,6 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       (const unsigned char *) SERVER_CERT,
       SERVER_CERT_len );
   CHECK_RET;
-      char error_buf[100];
-        mbedtls_strerror( ret, error_buf, 100 );
-        printf("Last error was: %d - %s\n\n", ret, error_buf );
         
   ret = mbedtls_x509_crt_parse( &(c->cert), 
       (const unsigned char *) CA_CERT,
