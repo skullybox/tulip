@@ -5,13 +5,19 @@
 
 #include "tul_tls_server.h"
 #include <string.h>
-
-#define CHECK_RET if(ret) return -1; 
+#include <assert.h>
+#define CHECK_RET if(ret) return -1;
+extern const char CA_CERT[];
+extern const char SERVER_CERT[];
+extern const char SERVER_KEY[];
 
 int tls_server_init(tul_tls_ctx *c, int lport)
 {
   int ret = 0;
   char buff[13] = {0};
+  int CA_CERT_len = strlen(CA_CERT);
+  int SERVER_CERT_len = strlen(SERVER_CERT);
+  int SERVER_KEY_len = strlen(SERVER_KEY);
   sprintf(buff, "%d", lport);
 
   mbedtls_net_init( &(c->server_fd) );
@@ -32,18 +38,22 @@ int tls_server_init(tul_tls_ctx *c, int lport)
   CHECK_RET;
 
   ret = mbedtls_x509_crt_parse( &(c->cert),
-      (const unsigned char *) mbedtls_test_srv_crt,
-      mbedtls_test_srv_crt_len );
+      (const unsigned char *) SERVER_CERT,
+      SERVER_CERT_len );
   CHECK_RET;
-
+      char error_buf[100];
+        mbedtls_strerror( ret, error_buf, 100 );
+        printf("Last error was: %d - %s\n\n", ret, error_buf );
+        
+   
   ret = mbedtls_x509_crt_parse( &(c->cert), 
-      (const unsigned char *) mbedtls_test_cas_pem,
-      mbedtls_test_cas_pem_len );
+      (const unsigned char *) CA_CERT,
+      CA_CERT_len );
   CHECK_RET;
 
     ret = mbedtls_pk_parse_key( &(c->pkey), 
-      (const unsigned char *) mbedtls_test_srv_key,
-      mbedtls_test_srv_key_len, NULL, 0 );
+      (const unsigned char *) SERVER_KEY,
+      SERVER_KEY_len, NULL, 0 );
   CHECK_RET;
 
   ret = mbedtls_net_bind( &(c->server_fd), 

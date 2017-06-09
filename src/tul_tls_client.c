@@ -9,12 +9,14 @@
 
 #define CHECK_RET if(ret) return -1;
 extern int RUN_TESTS;
+extern const char CA_CERT[];
 
 int tls_client_init(tul_tls_ctx *c, int lport)
 {
   int ret = 0;
   char buff[13] = {0};
   sprintf(buff, "%d", lport);
+  int CA_CERT_len = strlen(CA_CERT);
 
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
@@ -34,8 +36,8 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   CHECK_RET;
 
   ret = mbedtls_x509_crt_parse( &(c->cert), 
-      (const unsigned char *) mbedtls_test_cas_pem,
-      mbedtls_test_cas_pem_len );
+      (const unsigned char *) CA_CERT,
+      CA_CERT_len );
   CHECK_RET;
 
   ret = mbedtls_net_connect( &(c->server_fd), 

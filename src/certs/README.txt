@@ -8,7 +8,7 @@ are placed in respective folders here
 
 
 - generate root ca key
-    openssl genrsa -aes256 -out ca.key.pem 4096
+    openssl genrsa -aes256 -out ca.key.pem 2048
 
 - generate root ca cert
     openssl req -outform pem -key ca.key.pem -new -x509 -days 7300 -sha256 -extensions v3_ca -out ca.cert.pem
