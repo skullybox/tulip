@@ -1,7 +1,5 @@
 #! /bin/bash
 
-SERVER_PASS=$( cat "$1/pass.txt" | tr -s " " | grep "server private" | cut -f2 -d":" | sed 's/^ *//g')
-
 CA_CERT="$1/demoCA/cacert.pem"
 SERVER_KEY_FILE="$1/$(ls "$1/" | grep pem | grep -v csr)"
 SERVER_CERT="$1/demoCA/newcerts/01.pem"
@@ -27,6 +25,5 @@ do
 done <  "$SERVER_CERT"
 echo ";">> "$1/server_cert.c"
 
-echo "const char SERVER_KEY_PASS[] = \"$SERVER_PASS\";" >> "$1/server_cert.c"
 
 
