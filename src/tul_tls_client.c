@@ -11,6 +11,10 @@
 extern int RUN_TESTS;
 extern const char CA_CERT[];
 extern int CA_CERT_len;
+extern int CLIENT_KEY_len;
+extern const char CLIENT_KEY[];
+extern const char CLIENT_CERT[];
+extern int CLIENT_CERT_len;
 
 int tls_client_init(tul_tls_ctx *c, int lport)
 {
@@ -35,9 +39,19 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       NULL, 0);
   CHECK_RET;
 
+  ret = mbedtls_x509_crt_parse( &(c->cert),
+      (const unsigned char *) CLIENT_CERT,
+      CLIENT_CERT_len );
+  CHECK_RET;
+
   ret = mbedtls_x509_crt_parse( &(c->cert), 
       (const unsigned char *) CA_CERT,
       CA_CERT_len );
+  CHECK_RET;
+
+  ret = mbedtls_pk_parse_key( &(c->pkey), 
+      (const unsigned char *) CLIENT_KEY,
+      CLIENT_KEY_len, NULL, 0 );
   CHECK_RET;
 
   ret = mbedtls_net_connect( &(c->server_fd), 
@@ -49,11 +63,6 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       mbedtls_ssl_cache_get,
       mbedtls_ssl_cache_set );
 #endif
-
-  ret = mbedtls_pk_parse_key( &(c->pkey), 
-      (const unsigned char *) mbedtls_test_srv_key,
-      mbedtls_test_srv_key_len, NULL, 0 );
-  CHECK_RET;
 
   ret = mbedtls_ssl_config_defaults( &(c->conf),
       MBEDTLS_SSL_IS_CLIENT,
@@ -68,7 +77,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
     mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_NONE);
   else
     mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
-    
+
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
@@ -76,7 +85,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
 
   ret = mbedtls_ssl_set_hostname(&(c->ssl), "tls-c");
   CHECK_RET;
- 
+
   mbedtls_ssl_set_bio( &(c->ssl), 
       &(c->server_fd), mbedtls_net_send, mbedtls_net_recv, NULL );
 
