@@ -10,8 +10,8 @@ cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 # we'll add more client names here
 ifeq ($(CL),test)
-  cflgs := -DCLIENT_TEST -I./certs/test/ $(cflgs)
-  certs := certs/test/server_cert.c certs/test/ca_cert.c
+  cflgs := -DCLIENT_TEST $(cflgs)
+  certs := certs/test/server_cert.c certs/test/ca_cert.c certs/test/client_cert.c
 endif
 
 .PHONY: tls

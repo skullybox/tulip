@@ -42,13 +42,13 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       (const unsigned char *) SERVER_CERT,
       SERVER_CERT_len );
   CHECK_RET;
-        
+
   ret = mbedtls_x509_crt_parse( &(c->cert), 
       (const unsigned char *) CA_CERT,
       CA_CERT_len );
   CHECK_RET;
 
-    ret = mbedtls_pk_parse_key( &(c->pkey), 
+  ret = mbedtls_pk_parse_key( &(c->pkey), 
       (const unsigned char *) SERVER_KEY,
       SERVER_KEY_len, NULL, 0 );
   CHECK_RET;
