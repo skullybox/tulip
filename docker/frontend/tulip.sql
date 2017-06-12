@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     email varchar(100) NOT NULL, 
     PRIMARY KEY (id)
 );
-CREATE TABLE IF NOT EXISTS hostss (
+CREATE TABLE IF NOT EXISTS hosts (
     id MEDIUMINT NOT NULL AUTO_INCREMENT,
     hostName varchar(255) NOT NULL,
     ip varchar(255) NOT NULL,
