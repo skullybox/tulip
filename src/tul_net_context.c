@@ -4,7 +4,7 @@
  **/
 
 #include "tul_log.h"
-#include "tul_tls.h"
+#include "tul_tls_common.h"
 #include "tul_globals.h"
 #include "tul_net_context.h"
 
@@ -54,17 +54,23 @@ int tul_add_context(unsigned sock, int tls)
     {
       new->this->_use_tls = 1;
 
-      new->this->net_c.fd = sock;
+      mbedtls_net_init(&(new->this->tls.server_fd));
+      mbedtls_ssl_session_reset(&(tls_serv.ssl));
+      new->this->tls.server_fd.fd = sock;
 
       mbedtls_ssl_set_bio( 
-          &(tls_serv.ssl), &(new->this->net_c), 
+          &(tls_serv.ssl), &(new->this->tls.server_fd), 
           mbedtls_net_send, mbedtls_net_recv, NULL );
-
-      // mbedtls_debug_set_threshold(4);
 
       while( (ret = mbedtls_ssl_handshake( &(tls_serv.ssl))) != 0)
       {
-        if(ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
+        /*char error_buf[100];
+        mbedtls_strerror( ret, error_buf, 100 );
+        printf("Last error was: %d - %s\n\n", ret, error_buf );
+        */
+        
+        if(ret != MBEDTLS_ERR_SSL_WANT_READ && 
+            ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
           ret = 1;
           break;

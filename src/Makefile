@@ -8,6 +8,12 @@ inc := -I./tls/mbedtls-2.4.2/include
 libs := -L./tls/mbedtls-2.4.2/library -lmbedcrypto -lmbedtls -lmbedx509
 cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
+# we'll add more client names here
+ifeq ($(CL),test)
+  cflgs := -DCLIENT_TEST $(cflgs)
+  certs := certs/test/server_cert.c certs/test/ca_cert.c certs/test/client_cert.c
+endif
+
 .PHONY: tls
 all: tls main
 
@@ -15,10 +21,10 @@ tags:
 	ctags -td *.h *.c
 
 main: ${objects}
-	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread ${libs}
+	${C} ${ldflgs} ${certs} -o tulip ${objects} ${incflgs} -lpthread ${libs}
 
 win: crypt ${objects}
-	${C} ${ldflgs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 
+	${C} ${ldflgs} ${certs} -o tulip ${objects} ${incflgs} -lpthread -lws2_32 
 
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o $@

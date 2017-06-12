@@ -10,17 +10,7 @@
 
 #define CTX_BLOCK 32768
 
-#include "mbedtls/net_sockets.h"
-#include "mbedtls/debug.h"
-#include "mbedtls/ssl.h"
-#include "mbedtls/entropy.h"
-#include "mbedtls/ctr_drbg.h"
-#include "mbedtls/error.h"
-#include "mbedtls/certs.h"
-#if defined(MBEDTLS_SSL_CACHE_C)
-#include "mbedtls/ssl_cache.h"
-#endif
-
+#include "tul_tls_common.h"
 
 typedef struct __tul_net_context
 {
@@ -32,9 +22,7 @@ typedef struct __tul_net_context
   unsigned long long timestamp;
   char payload_in[CTX_BLOCK];
   char payload_out[CTX_BLOCK];
-  mbedtls_ssl_context ssl;
-  mbedtls_ssl_config conf;
-  mbedtls_net_context net_c;
+  tul_tls_ctx tls;
 } tul_net_context;
 
 typedef struct __tul_int_context_struct
