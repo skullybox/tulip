@@ -14,6 +14,8 @@ ifeq ($(CL),test)
   certs := certs/test/server_cert.c certs/test/ca_cert.c certs/test/client_cert.c
 endif
 
+PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
+
 .PHONY: tls
 all: tls main
 
@@ -33,6 +35,12 @@ clean-all:
 	@-rm -f *.o || true
 	@-rm -f tulip || true
 	@-rm -rf tls/mbedtls-2.4.2 || true
+
+install:
+	-mkdir -p "../${PREFIX}/etc/init.d/"
+	-mkdir -p "../${PREFIX}/etc/tulip"
+	cp "tulip" "../${PREFIX}/etc/tulip/tulip"
+	cp "config.cfg" "../${PREFIX}/etc/tulip/config.cfg"
 
 clean:
 	@-rm -f *.o || true
