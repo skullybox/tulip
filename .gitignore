@@ -41,7 +41,7 @@ tags
 .DS_Store
 
 # rpm stuff
-rpmbuild/BUILD  
+rpmbuild/BUILD
 rpmbuild/BUILDROOT
 rpmbuild/RPMS
 rpmbuild/SOURCES
