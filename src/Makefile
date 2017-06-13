@@ -42,7 +42,6 @@ install:
 	cp "tulip" "../${PREFIX}/etc/tulip/tulip"
 	cp "config.cfg" "../${PREFIX}/etc/tulip/config.cfg"
 
-
 clean:
 	@-rm -f *.o || true
 	@-rm -f tulip || true
