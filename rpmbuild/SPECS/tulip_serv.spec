@@ -15,15 +15,16 @@ Packager: Thin Cat Labs <info@thincatlabs.com>
 Tulip Server service
 
 %prep
+if [ ! -d src ]; then echo "add source..."; ln -s ../../src/ .; fi
 
 %build
-if [ ! -x ~/tulipc/out/tulip ];
-then
-make -C src clean-all
+echo "cleaning source..."
+make -C src/ clean-all
+echo "building source..."
 make -C src CL=$CLIENT
-fi
 
 %install
+echo "installing to buildroot..."
 make -C src/ install
 
 %files
@@ -31,13 +32,8 @@ make -C src/ install
 /etc/tulip/config.cfg
 
 %post
-chkconfig --add tulip
-chkconfig tulip on
 
 %preun
-service tulip stop
-chkconfig tulip off
-chkconfig --del tulip
 
 %changelog
 * Mon Jun 12 2017 - info (at) thincatlabs.com

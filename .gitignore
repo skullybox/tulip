@@ -39,3 +39,10 @@ tags
 *.swp
 
 .DS_Store
+
+# rpm stuff
+rpmbuild/BUILD  
+rpmbuild/BUILDROOT
+rpmbuild/RPMS
+rpmbuild/SOURCES
+rpmbuild/SRPMS
