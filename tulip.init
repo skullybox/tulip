@@ -1,0 +1,88 @@
+#!/bin/sh
+#
+# tulip Start/Stop the tulip daemon.
+#
+# chkconfig: 2345 90 60
+# description: Tulip - Thin Cat Labs
+
+### BEGIN INIT INFO
+# Provides: tulip
+# Required-Start: $local_fs $syslog
+# Required-Stop: $local_fs $syslog
+# Default-Start:  2345
+# Default-Stop: 90
+# Short-Description: Tulip - Thin Cat Labs
+# Description: Tulip - Thin Cat Labs
+### END INIT INFO
+
+source /etc/rc.d/init.d/functions
+
+[ -x /usr/tulip-1.1/tulip ] || exit 1
+
+RETVAL=0
+prog="tulip"
+desc="MTS Daemon"
+
+start() {
+  if [ -e /usr/tulip-1.1/tulip.pid ];
+  then
+    PID=`cat /usr/tulip-1.1/tulip.pid`;
+  PID_FOUND=`ps aux | tr -s " " | cut -f2 -d" " | grep $PID`;
+  if [ "$PID_FOUND" == "$PID" ];
+  then
+    return 0;
+  fi
+    fi
+    echo -n $"Starting $desc ($prog): "
+    daemon /usr/tulip-1.1/tulip /usr/tulip-1.1/tulip.cnf
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
+    RETVAL=$?
+      [ $RETVAL -eq 0 ] && success 
+      echo
+        return $RETVAL
+}
+
+stop() {
+  if [ ! -e /usr/tulip-1.1/tulip.pid ];
+  then
+    return 0;
+  fi
+    PID=`cat /usr/tulip-1.1/tulip.pid`;
+  PID_FOUND=`ps aux | tr -s " " | cut -f2 -d" " | grep $PID`;
+  if [ "$PID_FOUND" != "$PID" ];
+  then
+    return 0;
+  fi
+
+    echo -n $"Shutting down $desc ($prog): "
+    kill -INT `cat /usr/tulip-1.1/tulip.pid`
+    RETVAL=$?
+    sleep 30
+    [ $RETVAL -eq 0 ] && success && rm -f /var/lock/subsys/$prog
+    RETVAL=$?
+      [ $RETVAL -eq 0 ] && success 
+      echo
+        return $RETVAL
+}
+
+case "$1" in
+start)
+start
+;;
+stop)
+stop
+;;
+
+restart)
+stop
+start
+RETVAL=$?
+;;
+*)
+echo $"Usage: $0 {start|stop|restart}"
+RETVAL=1
+esac
+
+exit $RETVAL
+
