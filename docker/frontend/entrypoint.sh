@@ -4,7 +4,7 @@ set -e
 
 echo "loading tulip.sql into database"
 
-mysql -h percona -u tulip -ptulip cloud_auth < /tulip.sql
+mysql -h percona -u tulip -ptulip cloud_auth < /cloud_auth.sql
 
 if [ -z "$1" ]
 then
