@@ -6,7 +6,7 @@ RUN yum -y install httpd mysql-utilities openssl sudo php mod_ssl php-mysql mari
 RUN rm -f /var/www/html/index.*
 COPY entrypoint.sh / 
 COPY html/* /var/www/html/
-COPY tulip.sql /
+COPY *.sql /
 
 ENTRYPOINT ["/entrypoint.sh"]
 #ENTRYPOINT ["/usr/sbin/httpd -DFOREGROUND"]
