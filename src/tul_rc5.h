@@ -11,8 +11,6 @@ typedef unsigned     WORD; /* Should be 32-bit = 4 bytes        */
 #define RC5_b        16 /* number of bytes in key            */
 #define RC5_c         4 /* number  RC5_Words in key = ceil(8*b/RC5_W)*/
 #define RC5_t        56 /* size of table S = 2*(r+1) RC5_Words   */
-WORD S[RC5_t];         /* expanded key table                */
-WORD P = 0xb7e15163, Q = 0x9e3779b9;  /* magic constants             */
 /* Rotation operators. x must be unsigned, to get logical right shift*/
 #define ROTL(x,y) (((x)<<(y&(RC5_W-1))) | ((x)>>(RC5_W-(y&(RC5_W-1)))))
 #define ROTR(x,y) (((x)>>(y&(RC5_W-1))) | ((x)<<(RC5_W-(y&(RC5_W-1)))))

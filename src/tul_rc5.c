@@ -4,6 +4,9 @@
 
 #include "tul_rc5.h"
 
+WORD S[RC5_t];         /* expanded key table */
+WORD P = 0xb7e15163, Q = 0x9e3779b9;  /* magic constants */
+
 void RC5_ENCRYPT(WORD *pt, WORD *ct)
 {
   WORD i, A=pt[0]+S[0], B=pt[1]+S[1];

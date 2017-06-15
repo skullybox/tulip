@@ -16,6 +16,7 @@ void run_tests()
   _b64_test();
   _tls_server_test();
   _tls_client_test();
+  _tls_rc5_test();
 }
 
 

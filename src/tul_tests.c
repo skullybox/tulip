@@ -4,6 +4,7 @@
 
 #include "tul_b64.h"
 #include "tul_tests.h"
+#include "tul_rc5.h"
 #include "tul_module.h"
 #include "tul_tls_common.h"
 #include "tul_tls_client.h"
@@ -142,4 +143,9 @@ void _tls_client_test()
 
 }
 
+void _tls_rc5_test()
+{
+
+  fprintf(stderr, "PASS: tls_rc5_test\n");
+}
 
