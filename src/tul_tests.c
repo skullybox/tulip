@@ -5,6 +5,7 @@
 #include "tul_b64.h"
 #include "tul_tests.h"
 #include "tul_rc5.h"
+#include "tul_random.h"
 #include "tul_module.h"
 #include "tul_tls_common.h"
 #include "tul_tls_client.h"
@@ -149,3 +150,22 @@ void _tls_rc5_test()
   fprintf(stderr, "PASS: tls_rc5_test\n");
 }
 
+void _rand_test()
+{
+  unsigned check_fail = 0;
+  char b[2048] = {0};
+  tul_random(&b[0], 2048);
+
+  for(int i = 0; i < 2048; i+=4)
+  {
+    if( b[i] == b[i+1] == b[i+2] == b[i+3] == 0)
+      check_fail = 1;
+  }
+
+  if(check_fail)
+  {
+    fprintf(stderr, "FAIL: random_test\n");
+    return;
+  }
+  fprintf(stderr, "PASS: random_test\n");
+}

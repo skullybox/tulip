@@ -5,7 +5,7 @@
 #include "tul_random.h"
 #include <stdio.h>
 
-void random(void *data, unsigned sz)
+void tul_random(void *data, unsigned sz)
 {
   if(sz == 0)
     return;

@@ -5,7 +5,7 @@
 #ifndef _tul_random
 #define _tul_random
 
-void random(void *data, unsigned sz);
+void tul_random(void *data, unsigned sz);
 
 #endif
 

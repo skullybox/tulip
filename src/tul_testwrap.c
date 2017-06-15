@@ -11,6 +11,7 @@ int RUN_TESTS = 0;
 void run_tests()
 {
   RUN_TESTS = 1;
+  _rand_test();
   _tcp_listen_test();
   _tcp_connect_test();
   _b64_test();
