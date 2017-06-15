@@ -54,6 +54,11 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       CLIENT_KEY_len, NULL, 0 );
   CHECK_RET;
 
+  ret = mbedtls_ssl_conf_own_cert(&(c->conf), &(c->cert), &(c->pkey));
+  CHECK_RET;
+
+  mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
+
   ret = mbedtls_net_connect( &(c->server_fd), 
       c->host, buff, MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
@@ -73,23 +78,20 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
-  if(RUN_TESTS)
-    mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_NONE);
-  else
-    mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
-
-  mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
-  CHECK_RET;
-
-  ret = mbedtls_ssl_set_hostname(&(c->ssl), "tls-c");
   CHECK_RET;
 
   mbedtls_ssl_set_bio( &(c->ssl), 
       &(c->server_fd), mbedtls_net_send, mbedtls_net_recv, NULL );
 
   ret = mbedtls_ssl_handshake( &(c->ssl) );
+  /*  char error_buf[100];
+      mbedtls_strerror( ret, error_buf, 100 );
+      printf("Last error was: %d - %s\n\n", ret, error_buf );
+   */
+       
   CHECK_RET;
 
   return 0;
