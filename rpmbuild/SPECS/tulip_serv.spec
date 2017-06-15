@@ -29,7 +29,6 @@ make -C src/ install
 
 %files
 /etc/tulip/tulip
-/etc/tulip/config.cfg
 
 %post
 
