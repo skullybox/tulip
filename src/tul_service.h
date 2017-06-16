@@ -15,8 +15,7 @@ typedef void (*tul_read_callback)(char *buff,
     unsigned *trecv);
 
 typedef void (*tul_write_callback)(char *buff,
-    unsigned *tsend,
-    unsigned *sz);
+    unsigned *tsend);
 
 void tul_service(tul_net_context *ctx, short send_flg);
 

@@ -16,12 +16,15 @@ void configure_module()
 
 void module_read(char *buff, unsigned *recv)
 {
-
+  if (*recv != REQ_SZ)
+    return;
 }
 
 
-void module_write(char *buff, unsigned *sent, unsigned sz)
+void module_write(char *buff, unsigned *sent)
 {
+  if(*sent != RES_SZ)
+    return;
 
 }
 

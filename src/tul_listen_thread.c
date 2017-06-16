@@ -50,14 +50,17 @@ void *_run_listener(void *data)
   int *lport = (int*)data;
   int tls = ((int*)data)[1];
 
-  if(!tls && tul_tcp_listen_init(*lport, &sock))
+  if(!tls)
   {
-    tul_log("ERROR: network listener failed");
+    if ( tul_tcp_listen_init(*lport, &sock) )
+    {
+      tul_log("ERROR: network listener failed");
 
-    /* listen failed exit */
-    free(lport);
-    TUL_SIGNAL_INT = 1;
-    return NULL;
+      /* listen failed exit */
+      free(lport);
+      TUL_SIGNAL_INT = 1;
+      return NULL;
+    }
   }
   else
   {

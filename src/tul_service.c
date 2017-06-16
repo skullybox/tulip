@@ -17,8 +17,8 @@ void tul_service(tul_net_context *ctx, short send_flg)
      * and counters after processing recieved data */
     if(tul_WR_callback)
       tul_WR_callback(ctx->payload_out, 
-          &(ctx->_tsend),
-          &(ctx->payload_out_cnt));
+          &(ctx->_tsend));
+          
   }
   else 
   {
