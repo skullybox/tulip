@@ -146,8 +146,24 @@ void _tls_client_test()
 
 void _tls_rc5_test()
 {
+  RC5_ctx c;
+  unsigned char key[16] = "G57^h20S'yLR3>mG";
+  char text[8] = "ooHeiw3a";
+  char ct[8] = {0};
 
-  fprintf(stderr, "PASS: tls_rc5_test\n");
+  RC5_SETUP(key, &c);
+  RC5_ENCRYPT((unsigned *)text, (unsigned *)ct, &c);
+
+  memset(text, 0, 8);
+  RC5_DECRYPT((unsigned *)ct, (unsigned *)text, &c);
+
+  if(strncmp(text, "ooHeiw3a", 
+  strlen("ooHeiw3a")) == 0)
+  {
+    fprintf(stderr, "PASS: tls_rc5_test\n");
+    return;
+  }
+  fprintf(stderr, "FAIL: tls_rc5_test\n");
 }
 
 void _rand_test()
@@ -169,3 +185,4 @@ void _rand_test()
   }
   fprintf(stderr, "PASS: random_test\n");
 }
+

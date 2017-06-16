@@ -15,10 +15,16 @@ typedef unsigned     WORD; /* Should be 32-bit = 4 bytes        */
 #define ROTL(x,y) (((x)<<(y&(RC5_W-1))) | ((x)>>(RC5_W-(y&(RC5_W-1)))))
 #define ROTR(x,y) (((x)>>(y&(RC5_W-1))) | ((x)<<(RC5_W-(y&(RC5_W-1)))))
 
-void RC5_ENCRYPT(WORD *pt, WORD *ct);
-void RC5_DECRYPT(WORD *ct, WORD *pt);
-void RC5_SETUP(unsigned char *K);
+typedef struct _RC5_ctx
+{
+  WORD S[RC5_t];         /* expanded key table */
+  unsigned char K[RC5_b];
+} RC5_ctx;
 
+void RC5_ENCRYPT(WORD *pt, WORD *ct, RC5_ctx *ctx);
+void RC5_DECRYPT(WORD *ct, WORD *pt, RC5_ctx *ctx);
+void RC5_SETUP(unsigned char *K, RC5_ctx *ctx);
 
 
 #endif
+

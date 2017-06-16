@@ -1,10 +1,13 @@
 #! /bin/bash
 
+COM_KEY=$(pwgen -s -1 16)
 CA_CERT="$1/demoCA/cacert.pem"
 SERVER_KEY_FILE="$1/$(ls "$1/" | grep pem | grep -v client | grep -v csr)"
 SERVER_CERT="$1/demoCA/newcerts/01.pem"
 CLIENT_CERT="$1/demoCA/newcerts/02.pem"
 CLIENT_KEY_FILE="$1/$(ls "$1/" | grep pem | grep client | grep -v csr)"
+
+echo "const char COM_KEY[]  = \"$COM_KEY\";" > "$1/com_key.c"
 
 echo "const char CA_CERT [] = " > "$1/ca_cert.c"
 while read line;
