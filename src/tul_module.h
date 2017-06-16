@@ -7,20 +7,13 @@
 #define _tul_module
 
 #include "tul_service.h"
+#include "tul_net_context.h"
 
 void configure_module();
 
-void module_read(char *buff, unsigned *recv);
-void module_write(char *buff, unsigned *sent);
 
-/*
- *  16 byte salt
- *  16 byte md5
- *  30 byte host
- *  30 byte user
- *  30 byte action
- * 210 byte password
- */ 
+void module_read(tul_net_context *c);
+void module_write(tul_net_context *c);
 
 typedef unsigned char uchar;
 

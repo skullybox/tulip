@@ -7,10 +7,8 @@
 #define _tul_net_context
 
 #include "tul_globals.h"
-
-#define CTX_BLOCK 32768
-
 #include "tul_tls_common.h"
+#include "tul_module.h"
 
 typedef struct __tul_net_context
 {
@@ -18,10 +16,9 @@ typedef struct __tul_net_context
   unsigned _sock;
   unsigned _tsend;
   unsigned _trecv;
-  unsigned payload_out_cnt;
   unsigned long long timestamp;
-  char payload_in[CTX_BLOCK];
-  char payload_out[CTX_BLOCK];
+  char payload_in[10];
+  char payload_out[10];
   tul_tls_ctx tls;
 } tul_net_context;
 

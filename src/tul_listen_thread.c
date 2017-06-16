@@ -4,16 +4,17 @@
  **/
 
 #include "tul_log.h"
+#include "tul_module.h"
 #include "tul_tls_common.h"
 #include "tul_tls_server.h"
-#include "tul_service.h"
+#include "tul_net_context.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
-#include "tul_net_context.h"
 #include "tul_listen_thread.h"
 
 extern int TUL_SIGNAL_INT;
 extern int daemon_mode;
+
 
 void *_run_listener(void *data);
 void _run_core(int fd, int tls);
@@ -161,19 +162,19 @@ void do_read(int i, int tls)
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
 
-  if(ctx != NULL && ctx->_trecv < CTX_BLOCK)
+  if(ctx != NULL && ctx->_trecv < REQ_SZ)
   {
     if(!tls)
     {
       bread = read(ctx->_sock,
           &(ctx->payload_in[ctx->_trecv]),
-          CTX_BLOCK-ctx->_trecv);
+          REQ_SZ-ctx->_trecv);
     }
     else
     {
       bread = tls_read(tls_ctx,
           &(ctx->payload_in[ctx->_trecv]),
-          CTX_BLOCK-ctx->_trecv);
+          REQ_SZ-ctx->_trecv);
     }
 
 
@@ -205,22 +206,20 @@ void do_write(int i, int tls)
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
 
-  if(ctx->payload_out_cnt > 0 &&
-      ctx->payload_out_cnt <= CTX_BLOCK &&
-      ctx->_tsend < ctx->payload_out_cnt )
+  if( ctx->_tsend < RES_SZ)
   {
 
     if(!tls)
     {
       bwrite = write(ctx->_sock,
           &(ctx->payload_out[ctx->_tsend]),
-          ctx->payload_out_cnt-ctx->_tsend);
+          RES_SZ-ctx->_tsend);
     }
     else
     {
       bwrite = tls_write(tls_ctx,
           &(ctx->payload_out[ctx->_tsend]),
-          ctx->payload_out_cnt-ctx->_tsend);
+          RES_SZ-ctx->_tsend);
     }
 
     if(bwrite <= 0)
