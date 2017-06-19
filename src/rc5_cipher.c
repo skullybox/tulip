@@ -2,7 +2,7 @@
  * Modified from RC5REF file
  */
 
-#include "tul_rc5.h"
+#include "rc5_cipher.h"
 
 const WORD P = 0xb7e15163, Q = 0x9e3779b9;  /* magic constants */
 

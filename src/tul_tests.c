@@ -4,7 +4,7 @@
 
 #include "tul_b64.h"
 #include "tul_tests.h"
-#include "tul_rc5.h"
+#include "rc5_cipher.h"
 #include "tul_random.h"
 #include "tul_module.h"
 #include "tul_tls_common.h"
