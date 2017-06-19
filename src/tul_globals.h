@@ -4,9 +4,6 @@
   place globals here
  **/
 
-#ifndef _tul_globals
-#define _tul_globals
-
 #if defined(__APPLE__) || defined(__linux__)
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -34,6 +31,10 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+
+#ifndef _tul_globals
+#define _tul_globals
 
 #define DEF_SOCK_BUFF_SIZE 2048
 #define DEF_CTX_LIST_SZ 120

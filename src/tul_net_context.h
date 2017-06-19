@@ -3,14 +3,14 @@
 
  **/
 
-#ifndef _tul_net_context
-#define _tul_net_context
-
 #include "tul_globals.h"
 #include "tul_tls_common.h"
 #include "tul_module.h"
 
-typedef struct __tul_net_context
+#ifndef _tul_net_context
+#define _tul_net_context
+
+typedef struct  __tul_net_context
 {
   unsigned _use_tls;
   unsigned _sock;

@@ -3,13 +3,10 @@
   Network processing functions
  **/
 
+#include "tul_net_context.h"
+
 #ifndef _tul_service
 #define _tul_service
-
-#include "tul_net_context.h"
-#include "tul_globals.h"
-
-#define MAX_NET_BLOCK 20000
 
 typedef void (*tul_read_callback)();
 

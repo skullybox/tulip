@@ -3,6 +3,7 @@
   module callbacks
  **/
 
+
 #ifndef _tul_module
 #define _tul_module
 
@@ -10,7 +11,6 @@
 #include "tul_net_context.h"
 
 void configure_module();
-
 
 void module_read(tul_net_context *c);
 void module_write(tul_net_context *c);

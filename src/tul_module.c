@@ -4,8 +4,10 @@
  **/
 
 #include "tul_module.h"
-#include "tul_net_context"
+#include "tul_net_context.h"
 
+extern tul_read_callback tul_RD_callback;
+extern tul_write_callback tul_WR_callback;
 
 void configure_module()
 {
@@ -15,7 +17,6 @@ void configure_module()
 
 void module_read(tul_net_context *c)
 {
-  printf("BUFF: %s\n", c->
   if (c->_trecv != REQ_SZ)
     return;
 }
