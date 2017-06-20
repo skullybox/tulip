@@ -1798,6 +1798,7 @@ static void timing() {
 }
 */
 
+/*
 void testAPI(void) {
     u32 pieceLen, totalLen, dataLen;
     NESSIEstruct w;
@@ -1807,10 +1808,7 @@ void testAPI(void) {
         if ((dataLen & 0xff) == 0) {
             fprintf(stderr, "."); fflush(stderr);
         }
-        /*
-         * do the hashing in pieces of variable length:
-         */
-        NESSIEinit(&w);
+       NESSIEinit(&w);
         NESSIEadd(dataBuf, 8*dataLen, &w);
         NESSIEfinalize(&w, expectedDigest);
         if (dataLen > 0) {
@@ -1824,7 +1822,7 @@ void testAPI(void) {
                 }
                 NESSIEfinalize(&w, computedDigest);
                 if (memcmp(computedDigest, expectedDigest, DIGESTBYTES) != 0) {
-                    fprintf(stderr, "API error @ pieceLen = %lu\n", pieceLen);
+                    //fprintf(stderr, "API error @ pieceLen = %lu\n", pieceLen);
                     display(computedDigest, DIGESTBYTES); printf("\n\n");
                     display(expectedDigest, DIGESTBYTES); printf("\n\n");
                     return;
@@ -1841,7 +1839,9 @@ void testAPI(void) {
     }
     printf("No error detected.\n");
 }
+*/
 
+/*
 void makeISOTestVectors() {
     struct NESSIEstruct w;
     u8 digest[DIGESTBYTES];
@@ -1918,6 +1918,7 @@ void makeISOTestVectors() {
     printf("\n");
     fflush(stdout);
 }
+*/
 
 #ifdef TRACE_INTERMEDIATE_VALUES
 static void makeIntermediateValues() {
