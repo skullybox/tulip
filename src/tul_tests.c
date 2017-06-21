@@ -14,6 +14,15 @@
 #include "tul_listen_thread.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
+#include "tul_module.h"
+#include <assert.h>
+
+void _payload_limits_test()
+{
+  assert( REQ_SZ < 1024);
+  assert( RES_SZ < 1024);
+  fprintf(stdout, "PASS: pay_load_limits_test\n");
+}
 
 void _tcp_listen_test()
 {
@@ -123,7 +132,7 @@ void _tls_server_test()
     fprintf(stderr, "FAIL: tls_server_test\n");
     return;
   }
-  fprintf(stderr, "PASS: tls_server_test\n");
+  fprintf(stdout, "PASS: tls_server_test\n");
 }
 
 void _tls_client_test()
@@ -161,7 +170,7 @@ void _tls_rc5_test()
   if(strncmp(text, "ooHeiw3a", 
   strlen("ooHeiw3a")) == 0)
   {
-    fprintf(stderr, "PASS: tls_rc5_test\n");
+    fprintf(stdout, "PASS: tls_rc5_test\n");
     return;
   }
   fprintf(stderr, "FAIL: tls_rc5_test\n");
@@ -184,7 +193,7 @@ void _rand_test()
     fprintf(stderr, "FAIL: random_test\n");
     return;
   }
-  fprintf(stderr, "PASS: random_test\n");
+  fprintf(stdout, "PASS: random_test\n");
 }
 
 void _whirlpool_test()
@@ -207,7 +216,7 @@ void _whirlpool_test()
     return;
   }
 
-  fprintf(stderr, "PASS: whirlpool_test\n");
+  fprintf(stdout, "PASS: whirlpool_test\n");
 }
 
 

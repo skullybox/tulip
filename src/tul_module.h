@@ -34,7 +34,9 @@ typedef struct _comm_1
   uchar res[30];
 } comm_resp;
 
-static const unsigned RES_SZ = sizeof(comm_resp);
-static const unsigned REQ_SZ = sizeof(comm_req);
+static const unsigned RES_SZ = sizeof(comm_resp); 
+static const unsigned REQ_SZ = sizeof(comm_req); 
+
+
 
 #endif

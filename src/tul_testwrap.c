@@ -19,6 +19,7 @@ void run_tests()
   _tls_client_test();
   _tls_rc5_test();
   _whirlpool_test();
+  _payload_limits_test();
 }
 
 
