@@ -10,6 +10,7 @@
 #include "tul_tls_common.h"
 #include "tul_tls_client.h"
 #include "tul_tls_server.h"
+#include "whirlpool_hash.h"
 #include "tul_listen_thread.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
@@ -185,4 +186,28 @@ void _rand_test()
   }
   fprintf(stderr, "PASS: random_test\n");
 }
+
+void _whirlpool_test()
+{
+  unsigned char test[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  unsigned char hash_result[DIGESTBYTES] = {0};
+  char test_vector[] = "DC37E008CF9EE69B F11F00ED9ABA2690 1DD7C28CDEC066CC 6AF42E40F82F3A1E\n08EBA26629129D8F B7CB57211B9281A6 5517CC879D7B9621 42C65F5A7AF01467";
+  char *hash_str = NULL;
+  NESSIEstruct hash;
+
+  NESSIEinit(&hash);
+  NESSIEadd(test, strlen((char*)test)*8, &hash);
+  NESSIEfinalize(&hash, hash_result);
+
+  hashTostring(&hash_str, hash_result);
+
+  if(strcmp(hash_str, test_vector))
+  {
+    fprintf(stderr, "FAIL: whirlpool_test\n");
+    return;
+  }
+
+  fprintf(stderr, "PASS: whirlpool_test\n");
+}
+
 

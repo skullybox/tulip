@@ -14,5 +14,6 @@ void _b64_test();
 void _tls_server_test();
 void _tls_client_test();
 void _tls_rc5_test();
+void _whirlpool_test();
 
 #endif

@@ -132,6 +132,7 @@ void NESSIEadd(const unsigned char * const source, unsigned long sourceBits,
 void NESSIEfinalize(struct NESSIEstruct * const structpointer, 
     unsigned char * const result);
 
+void hashTostring(char **out, unsigned char * const result);
  
 #endif   /* _whirlpool_hash */
 
