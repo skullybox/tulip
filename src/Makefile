@@ -40,7 +40,6 @@ install:
 	-mkdir -p "../${PREFIX}/etc/init.d/"
 	-mkdir -p "../${PREFIX}/etc/tulip"
 	cp "tulip" "../${PREFIX}/etc/tulip/tulip"
-	cp "config.cfg" "../${PREFIX}/etc/tulip/config.cfg"
 
 clean:
 	@-rm -f *.o || true
