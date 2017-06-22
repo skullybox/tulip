@@ -28,7 +28,7 @@ void _tcp_listen_test()
 {
   int _sock = 0;
 
-  if(tul_tcp_listen_init(8080, &_sock))
+  if(tul_tcp_listen_init(9080, &_sock))
   {
     fprintf(stderr, "FAIL: tcp_listen_test\n");
     return;
