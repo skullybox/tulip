@@ -76,7 +76,6 @@ int tul_add_context(unsigned sock, int tls)
           break;
         }
       }
-      printf("TLS ret: %d\n", ret);
 
       /* TLS handshake failure */
       if(ret)

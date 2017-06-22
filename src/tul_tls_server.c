@@ -53,6 +53,9 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       SERVER_KEY_len, NULL, 0 );
   CHECK_RET;
 
+  ret = mbedtls_ssl_conf_own_cert(&(c->conf), &(c->cert), &(c->pkey));
+  CHECK_RET;
+
   ret = mbedtls_net_bind( &(c->server_fd), 
       NULL, buff, MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
@@ -73,9 +76,6 @@ int tls_server_init(tul_tls_ctx *c, int lport)
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
-  ret = mbedtls_ssl_conf_own_cert( &(c->conf), 
-      &(c->cert), &(c->pkey));  
-  CHECK_RET;
 
   mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
 

@@ -11,7 +11,7 @@ cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 # we'll add more client names here
 ifeq ($(CL),test)
   cflgs := -DCLIENT_TEST $(cflgs)
-  certs := certs/test/server_cert.c certs/test/ca_cert.c certs/test/client_cert.c
+  certs := certs/test/server_cert.c certs/test/ca_cert.c certs/test/client_cert.c certs/test/com_key.c
 endif
 
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
@@ -40,7 +40,6 @@ install:
 	-mkdir -p "../${PREFIX}/etc/init.d/"
 	-mkdir -p "../${PREFIX}/etc/tulip"
 	cp "tulip" "../${PREFIX}/etc/tulip/tulip"
-	cp "config.cfg" "../${PREFIX}/etc/tulip/config.cfg"
 
 clean:
 	@-rm -f *.o || true

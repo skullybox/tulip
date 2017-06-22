@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 #endif
 
   /* load configuration */
-  load_config();
+  // load_config();
 
   tul_log("starting listener");
   run_listener(port, tls);

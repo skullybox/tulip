@@ -4,11 +4,25 @@
 
 #include "tul_b64.h"
 #include "tul_tests.h"
+#include "rc5_cipher.h"
+#include "tul_random.h"
+#include "tul_module.h"
 #include "tul_tls_common.h"
 #include "tul_tls_client.h"
 #include "tul_tls_server.h"
+#include "whirlpool_hash.h"
+#include "tul_listen_thread.h"
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
+#include "tul_module.h"
+#include <assert.h>
+
+void _payload_limits_test()
+{
+  assert( REQ_SZ < 1024);
+  assert( RES_SZ < 1024);
+  fprintf(stdout, "PASS: pay_load_limits_test\n");
+}
 
 void _tcp_listen_test()
 {
@@ -101,6 +115,7 @@ void _b64_test()
   fprintf(stdout, "PASS: base64_test\n");
 }
 
+extern int tls;
 void _tls_server_test()
 {
   int ret = 0;
@@ -109,12 +124,15 @@ void _tls_server_test()
   ret = tls_server_init(&c, 9443);
   tls_server_free(&c);
 
+  run_listener(9443, tls);
+  configure_module();
+
   if(ret)
   {
     fprintf(stderr, "FAIL: tls_server_test\n");
     return;
   }
-  fprintf(stderr, "PASS: tls_server_test\n");
+  fprintf(stdout, "PASS: tls_server_test\n");
 }
 
 void _tls_client_test()
@@ -123,32 +141,82 @@ void _tls_client_test()
   char buf[1025] = {0};
   tul_tls_ctx c;
 
-  strcpy(c.host, "apple.com");
-  ret = tls_client_init(&c, 443);
+  sleep(1);
+  strcpy(c.host, "127.0.0.1");
+  ret = tls_client_init(&c, 9443);
   if(ret)
   {
     fprintf(stderr, "FAIL: tls_client_test\n");
     return;
   }
 
-  ret = tls_write(&c, "GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n", 
-      strlen("GET / HTTP/1.1\r\nHost: apple.com\r\n\r\n"));
-  if(!ret || ret < 0)
-  {
-    fprintf(stderr, "FAIL: tls_client_test\n");
-    return;
-  }
-
-  ret = tls_read(&c, buf, 1024);
-  tls_client_free(&c);
-
-  if(!ret || ret < 0)
-  {
-    fprintf(stderr, "FAIL: tls_client_test\n");
-    return;
-  }
   fprintf(stderr, "PASS: tls_client_test\n");
 
+}
+
+void _tls_rc5_test()
+{
+  RC5_ctx c;
+  unsigned char key[16] = "G57^h20S'yLR3>mG";
+  char text[8] = "ooHeiw3a";
+  char ct[8] = {0};
+
+  RC5_SETUP(key, &c);
+  RC5_ENCRYPT((unsigned *)text, (unsigned *)ct, &c);
+
+  memset(text, 0, 8);
+  RC5_DECRYPT((unsigned *)ct, (unsigned *)text, &c);
+
+  if(strncmp(text, "ooHeiw3a", 
+  strlen("ooHeiw3a")) == 0)
+  {
+    fprintf(stdout, "PASS: tls_rc5_test\n");
+    return;
+  }
+  fprintf(stderr, "FAIL: tls_rc5_test\n");
+}
+
+void _rand_test()
+{
+  unsigned check_fail = 0;
+  char b[2048] = {0};
+  tul_random(&b[0], 2048);
+
+  for(int i = 0; i < 2048; i+=4)
+  {
+    if( b[i] == b[i+1] == b[i+2] == b[i+3] == 0)
+      check_fail = 1;
+  }
+
+  if(check_fail)
+  {
+    fprintf(stderr, "FAIL: random_test\n");
+    return;
+  }
+  fprintf(stdout, "PASS: random_test\n");
+}
+
+void _whirlpool_test()
+{
+  unsigned char test[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  unsigned char hash_result[DIGESTBYTES] = {0};
+  char test_vector[] = "DC37E008CF9EE69B F11F00ED9ABA2690 1DD7C28CDEC066CC 6AF42E40F82F3A1E\n08EBA26629129D8F B7CB57211B9281A6 5517CC879D7B9621 42C65F5A7AF01467";
+  char *hash_str = NULL;
+  NESSIEstruct hash;
+
+  NESSIEinit(&hash);
+  NESSIEadd(test, strlen((char*)test)*8, &hash);
+  NESSIEfinalize(&hash, hash_result);
+
+  hashTostring(&hash_str, hash_result);
+
+  if(strcmp(hash_str, test_vector))
+  {
+    fprintf(stderr, "FAIL: whirlpool_test\n");
+    return;
+  }
+
+  fprintf(stdout, "PASS: whirlpool_test\n");
 }
 
 
