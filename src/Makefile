@@ -4,8 +4,8 @@ C = gcc
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 
-inc := -I./tls/mbedtls-2.4.2/include
-libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509
+inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
+libs := -L./tls/mbedtls-2.4.2/library -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmbedtls -lmbedcrypto -lmbedx509 -lmysqlclient
 cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 # we'll add more client names here
@@ -17,7 +17,7 @@ endif
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
 .PHONY: tls
-all: tls main
+all: sql tls main
 
 tags: 
 	ctags -f TAGS *.h *.c
@@ -35,6 +35,7 @@ clean-all:
 	@-rm -f *.o || true
 	@-rm -f tulip || true
 	@-rm -rf tls/mbedtls-2.4.2 || true
+	@-rm -rf mysql/mysql-connector-c-6.1.10-src || true
 
 install:
 	-mkdir -p "../${PREFIX}/etc/init.d/"
@@ -49,5 +50,11 @@ tls:
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
 		tar zxf "tls/mbedtls-2.4.2-apache.tgz" -C "tls";\
 		cd "tls/mbedtls-2.4.2" && cmake . && ${MAKE};\
+	fi
+
+sql:
+	if [ ! -d "mysql/mysql-connector-c-6.1.10-src" ]; then \
+		tar zxf "mysql/mysql-connector-c-6.1.10-src.tar.gz" -C "mysql";\
+		cd "mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
 	fi
 
