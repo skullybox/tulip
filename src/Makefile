@@ -20,7 +20,7 @@ PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 all: tls main
 
 tags: 
-	ctags -td *.h *.c
+	ctags -f TAGS *.h *.c
 
 main: ${objects}
 	${C} ${ldflgs} ${certs} -o tulip ${objects} ${inc} -lpthread ${libs}

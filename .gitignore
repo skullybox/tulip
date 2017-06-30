@@ -36,6 +36,7 @@
 tulip
 src/tls/mbedtls-2.4.2
 tags
+TAGS
 *.swp
 
 .DS_Store

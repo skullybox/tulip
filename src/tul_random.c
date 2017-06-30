@@ -14,7 +14,7 @@ void tul_random(void *data, unsigned sz)
   if(fp)
     return;
 
-  fread(data, 1, sz, fp);
+  int ret = fread(data, 1, sz, fp);
   fclose(fp);
 }
 
