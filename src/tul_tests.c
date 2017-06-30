@@ -4,6 +4,7 @@
 
 #include "tul_b64.h"
 #include "tul_tests.h"
+#include "tul_mysql.h"
 #include "rc5_cipher.h"
 #include "tul_random.h"
 #include "tul_module.h"
@@ -219,4 +220,14 @@ void _whirlpool_test()
   fprintf(stdout, "PASS: whirlpool_test\n");
 }
 
+void _mysql_client_test()
+{
+  if(db_init())
+  {
+    fprintf(stderr, "FAIL: mysql_client_test\n");
+    return;
+  }
+
+  fprintf(stdout, "PASS: mysql_client_test\n");
+}
 
