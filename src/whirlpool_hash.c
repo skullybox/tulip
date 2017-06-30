@@ -1962,7 +1962,7 @@ void hashTostring(char **out, unsigned char * const result)
   *out = calloc(1,DIGESTBYTES+9);
   for (i = 0; i < DIGESTBYTES; i++) {
     if (i%32 == 0 && i!=0) {
-      sprintf(tmp, "\n");
+      sprintf(tmp, " ");
       strcat(*out, tmp);
     }
     if (i%8 == 0 && i!=0 && i!=32) {
