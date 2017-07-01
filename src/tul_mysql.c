@@ -32,7 +32,7 @@ int db_init()
   /* initialize structure */
   for(int i = 0; i < MAX_MYSQL_POOL; i++)
   {
-    if( (conn_pool[i] = mysql_init(NULL)) == NULL)
+    if( (conn_pool[i] = mysql_init(conn_pool[i])) == NULL)
       ret = 1;
   }
 
