@@ -11,7 +11,7 @@ void tul_random(void *data, unsigned sz)
     return;
 
   FILE *fp = fopen("/dev/urandom", "r");
-  if(fp)
+  if(!fp)
     return;
 
   int ret = fread(data, 1, sz, fp);

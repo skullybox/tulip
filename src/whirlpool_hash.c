@@ -1957,20 +1957,17 @@ int main(int argc, char *argv[]) {
 
 void hashTostring(char **out, unsigned char * const result)
 {
-  char tmp[5] = {0};
   int i;
-  *out = calloc(1,DIGESTBYTES+9);
+  char tmp[125] = {0};
+  *out = calloc(1,DIGESTBYTES+200);
+
   for (i = 0; i < DIGESTBYTES; i++) {
-    if (i%32 == 0 && i!=0) {
-      sprintf(tmp, " ");
-      strcat(*out, tmp);
+    if (i%8 == 0 && i!=0 && i!=64) {
+      strcat(*out, " ");
     }
-    if (i%8 == 0 && i!=0 && i!=32) {
-      sprintf(tmp, " ");
+
+      sprintf(tmp, "%02X", result[i]);
       strcat(*out, tmp);
-    }
-    sprintf(tmp, "%02X", result[i]);
-    strcat(*out, tmp);
   }
 }
 

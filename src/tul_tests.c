@@ -112,6 +112,7 @@ void _b64_test()
     fprintf(stderr, "FAIL: base64_test(3)\n");
     return;
   }
+  free(r); 
 
   fprintf(stdout, "PASS: base64_test\n");
 }
@@ -185,7 +186,8 @@ void _rand_test()
 
   for(int i = 0; i < 2048; i+=4)
   {
-    if( b[i] == b[i+1] == b[i+2] == b[i+3] == 0)
+    if( b[i] == 0 && b[i+1] == 0 && 
+        b[i+2] == 0 && b[i+3] == 0)
       check_fail = 1;
   }
 

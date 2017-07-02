@@ -30,7 +30,6 @@ char * base64_enc(char *d, size_t sz)
   size_t n_sz = 4 * (sz / 3);
   int b_count = 0;
 
-  n = calloc(1, n_sz+1);
   if(sz % 3)
     n = calloc(1, n_sz+4+1);
   else

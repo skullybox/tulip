@@ -15,7 +15,7 @@
 
 static pthread_mutex_t my_mutex;
 static unsigned my_inited = 0;
-MYSQL *conn_pool[30] = {0};
+static MYSQL *conn_pool[30] = {0};
 
 int db_init()
 {
