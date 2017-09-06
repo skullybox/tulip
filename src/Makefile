@@ -20,7 +20,8 @@ PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 all: sql tls main
 
 tags: 
-	ctags -f TAGS *.h *.c
+	ctags -R --c-kinds=+ --fields=+iaS --extra=+q .
+	ctags -R --c-kinds=+ -a --fields=+iaS --extra=+q /usr/include
 
 main: ${objects}
 	${C} ${ldflgs} ${certs} -o tulip ${objects} ${inc} -lpthread ${libs}
