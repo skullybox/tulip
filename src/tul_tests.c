@@ -20,8 +20,8 @@
 
 void _payload_limits_test()
 {
-  assert( REQ_SZ < 1024);
-  assert( RES_SZ < 1024);
+  assert( REQ_SZ < DEF_SOCK_BUFF_SIZE);
+  assert( RES_SZ < DEF_SOCK_BUFF_SIZE);
   fprintf(stdout, "PASS: pay_load_limits_test\n");
 }
 

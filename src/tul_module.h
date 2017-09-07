@@ -20,17 +20,19 @@ typedef unsigned char uchar;
 typedef struct _comm_0
 {
   uchar salt[16];
-  uchar md5[16];
+  uchar hash[64];
   uchar host[30];
   uchar user[30];
   uchar action[30];
-  uchar password[210];
+  uchar password[16];
+  uchar payload[1024];
 } comm_req;
 
 typedef struct _comm_1
 {
   uchar salt[16];
-  uchar md5[16];
+  uchar hash[64];
+  uchar password[16];
   uchar res[30];
 } comm_resp;
 
