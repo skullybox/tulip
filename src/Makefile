@@ -3,6 +3,7 @@ C = gcc
 
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
+objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
 inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
 libs := -L./tls/mbedtls-2.4.2/library -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmbedtls -lmbedcrypto -lmbedx509 -lmysqlclient
@@ -17,23 +18,26 @@ endif
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
 .PHONY: tls
-all: sql tls main
+all: prep sql tls main
 
 tags: 
 	ctags -R --c-kinds=+ --fields=+iaS --extra=+q .
 	ctags -R --c-kinds=+ -a --fields=+iaS --extra=+q /usr/include
 
+prep: 
+	@-mkdir .obj
+
 main: ${objects}
-	${C} ${ldflgs} ${certs} -o tulip ${objects} ${inc} -lpthread ${libs}
+	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} ${inc} -lpthread ${libs}
 
 win: crypt ${objects}
-	${C} ${ldflgs} ${certs} -o tulip ${objects} ${inc} -lpthread -lws2_32 
+	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} ${inc} -lpthread -lws2_32 
 
 %.o : %.c
-	${C} ${cflgs} ${incflgs} $^ -o $@
+	${C} ${cflgs} ${incflgs} $^ -o .obj/$@
 
 clean-all:
-	@-rm -f *.o || true
+	@-rm -rf .obj || true
 	@-rm -f tulip || true
 	@-rm -rf tls/mbedtls-2.4.2 || true
 	@-rm -rf mysql/mysql-connector-c-6.1.10-src || true
@@ -44,7 +48,7 @@ install:
 	cp "tulip" "../${PREFIX}/etc/tulip/tulip"
 
 clean:
-	@-rm -f *.o || true
+	@-rm -rf .obj || true
 	@-rm -f tulip || true
 
 tls:
