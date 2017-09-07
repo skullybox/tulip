@@ -9,7 +9,7 @@
 #define SQL_HST "db001"
 #define SQL_USR "root"
 #define SQL_PAS "04d8bpgxdadOlZfIQFw0pm"
-#define SQL_DB  "cloud_auth"
+#define SQL_DB  "csms"
 
 #define MAX_MYSQL_POOL 30
 
