@@ -17,8 +17,8 @@ typedef struct  __tul_net_context
   unsigned _tsend;
   unsigned _trecv;
   unsigned long long timestamp;
-  char payload_in[1024];
-  char payload_out[1024];
+  char payload_in[DEF_SOCK_BUFF_SIZE];
+  char payload_out[DEF_SOCK_BUFF_SIZE];
   tul_tls_ctx tls;
 } tul_net_context;
 
