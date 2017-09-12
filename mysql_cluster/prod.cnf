@@ -1,0 +1,67 @@
+[mysqld]
+
+datadir=/var/lib/mysql/
+socket=/var/lib/mysql/mysql.sock
+
+# for gtid
+server-id = 12
+port=3336
+
+report-host=main-mysql-2
+report-port=3336
+
+master-info-repository=table
+skip-slave_start
+gtid-mode = on
+enforce-gtid-consistency=true
+log-slave-updates=true
+
+# Disabling symbolic-links is recommended to prevent assorted security risks;
+# to do so, uncomment this line:
+symbolic-links=0
+
+user=mysql
+bind-address = 0.0.0.0
+
+# logs
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+log-bin = /var/lib/mysql/mysql-replication.log
+binlog-format = ROW
+
+slow_query_log_file=/var/log/mysql_slow_queries.log
+long_query_time = 2
+
+#
+sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER
+
+[mysqld_safe]
+
+innodb_file_per_table=1
+innodb_buffer_pool_size=20000M
+innodb_log_file_size=1024M
+innodb_log_buffer_size=64M
+innodb_flush_method=O_DSYNC
+
+thread_cache_size=128
+table_cache=8192
+max_connections=300
+key_buffer = 256M
+long_query_time = 2
+open_files_limit= 50000
+max_allowed_packet = 500M
+sort_buffer_size = 4M
+read_buffer_size = 4M
+read_rnd_buffer_size = 8M
+query_cache_type = 1
+query_cache_size = 1024M
+query_cache_limit = 16M
+join_buffer_size = 1M
+max_heap_table_size = 64M
+tmp_table_size=64M
+
+replicate-wild-ignore-table=mysql.%
+
+[client]
+socket=/var/lib/mysql/mysql.sock

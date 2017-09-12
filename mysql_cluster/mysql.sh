@@ -21,6 +21,7 @@ then
   GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION; \
   create user 'repl'@'%' identified by 'password'; GRANT REPLICATION SLAVE,REPLICATION CLIENT ON *.* TO 'repl'@'%';FLUSH PRIVILEGES;shutdown;"
 else
+  echo "172.17.0.1  db1 db2" >> /etc/hosts
   sudo -umysql mysqld --datadir="$DATADIR"
 
 fi
