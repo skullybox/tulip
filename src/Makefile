@@ -5,8 +5,8 @@ sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
-inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
-libs := -L./tls/mbedtls-2.4.2/library -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmbedtls -lmbedcrypto -lmbedx509 -lmysqlclient
+inc := -I./tls/mbedtls-2.4.2/include 
+libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
 cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 # we'll add more client names here
@@ -18,7 +18,7 @@ endif
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
 .PHONY: tls
-all: prep sql tls main
+all: prep tls main
 
 tags: 
 	ctags -R --c-kinds=+ --fields=+iaS --extra=+q .
