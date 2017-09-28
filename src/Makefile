@@ -5,7 +5,7 @@ sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
-inc := -I./tls/mbedtls-2.4.2/include 
+inc := -I./tls/mbedtls-2.4.2/include -Isqlite
 libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
 cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
@@ -18,7 +18,7 @@ endif
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
 .PHONY: tls
-all: prep tls main
+all: prep tls sql main
 
 tags: 
 	ctags -R --c-kinds=+ --fields=+iaS --extra=+q .
@@ -28,7 +28,7 @@ prep:
 	@-mkdir .obj
 
 main: ${objects}
-	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} ${inc} -lpthread ${libs}
+	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} .obj/sqlite3.o ${inc} -lpthread ${libs} -ldl
 
 win: crypt ${objects}
 	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} ${inc} -lpthread -lws2_32 
@@ -58,8 +58,5 @@ tls:
 	fi
 
 sql:
-	if [ ! -d "mysql/mysql-connector-c-6.1.10-src" ]; then \
-		tar zxf "mysql/mysql-connector-c-6.1.10-src.tar.gz" -C "mysql";\
-		cd "mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
-	fi
+	gcc ${cflgs} -Isqlite sqlite/sqlite3.c -o .obj/sqlite3.o
 
