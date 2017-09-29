@@ -7,7 +7,7 @@ objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
 inc := -I./tls/mbedtls-2.4.2/include -Isqlite
 libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
-cflgs := -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
+cflgs := -DSYSLOG_USE=1 -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 # we'll add more client names here
 ifeq ($(CL),test)

@@ -12,7 +12,6 @@
 #include <fcntl.h>
 #include <sys/select.h>
 #include <syslog.h>
-#define SYSLOG_USE
 #else
 #define UNICODE 1
 #define WIN32_LEAN_AND_MEAN
@@ -39,17 +38,25 @@
 #define DEF_SOCK_BUFF_SIZE 4096
 #define DEF_CTX_LIST_SZ 220
 
-typedef struct __app_context
-{
-  unsigned int sock;
-  struct sockaddr_in addr;
-  char dat_in[DEF_SOCK_BUFF_SIZE];
-  char dat_out[DEF_SOCK_BUFF_SIZE];
-  unsigned int s;
-  unsigned int r;
-} tul_app_ctx;
-
-tul_app_ctx tul_context_list[DEF_CTX_LIST_SZ];
+static char TUL_TULIP[15][50] = {
+"                ,",
+"            /\\^/`\\",
+"           | \\/   |",
+"           | |    |",
+"           \\ \\    /",
+"            '\\\\//'",
+"              ||",
+"              ||",
+"              ||",
+"              ||  ,",
+"          |\\  ||  |\\",
+"          | | ||  | |",
+"          | | || / /",
+"           \\ \\||/ /",
+"            `\\\\//`"
+};
+static char TUL_SERVERNAME[] = "Tulip Server";
+static char TUL_VERSION[] = "0.01";
 
 extern int TUL_SIGNAL_INT;
 

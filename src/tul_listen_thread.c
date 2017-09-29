@@ -55,7 +55,7 @@ void *_run_listener(void *data)
   {
     if ( tul_tcp_listen_init(*lport, &sock) )
     {
-      tul_log("ERROR: network listener failed");
+      tul_log(" tulip_boot >>>> ERROR: network listener failed");
 
       /* listen failed exit */
       free(lport);
@@ -65,13 +65,13 @@ void *_run_listener(void *data)
   }
   else
   {
-    tul_log("enabling tls");
+    tul_log(" tulip_boot >>>> enabling tls");
     ret = tls_server_init(&tls_serv, *lport);
     sock = tls_serv.server_fd.fd;
 
     if(ret)
     {
-      tul_log("tls server init failed!");
+      tul_log(" tulip_boot >>>> tls server init failed!");
       free(lport);
       TUL_SIGNAL_INT = 1;
       return NULL;
@@ -79,7 +79,7 @@ void *_run_listener(void *data)
   }
 
   free(lport);
-  tul_log("starting core");
+  tul_log(" tulip_boot >>>> starting core");
   _run_core(sock, tls);
   return NULL;
 }

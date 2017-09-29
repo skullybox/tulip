@@ -3,6 +3,7 @@
 
  **/
 
+#include "tul_log.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
 
@@ -14,12 +15,12 @@ void tul_make_daemon()
   ret_p = fork();
   if(ret_p < 0)
   {
-    fprintf(stderr, "fork error! ..exiting.\n");
+    tul_log(" tulip_boot >>>> fork error! ..exiting.");
     exit(-1);
   }
   else if(ret_p > 0)
   {
-    fprintf(stdout, "launching deamon ..done.\n");
+    tul_log(" tulip_boot >>>> launching deamon ..done.");
     exit(0);
   }
 

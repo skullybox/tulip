@@ -22,27 +22,31 @@ int tls = 1;
 int port = 0;
 int daemon_mode = 0;
 
+
+void print_version_info();
+
 int main(int argc, char **argv)
 {
 
+  /* open syslog */
+#ifdef SYSLOG_USE
+  char syslog_ident[] = "TULIP";
+  openlog(syslog_ident, LOG_PID|LOG_NDELAY|LOG_CONS, LOG_LOCAL0);
+#endif
+
   parseParams(argc, argv);
 
+  print_version_info();
   tul_global_signal_handle_init();
-
-  /* open syslog */
-#ifdef SYStul_log_USE
-  char syslog_ident[] = "TULIP";
-  openlog(syslog_ident, tul_log_PID|tul_log_NDELAY, tul_log_LOCAL1);
-#endif
 
 #if defined(__APPLE__) || defined(__linux__)
   if(daemon_mode)
   {
-    tul_log("starting in daemon mode");
+    tul_log(" tulip_boot >>>> starting in daemon mode");
     tul_make_daemon();
   }
   else
-    tul_log("starting in foreground");
+    tul_log(" tulip_boot >>>> starting in foreground");
 
 #else
   WSADATA wsaData;
@@ -51,12 +55,12 @@ int main(int argc, char **argv)
 #endif
 
   /* load configuration */
-  // load_config();
+  load_config();
 
-  tul_log("starting listener");
+  tul_log(" tulip_boot >>>> starting listener");
   run_listener(port, tls);
 
-  tul_log("loading module callbacks");
+  tul_log(" tulip_boot >>>> loading module callbacks");
   configure_module();
 
 
@@ -74,5 +78,17 @@ int main(int argc, char **argv)
   return 0;
 }
 
+
+void print_version_info()
+{
+  for(int i = 0; i < 15; i++)
+  {
+    printf("%s\n",&TUL_TULIP[i][0]);
+  }
+
+  printf(" ------------------------\n %s -- %s\n ------------------------\n",
+      TUL_SERVERNAME, TUL_VERSION );
+
+}
 
 

@@ -28,7 +28,8 @@ void load_config()
   /* config failed to open */
   if(!fp)
   {
-    tul_log("warning config file ./config.cfg failed to open");
+
+    tul_log(" tulip_boot >>>> warning config file ./config.cfg failed to open");
     return;
   }
 
@@ -39,12 +40,12 @@ void load_config()
 
   if(bytes_read > TUL_MAX_CONFIG_FILE)
   {
-    tul_log("config file too large. unloading.");
+    tul_log(" tulip_boot >>>> config file too large. unloading.");
     memset(tul_config_context, 0, TUL_MAX_CONFIG_FILE+1);
     return;
   }
   else
-    tul_log("configuration loaded"); 
+    tul_log(" tulip_boot >>>> configuration loaded"); 
 
   generate_behavior(tul_config_context);
 }
@@ -68,7 +69,7 @@ void generate_behavior(char *c)
     /* config line check */
     if(strlen(ret_line) > TUL_MAX_FIELD_SIZE)
     {
-      tul_log("config line length exceeded!");
+      tul_log(" tulip_boot >>>> config line length exceeded!");
 
       if(ret_line)
         free(ret_line);
@@ -135,7 +136,7 @@ NEXT_LINE:
     ret_line = NULL;
   }
 
-  snprintf(str_tmp, TUL_MAX_LINE_LENGTH, "read %d flows", FLOW_COUNT);
+  snprintf(str_tmp, TUL_MAX_LINE_LENGTH, " tulip_boot >>>> read %d flows", FLOW_COUNT);
   tul_log(str_tmp);
 }
 
