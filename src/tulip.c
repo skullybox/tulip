@@ -6,7 +6,6 @@
 #include "tulip.h"
 #include "tul_log.h"
 #include "tul_module.h"
-#include "tul_config.h"
 #include "tul_daemon.h"
 #include "tul_globals.h"
 #include "tul_parseparams.h"
@@ -54,15 +53,11 @@ int main(int argc, char **argv)
   WSAStartup(MAKEWORD(2,2),&wsaData);
 #endif
 
-  /* load configuration */
-  load_config();
-
   tul_log(" tulip_boot >>>> starting listener");
   run_listener(port, tls);
 
   tul_log(" tulip_boot >>>> loading module callbacks");
   configure_module();
-
 
   while(!TUL_SIGNAL_INT)
   {
