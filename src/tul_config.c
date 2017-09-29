@@ -138,6 +138,11 @@ NEXT_LINE:
 
   snprintf(str_tmp, TUL_MAX_LINE_LENGTH, " tulip_boot >>>> read %d flows", FLOW_COUNT);
   tul_log(str_tmp);
+
+  for(int i = 0; i < FLOW_COUNT; i++)
+  {
+    printf(" -=[ %s ]=-\n", FLOW_LIST[i]->name);
+  }
 }
 
 
@@ -250,6 +255,15 @@ int get_config(char *l, tul_flowdef *f)
       f->dest = TUL_DEST_DISK;
       strcpy(f->disk_path, &v[5]);
     }
+    else if(!strncmp(v, "route:", 6))
+    {
+      if(f->dest)
+        return -1;
+
+      f->dest = TUL_DEST_ROUTE;
+      strcpy(f->route_path, &v[5]);
+    }
+
   }
 
   /* IP filter */

@@ -14,6 +14,7 @@
 #define TUL_AUTH_TOKEN 21
 #define TUL_DEST_USER 39
 #define TUL_DEST_DISK 41
+#define TUL_DEST_ROUTE 99
 
 #define TUL_MAX_CONFIG_FILE 81920
 
@@ -32,6 +33,7 @@ typedef struct _flowdef {
   char ip[TUL_MAX_FIELD_SIZE+1];
   char name[TUL_MAX_FIELD_SIZE+1];
   char disk_path[TUL_MAX_LINE_LENGTH+1];
+  char route_path[TUL_MAX_LINE_LENGTH+1];
 } tul_flowdef;
 
 void load_config();
