@@ -78,7 +78,7 @@ int tls_server_init(tul_tls_ctx *c, int lport)
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
 
   /* for extra security we verify the client cert */
-  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_NONE);
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
   CHECK_RET;

@@ -39,10 +39,12 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       NULL, 0);
   CHECK_RET;
 
-  ret = mbedtls_x509_crt_parse( &(c->cert),
-      (const unsigned char *) CLIENT_CERT,
-      CLIENT_CERT_len );
-  CHECK_RET;
+  /* DISABLED THIS UNLESS WE CARE ABOUT THE CERT USED BY CLIENT
+     ret = mbedtls_x509_crt_parse( &(c->cert),
+     (const unsigned char *) CLIENT_CERT,
+     CLIENT_CERT_len );
+     CHECK_RET;
+  */
 
   ret = mbedtls_x509_crt_parse( &(c->cert), 
       (const unsigned char *) CA_CERT,
@@ -54,8 +56,10 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       CLIENT_KEY_len, NULL, 0 );
   CHECK_RET;
 
-  ret = mbedtls_ssl_conf_own_cert(&(c->conf), &(c->cert), &(c->pkey));
-  CHECK_RET;
+  /* DISABLED THIS UNLESS WE CARE ABOUT THE CERT USED BY CLIENT
+     ret = mbedtls_ssl_conf_own_cert(&(c->conf), &(c->cert), &(c->pkey));
+     CHECK_RET;
+  */
 
   mbedtls_ssl_conf_ca_chain( &(c->conf), &(c->cert), NULL );
 
