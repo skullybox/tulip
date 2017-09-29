@@ -21,7 +21,7 @@ void _payload_limits_test()
 {
   assert( REQ_SZ < DEF_SOCK_BUFF_SIZE);
   assert( RES_SZ < DEF_SOCK_BUFF_SIZE);
-  fprintf(stdout, "PASS: pay_load_limits_test\n");
+  fprintf(stdout, " PASS: pay_load_limits_test\n");
 }
 
 void _tcp_listen_test()
@@ -30,11 +30,11 @@ void _tcp_listen_test()
 
   if(tul_tcp_listen_init(9080, &_sock))
   {
-    fprintf(stderr, "FAIL: tcp_listen_test\n");
+    fprintf(stderr, " FAIL: tcp_listen_test\n");
     return;
   }
 
-  fprintf(stdout, "PASS: tcp_listen_test\n");
+  fprintf(stdout, " PASS: tcp_listen_test\n");
   close(_sock);
 }
 
@@ -44,11 +44,11 @@ void _tcp_connect_test()
 
   if(tul_tcp_connect("apple.com", 80, &_sock))
   {
-    fprintf(stderr, "FAIL: tcp_connect_test\n");
+    fprintf(stderr, " FAIL: tcp_connect_test\n");
     return;
   }
 
-  fprintf(stdout, "PASS: tcp_connect_test\n");
+  fprintf(stdout, " PASS: tcp_connect_test\n");
   close(_sock);
 }
 
@@ -64,7 +64,7 @@ void _b64_test()
   /* encoding test --- */
   if(strcmp(r, "YW55IGNhcm5hbCBwbGVhc3VyZS4="))
   {
-    fprintf(stderr, "FAIL: base64_test\n");
+    fprintf(stderr, " FAIL: base64_test\n");
     return;
   }
 
@@ -72,7 +72,7 @@ void _b64_test()
   r = base64_enc(u, strlen(u));
   if(strcmp(r, "YW55IGNhcm5hbCBwbGVhc3VyZQ=="))
   {
-    fprintf(stderr, "FAIL: base64_test\n");
+    fprintf(stderr, " FAIL: base64_test\n");
     return;
   }
 
@@ -80,7 +80,7 @@ void _b64_test()
   r = base64_enc(v, strlen(v));
   if(strcmp(r, "YW55IGNhcm5hbCBwbGVhc3Vy"))
   {
-    fprintf(stderr, "FAIL: base64_test\n");
+    fprintf(stderr, " FAIL: base64_test\n");
     return;
   }
 
@@ -90,7 +90,7 @@ void _b64_test()
       strlen("YW55IGNhcm5hbCBwbGVhc3VyZS4="));
   if(strcmp(r, t))
   {
-    fprintf(stderr, "FAIL: base64_test(1)\n");
+    fprintf(stderr, " FAIL: base64_test(1)\n");
     return;
   }
 
@@ -99,7 +99,7 @@ void _b64_test()
       strlen("YW55IGNhcm5hbCBwbGVhc3VyZQ=="));
   if(strcmp(r, u))
   {
-    fprintf(stderr, "FAIL: base64_test(2)\n");
+    fprintf(stderr, " FAIL: base64_test(2)\n");
     return;
   }
 
@@ -108,12 +108,12 @@ void _b64_test()
       strlen("YW55IGNhcm5hbCBwbGVhc3Vy"));
   if(strcmp(r, v))
   {
-    fprintf(stderr, "FAIL: base64_test(3)\n");
+    fprintf(stderr, " FAIL: base64_test(3)\n");
     return;
   }
   free(r); 
 
-  fprintf(stdout, "PASS: base64_test\n");
+  fprintf(stdout, " PASS: base64_test\n");
 }
 
 extern int tls;
@@ -130,10 +130,10 @@ void _tls_server_test()
 
   if(ret)
   {
-    fprintf(stderr, "FAIL: tls_server_test\n");
+    fprintf(stderr, " FAIL: tls_server_test\n");
     return;
   }
-  fprintf(stdout, "PASS: tls_server_test\n");
+  fprintf(stdout, " PASS: tls_server_test\n");
 }
 
 void _tls_client_test()
@@ -147,11 +147,11 @@ void _tls_client_test()
   ret = tls_client_init(&c, 9443);
   if(ret)
   {
-    fprintf(stderr, "FAIL: tls_client_test\n");
+    fprintf(stderr, " FAIL: tls_client_test\n");
     return;
   }
 
-  fprintf(stderr, "PASS: tls_client_test\n");
+  fprintf(stderr, " PASS: tls_client_test\n");
 
 }
 
@@ -171,10 +171,10 @@ void _tls_rc5_test()
   if(strncmp(text, "ooHeiw3a", 
   strlen("ooHeiw3a")) == 0)
   {
-    fprintf(stdout, "PASS: tls_rc5_test\n");
+    fprintf(stdout, " PASS: tls_rc5_test\n");
     return;
   }
-  fprintf(stderr, "FAIL: tls_rc5_test\n");
+  fprintf(stderr, " FAIL: tls_rc5_test\n");
 }
 
 void _rand_test()
@@ -192,10 +192,10 @@ void _rand_test()
 
   if(check_fail)
   {
-    fprintf(stderr, "FAIL: random_test\n");
+    fprintf(stderr, " FAIL: random_test\n");
     return;
   }
-  fprintf(stdout, "PASS: random_test\n");
+  fprintf(stdout, " PASS: random_test\n");
 }
 
 void _whirlpool_test()
@@ -214,11 +214,11 @@ void _whirlpool_test()
 
   if(strcmp(hash_str, test_vector))
   {
-    fprintf(stderr, "FAIL: whirlpool_test\n");
+    fprintf(stderr, " FAIL: whirlpool_test\n");
     return;
   }
 
-  fprintf(stdout, "PASS: whirlpool_test\n");
+  fprintf(stdout, " PASS: whirlpool_test\n");
 }
 
 
