@@ -162,19 +162,19 @@ void do_read(int i, int tls)
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
 
-  if(ctx != NULL && ctx->_trecv < REQ_SZ)
+  if(ctx != NULL && ctx->_trecv < DEF_SOCK_BUFF_SIZE)
   {
     if(!tls)
     {
       bread = read(ctx->_sock,
           &(ctx->payload_in[ctx->_trecv]),
-          REQ_SZ-ctx->_trecv);
+          DEF_SOCK_BUFF_SIZE-ctx->_trecv);
     }
     else
     {
       bread = tls_read(tls_ctx,
           &(ctx->payload_in[ctx->_trecv]),
-          REQ_SZ-ctx->_trecv);
+          DEF_SOCK_BUFF_SIZE-ctx->_trecv);
     }
 
 
@@ -206,20 +206,20 @@ void do_write(int i, int tls)
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
 
-  if( ctx->_tsend < RES_SZ)
+  if( ctx->_ttsend )
   {
 
     if(!tls)
     {
       bwrite = write(ctx->_sock,
           &(ctx->payload_out[ctx->_tsend]),
-          RES_SZ-ctx->_tsend);
+          DEF_SOCK_BUFF_SIZE-ctx->_tsend);
     }
     else
     {
       bwrite = tls_write(tls_ctx,
           &(ctx->payload_out[ctx->_tsend]),
-          RES_SZ-ctx->_tsend);
+          DEF_SOCK_BUFF_SIZE-ctx->_tsend);
     }
 
     if(bwrite <= 0)

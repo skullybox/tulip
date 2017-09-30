@@ -17,14 +17,14 @@ void configure_module()
 
 void module_read(tul_net_context *c)
 {
-  if (c->_trecv != REQ_SZ)
+  if (c->_trecv < REQ_HSZ)
     return;
 }
 
 
 void module_write(tul_net_context *c)
 {
-  if(c->_tsend != RES_SZ)
+  if(c->_tsend < RES_HSZ)
     return;
 
 }
