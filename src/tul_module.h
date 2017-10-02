@@ -23,7 +23,7 @@ typedef struct _comm_0
   uchar hmac[64];
   uchar user[30];
   uchar kek[16];
-  uint64_t payload_sz;
+  unsigned payload_sz;
 } comm_req;
 
 typedef struct _comm_1
@@ -31,7 +31,7 @@ typedef struct _comm_1
   uchar salt[16];
   uchar hmac[64];
   uchar kek[16];
-  uint64_t payload_sz;
+  unsigned payload_sz;
 } comm_resp;
 
 static const unsigned RES_HSZ = sizeof(comm_resp); 
