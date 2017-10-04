@@ -9,8 +9,8 @@
 #ifndef _tul_b64
 #define _tul_b64
 
-char * base64_enc(char *d, size_t sz);
-char * base64_dec(char *d, size_t sz);
+unsigned char * base64_enc(unsigned char *d, size_t sz);
+unsigned char * base64_dec(unsigned char *d, size_t sz);
 
 #endif
 

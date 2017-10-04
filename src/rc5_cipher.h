@@ -25,6 +25,9 @@ void RC5_ENCRYPT(WORD *pt, WORD *ct, RC5_ctx *ctx);
 void RC5_DECRYPT(WORD *ct, WORD *pt, RC5_ctx *ctx);
 void RC5_SETUP(unsigned char *K, RC5_ctx *ctx);
 
+void salt_password(unsigned char *p, unsigned char *salt, short len);
+void rc5_encrypt(WORD *pt, WORD *ct, RC5_ctx *ctx, short len);
+void rc5_decrypt(WORD *ct, WORD *pt, RC5_ctx *ctx, short len);
 
 #endif
 

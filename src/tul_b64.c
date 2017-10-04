@@ -24,7 +24,7 @@ int getIndex(char c)
   return -1;
 }
 
-char * base64_enc(char *d, size_t sz)
+unsigned char * base64_enc(unsigned char *d, size_t sz)
 {
   char *n = NULL;
   size_t n_sz = 4 * (sz / 3);
@@ -59,9 +59,9 @@ char * base64_enc(char *d, size_t sz)
   return n;
 }
 
-char * base64_dec(char *d, size_t sz)
+unsigned char * base64_dec(unsigned char *d, size_t sz)
 {
-  char *n = NULL;
+  unsigned char *n = NULL;
   size_t n_sz = 0;
   int b_count = 0;
   int a,b,c,e;
