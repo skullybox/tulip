@@ -58,5 +58,5 @@ tls:
 	fi
 
 sql:
-	gcc ${cflgs} -Isqlite sqlite/sqlite3.c -o .obj/sqlite3.o
+	gcc ${cflgs} -DSQLITE_THREADSAFE=2 -Isqlite sqlite/sqlite3.c -o .obj/sqlite3.o
 
