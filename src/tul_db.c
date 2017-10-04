@@ -12,7 +12,11 @@
 
 #define SQLPOOL 30
 extern int TUL_SIGNAL_INT;
+
+#ifndef USE_MSYQL
 sqlite3 *sql_pool[SQLPOOL];
+#endif
+
 pthread_mutex_t pool_locks[SQLPOOL];
 
 
@@ -24,6 +28,7 @@ pthread_mutex_t pool_locks[SQLPOOL];
 int tul_query(int num_q,...)
 {
 
+#ifndef USE_MYSQL
   /* get a econnection
    * from the connection pool
    */
@@ -60,11 +65,13 @@ int tul_query(int num_q,...)
 
   /* release lock */
   pthread_mutex_unlock(&pool_locks[pos]);
+#endif
 
 }
 
 void tul_dbinit()
 {
+#ifndef USE_MYSQL
   /* check if db file exists */
   FILE *fp = fopen(TUL_DBNAME, "r");
 
@@ -124,10 +131,12 @@ void tul_dbinit()
   if(create_user("admin", "admin", "admin@root", "tulip!2345"))
     tul_log(" tulip_boot >>>> ERROR: db init error");
 
+#endif
 }
 
 void tul_dbclean()
 {
+#ifndef USE_MYSQL
   for (int i = 0; i < SQLPOOL; i++)
   {
     if(sql_pool[i])
@@ -135,6 +144,7 @@ void tul_dbclean()
       sqlite3_close(sql_pool[i]);
     }
   }
+#endif
 }
 
 
