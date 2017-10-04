@@ -19,6 +19,7 @@ PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
 .PHONY: tls
 all: prep tls sql main
+mysql: prep tls mysqlc with_mysql
 
 tags: 
 	ctags -R --c-kinds=+ --fields=+iaS --extra=+q .
@@ -28,6 +29,9 @@ prep:
 	@-mkdir .obj
 
 main: ${objects}
+	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} .obj/sqlite3.o ${inc} -lpthread ${libs} -ldl
+
+with_mysql: ${objects}
 	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} .obj/sqlite3.o ${inc} -lpthread ${libs} -ldl
 
 win: crypt ${objects}
@@ -60,3 +64,8 @@ tls:
 sql:
 	gcc ${cflgs} -DSQLITE_THREADSAFE=2 -Isqlite sqlite/sqlite3.c -o .obj/sqlite3.o
 
+mysqlc:
+		if [ ! -d "mysql/mysql-connector-c-6.1.10-src" ]; then \
+			tar zxf "mysql/mysql-connector-c-6.1.10-src.tar.gz" -C "mysql";\
+			cd "mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
+		fi
