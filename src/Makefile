@@ -35,7 +35,6 @@ prep:
 	@-mkdir .obj
 
 main: ${objects}
-	tul_db.o
 	${C} ${ldflgs} ${certs} -o tulip ${objects_bin} .obj/sqlite3.o ${inc} -lpthread ${libs} -ldl
 
 with_mysql: ${objects}
