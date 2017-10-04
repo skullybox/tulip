@@ -8,9 +8,9 @@
 
 #include <sqlite3.h>
 
-static char TUL_DBNAME[] = "tulip.sql";
+static char TUL_DBNAME[] = "tulip.db";
 
-void tul_query(unsigned mode, char *x,...);
+int tul_query(int num_q, ...); 
 void tul_dbinit();
 void tul_dbclean();
 

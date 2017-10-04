@@ -6,6 +6,8 @@
 #include "tul_log.h"
 #include "tul_db.h"
 #include <stdio.h>
+#include <stdarg.h>
+#include <pthread.h>
 
 extern int TUL_SIGNAL_INT;
 #define SQLPOOL 30
@@ -16,16 +18,47 @@ pthread_mutex_t pool_locks[SQLPOOL];
 /* query mode, followed by list of queries
  * mode 0 = read
  * mode 1 = write
+ * num_q = number of queries
  */
-void tul_query(unsigned mode, char *x,...)
+int tul_query(int num_q,...)
 {
 
-  /* TODO: get a econnection
+  /* get a econnection
    * from the connection pool
    */
+  char *q = NULL;
+  int ret = 0;
+  int errors_found = 0;
+  unsigned pos = 0;
+  unsigned locked = 0;
+  va_list ap;
 
- 
+
+  while(!locked)
+  {
+    if(!pthread_mutex_trylock(&pool_locks[pos]))
+    {
+      locked = 1;
+      break;
+    }
+    pos++;
+    if(pos >= SQLPOOL)
+      pos = 0;
+  }
+
   /* TODO: execute queries */
+  va_start(ap, num_q);
+  for(int i = 0; i < num_q; i++)
+  {
+    q = va_arg(ap, char*);
+    ret = sqlite3_exec(sql_pool[pos], q, NULL, NULL, NULL);
+    if(ret)
+      errors_found = 1;
+  }
+  va_end(ap);
+
+  /* release lock */
+  pthread_mutex_unlock(&pool_locks[pos]);
 
 }
 
@@ -59,22 +92,34 @@ void tul_dbinit()
   }
   sqlite3_close(db);
 
+  /* initialize database connection pools 
+   */
+  for (int i = 0; i < SQLPOOL; i++)
+  {
+    rc = sqlite3_open(TUL_DBNAME, &sql_pool[i]);
+    if(rc != SQLITE_OK)
+    {
+      tul_log(" tulip_boot >>>> ERROR: db connection pool IO error");
+      tul_dbclean();
+
+      return;
+    }
+  }
+
   /* initialize the database at this point
    * execute queries to create tables and initialized
    * data.
    */
-    for (int i = 0; i < SQLPOOL; i++)
-    {
-      rc = sqlite3_open(TUL_DBNAME, &sql_pool[i]);
-      if(rc != SQLITE_OK)
-      {
-        tul_log(" tulip_boot >>>> ERROR: db connection pool IO error");
-        tul_dbclean();
+  tul_query(4,
+      "create table user(uid integer not null, username varchar(15) unique not null, name varchar(50) not null, email varchar(50) unique not null, password varchar(24) not null, salt varchar(24) not null, ctime integer not null, primary key(uid));",
 
-        return;
-      }
-    }
+      "create table friend_request(uid integer, user_from varchar(15), ctime integer not null);",
 
+      "create table friend_list(uid integer, friend integer, ctime integer not null, foreign key(uid) references user(uid), foreign key(friend) references user(uid));",
+
+      "create table message(msg_id integer not null, uid integer, frm integer, ctime integer not null, msg text, primary key(msg_id), foreign key (uid) references user(uid), foreign key(frm) references user(uid));"
+      );
+  
 
 }
 

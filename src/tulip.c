@@ -4,6 +4,7 @@
  **/
 
 #include "tulip.h"
+#include "tul_db.h"
 #include "tul_log.h"
 #include "tul_module.h"
 #include "tul_daemon.h"
@@ -53,6 +54,8 @@ int main(int argc, char **argv)
   WSAStartup(MAKEWORD(2,2),&wsaData);
 #endif
 
+  tul_dbinit();
+
   tul_log(" tulip_boot >>>> starting listener");
   run_listener(port, tls);
 
@@ -65,6 +68,9 @@ int main(int argc, char **argv)
      * until we are signaled to exit */
     usleep(1000000);
   }
+
+  tul_dbclean();
+
 #if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif

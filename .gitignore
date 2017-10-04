@@ -39,6 +39,7 @@ src/mysql/mysql-connector-c-6.1.10-src
 tags
 TAGS
 *.swp
+*.db
 
 .DS_Store
 
