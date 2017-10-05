@@ -26,7 +26,7 @@ int getIndex(char c)
 
 unsigned char * base64_enc(unsigned char *d, size_t sz)
 {
-  char *n = NULL;
+  unsigned char *n = NULL;
   size_t n_sz = 4 * (sz / 3);
   int b_count = 0;
 
