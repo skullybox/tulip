@@ -65,8 +65,8 @@ int create_user(char *uid, char *name, char *email, char *pass)
     RC5_ctx rc5;
     char SQL[4096] = {0};
     char *tmp = NULL;
-    char salt[24] = {0};
-    char epass[24] = {0};
+    char salt[25] = {0};
+    char epass[25] = {0};
     char l_dbk[16] = {0};
 
     /* if everything looks good
@@ -97,12 +97,14 @@ int create_user(char *uid, char *name, char *email, char *pass)
     /* take base64 of encrypted password
      */
     tmp = base64_enc(epass, 16);
+    memset(epass, 0, 25);
     strncpy(epass, tmp, strlen(tmp));
     free(tmp);
 
     /* base64 encode salt
      */
     tmp = base64_enc(salt, 16);
+    memset(salt, 0, 25);
     strncpy(salt, tmp, strlen(tmp));
     free(tmp);
 
