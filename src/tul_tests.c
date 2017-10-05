@@ -58,6 +58,7 @@ void _b64_test()
   char t[] = "any carnal pleasure.";
   char u[] = "any carnal pleasure";
   char v[] = "any carnal pleasur";
+  char w[] = "N*5-/uw_I(Ye91},)";
 
   char *r = base64_enc(t, strlen(t));
 
@@ -79,6 +80,14 @@ void _b64_test()
   free(r); 
   r = base64_enc(v, strlen(v));
   if(strcmp(r, "YW55IGNhcm5hbCBwbGVhc3Vy"))
+  {
+    fprintf(stderr, " FAIL: base64_test\n");
+    return;
+  }
+
+  free(r); 
+  r = base64_enc(w, strlen(w));
+  if(strcmp(r, "Tio1LS91d19JKFllOTF9LA=="))
   {
     fprintf(stderr, " FAIL: base64_test\n");
     return;
@@ -112,6 +121,18 @@ void _b64_test()
     return;
   }
   free(r); 
+
+  /*
+  r = base64_dec("Tio1LS91d19JKFllOTF9LA==", 
+      strlen("Tio1LS91d19JKFllOTF9LA=="));
+  if(strcmp(r, w))
+  {
+    fprintf(stderr, " FAIL: base64_test(4)\n");
+    return;
+  }
+  free(r); 
+  */
+
 
   fprintf(stdout, " PASS: base64_test\n");
 }

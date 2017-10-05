@@ -120,6 +120,9 @@ int create_user(char *uid, char *name, char *email, char *pass)
   if(!user_exists(uid))
     return 7;
 
+  //decrypt_user_pass(epass, salt);
+  //tul_log(epass);
+
   return 0;
 }
 
@@ -151,4 +154,38 @@ int get_user_pass(char *uid, char *pass, char *salt)
 }
 
 
+void decrypt_user_pass(char *pass, char *salt)
+{
+  RC5_ctx rc5;
+  char *_t = NULL;
+  char l_dbk[16] = {0};
+  char l_salt[25] = {0};
+  char d_pass[25] = {0};
+
+  /* convert from base64 */
+  tul_log(salt);
+  _t = base64_dec(salt, strlen(salt));
+  memset(salt, 0, 25);
+  memcpy(salt, _t, 16);
+  free(_t);
+
+  _t = base64_dec(pass, strlen(pass));
+  memset(pass, 0, 25);
+  memcpy(pass, _t, 16);
+  free(_t);
+
+  memcpy(l_dbk, dbk, 16);
+  salt_password(l_dbk, salt,16);
+  _t = base64_enc(l_dbk, 16);
+  tul_log("KEK");
+  tul_log(_t);
+  free(_t);
+
+  RC5_SETUP(l_dbk, &rc5);
+  rc5_decrypt((unsigned*)&pass[0], (unsigned*)&d_pass[0], &rc5, 16);
+
+  memset(pass, 0, 25);
+  memcpy(pass, d_pass, 16);
+
+}
 
