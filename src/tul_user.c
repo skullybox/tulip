@@ -25,6 +25,7 @@ int user_exists(char *uid)
       "select uid from user where uid='%s'", uid);
 
   tul_query_get(SQL, &res, &row, &col);
+  sqlite3_free_table(res);
 
   if(row)
     return 1;
@@ -43,6 +44,7 @@ int email_exists(char *email)
       "select email from user where email='%s'", email);
 
   tul_query_get(SQL, &res, &row, &col);
+  sqlite3_free_table(res);
 
   if(row)
     return 1;
@@ -62,60 +64,91 @@ int email_exists(char *email)
  */
 int create_user(char *uid, char *name, char *email, char *pass)
 {
-    RC5_ctx rc5;
-    char SQL[4096] = {0};
-    char *tmp = NULL;
-    char salt[25] = {0};
-    char epass[25] = {0};
-    char l_dbk[16] = {0};
+  RC5_ctx rc5;
+  char SQL[4096] = {0};
+  char *tmp = NULL;
+  char salt[25] = {0};
+  char epass[25] = {0};
+  char l_dbk[16] = {0};
 
-    /* if everything looks good
-     * we can create the user
-     */ 
-    if(user_exists(uid))
-      return 1;
-    if(email_exists(email))
-      return 2;
-    if(strlen(uid) < 3)
-      return 3;
-    if(strlen(name) < 3)
-      return 4;
-    if(strlen(email) < 5)
-      return 5;
-    if(strlen(pass) < 10)
-      return 6;
+  /* if everything looks good
+   * we can create the user
+   */ 
+  if(user_exists(uid))
+    return 1;
+  if(email_exists(email))
+    return 2;
+  if(strlen(uid) < 3)
+    return 3;
+  if(strlen(name) < 3)
+    return 4;
+  if(strlen(email) < 5)
+    return 5;
+  if(strlen(pass) < 10)
+    return 6;
 
-    /* encrypt password
-     */
-    tul_random(&salt[0], 16); 
-    memcpy(l_dbk, dbk, 16);
-    salt_password(l_dbk, salt,16);
+  /* encrypt password
+  */
+  tul_random(&salt[0], 16); 
+  memcpy(l_dbk, dbk, 16);
+  salt_password(l_dbk, salt,16);
 
-    RC5_SETUP(l_dbk, &rc5);
-    rc5_encrypt((unsigned*)&pass[0], (unsigned*)&epass[0], &rc5, 16);
+  RC5_SETUP(l_dbk, &rc5);
+  rc5_encrypt((unsigned*)&pass[0], (unsigned*)&epass[0], &rc5, 16);
 
-    /* take base64 of encrypted password
-     */
-    tmp = base64_enc(epass, 16);
-    memset(epass, 0, 25);
-    strncpy(epass, tmp, strlen(tmp));
-    free(tmp);
+  /* take base64 of encrypted password
+  */
+  tmp = base64_enc(epass, 16);
+  memset(epass, 0, 25);
+  strncpy(epass, tmp, strlen(tmp));
+  free(tmp);
 
-    /* base64 encode salt
-     */
-    tmp = base64_enc(salt, 16);
-    memset(salt, 0, 25);
-    strncpy(salt, tmp, strlen(tmp));
-    free(tmp);
+  /* base64 encode salt
+  */
+  tmp = base64_enc(salt, 16);
+  memset(salt, 0, 25);
+  strncpy(salt, tmp, strlen(tmp));
+  free(tmp);
 
-    /* store user
-     */
-    sprintf(SQL, "BEGIN; insert into user(uid, name, email, password, salt) values ('%s', '%s', '%s','%s','%s'); COMMIT;",
-        uid, name, email, epass, salt);
+  /* store user
+  */
+  sprintf(SQL, "BEGIN; insert into user(uid, name, email, password, salt) values ('%s', '%s', '%s','%s','%s'); COMMIT;",
+      uid, name, email, epass, salt);
 
-    if(tul_query(1,SQL))
-      return 7;
-    return 0;
+  if(tul_query(1,SQL))
+    return 7;
+  if(!user_exists(uid))
+    return 7;
+
+  return 0;
 }
+
+/* retrieves user password from the db
+ * returns 0 when found
+ * returns 1 when not found
+ */
+int get_user_pass(char *uid, char *pass, char *salt)
+{
+  char SQL[4096] = {0};
+  int col = 0;
+  int row = 0;
+  char **res = NULL;
+
+  sprintf(SQL, "select salt, password from user where uid='%s'", uid);
+  tul_log(SQL);
+
+  tul_query_get(SQL, &res, &row, &col);
+  if(row == 1)
+  {
+    strcpy(salt, res[col]);
+    strcpy(pass, res[col+1]);
+    sqlite3_free_table(res);
+    return 0;
+  }
+
+  sqlite3_free_table(res);
+  return 1;
+}
+
 
 
