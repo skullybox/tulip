@@ -16,12 +16,37 @@
 char dbk[16]="sxUq##X~$ml/<|6";
 int user_exists(char *uid)
 {
+  char ** res;
+  int row = 0;
+  int col = 0;
+  char SQL[4096] = {0};
+
+  sprintf(SQL,
+      "select uid from user where uid='%s'", uid);
+
+  tul_query_get(SQL, &res, &row, &col);
+
+  if(row)
+    return 1;
 
   return 0;
 }
 
 int email_exists(char *email)
 {
+  char ** res;
+  int row = 0;
+  int col = 0;
+  char SQL[4096] = {0};
+
+  sprintf(SQL,
+      "select email from user where email='%s'", email);
+
+  tul_query_get(SQL, &res, &row, &col);
+
+  if(row)
+    return 1;
+
   return 0;
 }
 
@@ -42,7 +67,6 @@ int create_user(char *uid, char *name, char *email, char *pass)
     char *tmp = NULL;
     char salt[24] = {0};
     char epass[24] = {0};
-    char sql[4096] = {0};
     char l_dbk[16] = {0};
 
     /* if everything looks good
@@ -73,13 +97,13 @@ int create_user(char *uid, char *name, char *email, char *pass)
     /* take base64 of encrypted password
      */
     tmp = base64_enc(epass, 16);
-    strcpy(epass, tmp);
+    strncpy(epass, tmp, strlen(tmp));
     free(tmp);
 
     /* base64 encode salt
      */
     tmp = base64_enc(salt, 16);
-    strcpy(salt, tmp);
+    strncpy(salt, tmp, strlen(tmp));
     free(tmp);
 
     /* store user

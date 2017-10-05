@@ -10,9 +10,10 @@
 
 static char TUL_DBNAME[] = "tulip.db";
 
-int tul_query(int num_q, ...); 
 void tul_dbinit();
 void tul_dbclean();
+int tul_query(int num_q, ...); 
+void tul_query_get(char *q, char ***res, int *row, int *col);
 
 #endif
 

@@ -20,9 +20,7 @@ sqlite3 *sql_pool[SQLPOOL];
 pthread_mutex_t pool_locks[SQLPOOL];
 
 
-/* query mode, followed by list of queries
- * mode 0 = read
- * mode 1 = write
+/* query followed by list of queries
  * num_q = number of queries
  */
 int tul_query(int num_q,...)
@@ -68,6 +66,42 @@ int tul_query(int num_q,...)
 #endif
 
 }
+
+/* query followed by list of queries
+ * num_q = number of queries
+ */
+void tul_query_get(char *q, char ***res, int *row, int *col)
+{
+
+#ifndef USE_MYSQL
+  /* get a econnection
+   * from the connection pool
+   */
+  int ret = 0;
+  int pos = 0;
+  unsigned locked = 0;
+
+  while(!locked)
+  {
+    if(!pthread_mutex_trylock(&pool_locks[pos]))
+    {
+      locked = 1;
+      break;
+    }
+    pos++;
+    if(pos >= SQLPOOL)
+      pos = 0;
+  }
+
+  /* execute query */
+  sqlite3_get_table( sql_pool[pos], q, res, row, col, NULL);
+
+  /* release lock */
+  pthread_mutex_unlock(&pool_locks[pos]);
+#endif
+
+}
+
 
 void tul_dbinit()
 {
