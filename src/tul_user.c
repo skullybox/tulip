@@ -13,7 +13,7 @@
 #include "tul_random.h"
 #include "rc5_cipher.h"
 
-char dbk[16]="sxUq##X~$ml/<|6";
+unsigned char dbk[17]="sxUq##X~$ml/<|6.";
 int user_exists(char *uid)
 {
   char ** res;
@@ -65,11 +65,11 @@ int email_exists(char *email)
 int create_user(char *uid, char *name, char *email, char *pass)
 {
   RC5_ctx rc5;
-  char SQL[4096] = {0};
-  char *tmp = NULL;
-  char salt[25] = {0};
-  char epass[25] = {0};
-  char l_dbk[16] = {0};
+  unsigned char *tmp = NULL;
+  unsigned char SQL[4096] = {0};
+  unsigned char salt[25] = {0};
+  unsigned char epass[25] = {0};
+  unsigned char l_dbk[17] = {0};
 
   /* if everything looks good
    * we can create the user
@@ -92,6 +92,9 @@ int create_user(char *uid, char *name, char *email, char *pass)
   tul_random(&salt[0], 16); 
   memcpy(l_dbk, dbk, 16);
   salt_password(l_dbk, salt,16);
+
+  tmp = base64_enc(salt, 16);
+  free(tmp);
 
   RC5_SETUP(l_dbk, &rc5);
   rc5_encrypt((unsigned*)&pass[0], (unsigned*)&epass[0], &rc5, 16);
@@ -120,8 +123,8 @@ int create_user(char *uid, char *name, char *email, char *pass)
   if(!user_exists(uid))
     return 7;
 
-  //decrypt_user_pass(epass, salt);
-  //tul_log(epass);
+  decrypt_user_pass(epass, salt);
+  tul_log(epass);
 
   return 0;
 }
@@ -158,12 +161,11 @@ void decrypt_user_pass(char *pass, char *salt)
 {
   RC5_ctx rc5;
   char *_t = NULL;
-  char l_dbk[16] = {0};
-  char l_salt[25] = {0};
-  char d_pass[25] = {0};
+  unsigned char l_dbk[17] = {0};
+  unsigned char l_salt[25] = {0};
+  unsigned char d_pass[25] = {0};
 
   /* convert from base64 */
-  tul_log(salt);
   _t = base64_dec(salt, strlen(salt));
   memset(salt, 0, 25);
   memcpy(salt, _t, 16);
@@ -176,14 +178,11 @@ void decrypt_user_pass(char *pass, char *salt)
 
   memcpy(l_dbk, dbk, 16);
   salt_password(l_dbk, salt,16);
-  _t = base64_enc(l_dbk, 16);
-  tul_log("KEK");
-  tul_log(_t);
-  free(_t);
 
   RC5_SETUP(l_dbk, &rc5);
   rc5_decrypt((unsigned*)&pass[0], (unsigned*)&d_pass[0], &rc5, 16);
 
+  tul_log(d_pass); 
   memset(pass, 0, 25);
   memcpy(pass, d_pass, 16);
 

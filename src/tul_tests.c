@@ -63,6 +63,7 @@ void _b64_test()
   char *r = base64_enc(t, strlen(t));
 
   /* encoding test --- */
+  r = base64_enc(t, strlen(t));
   if(strcmp(r, "YW55IGNhcm5hbCBwbGVhc3VyZS4="))
   {
     fprintf(stderr, " FAIL: base64_test\n");
@@ -87,7 +88,7 @@ void _b64_test()
 
   free(r); 
   r = base64_enc(w, strlen(w));
-  if(strcmp(r, "Tio1LS91d19JKFllOTF9LA=="))
+  if(strcmp(r, "Tio1LS91d19JKFllOTF9LCk="))
   {
     fprintf(stderr, " FAIL: base64_test\n");
     return;

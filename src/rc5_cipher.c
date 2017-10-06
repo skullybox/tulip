@@ -9,7 +9,7 @@ const WORD P = 0xb7e15163, Q = 0x9e3779b9;  /* magic constants */
 
 void rc5_encrypt(WORD *pt, WORD *ct, RC5_ctx *ctx, short len)
 {
-  for(int i = 0; i < len/4; i++)
+  for(int i = 0; i < len; i+=4)
   {
     RC5_ENCRYPT(&pt[i], &ct[i], ctx);
   }
@@ -17,7 +17,7 @@ void rc5_encrypt(WORD *pt, WORD *ct, RC5_ctx *ctx, short len)
 
 void rc5_decrypt(WORD *ct, WORD *pt, RC5_ctx *ctx, short len)
 {
-  for(int i = 0; i < len/4; i++)
+  for(int i = 0; i < len; i+=4)
   {
     RC5_DECRYPT(&ct[i], &pt[i], ctx);
   }
@@ -61,6 +61,7 @@ void RC5_SETUP(unsigned char *K, RC5_ctx *ctx)
 
 void salt_password(unsigned char *p, unsigned char *salt, short sz)
 {
+  return;
     for(int i = 0; i < sz; i++)
     {
       p[i] = p[i] ^ salt[i];
