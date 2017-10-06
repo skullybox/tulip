@@ -93,9 +93,6 @@ int create_user(char *uid, char *name, char *email, char *pass)
   memcpy(l_dbk, dbk, 16);
   salt_password(l_dbk, salt,16);
 
-  tmp = base64_enc(salt, 16);
-  free(tmp);
-
   RC5_SETUP(l_dbk, &rc5);
   rc5_encrypt((unsigned*)&pass[0], (unsigned*)&epass[0], &rc5, 16);
 
@@ -123,6 +120,7 @@ int create_user(char *uid, char *name, char *email, char *pass)
   if(!user_exists(uid))
     return 7;
 
+  tul_log(epass);
   decrypt_user_pass(epass, salt);
   tul_log(epass);
 
@@ -182,7 +180,6 @@ void decrypt_user_pass(char *pass, char *salt)
   RC5_SETUP(l_dbk, &rc5);
   rc5_decrypt((unsigned*)&pass[0], (unsigned*)&d_pass[0], &rc5, 16);
 
-  tul_log(d_pass); 
   memset(pass, 0, 25);
   memcpy(pass, d_pass, 16);
 

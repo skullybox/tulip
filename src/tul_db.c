@@ -162,7 +162,7 @@ void tul_dbinit()
       "create table message(msg_id integer not null, uid integer, frm integer, ctime DATETIME DEFAULT CURRENT_TIMESTAMP, msg text, primary key(msg_id), foreign key (uid) references user(uid), foreign key(frm) references user(uid));"
       );
   
-  char password_blk[16] = "tulip!2345";
+  char password_blk[17] = "tulip!2345";
   if(create_user("admin", "admin", "admin@root", password_blk))
     tul_log(" tulip_boot >>>> ERROR: db init error");
 

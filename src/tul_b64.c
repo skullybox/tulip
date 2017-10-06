@@ -75,7 +75,7 @@ unsigned char * base64_dec(unsigned char *d, size_t sz)
 
   n_sz = ((sz-offset)/4)*3;
 
-  n = calloc(1, n_sz+1);
+  n = calloc(1, n_sz+1+offset);
 
   for(int i = 0; i < sz; i+=4)
   {
