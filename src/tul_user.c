@@ -120,8 +120,6 @@ int create_user(char *uid, char *name, char *email, char *pass)
   if(!user_exists(uid))
     return 7;
 
-  decrypt_user_pass(epass, salt);
-
   return 0;
 }
 

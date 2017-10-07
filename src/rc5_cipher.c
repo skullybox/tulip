@@ -61,7 +61,6 @@ void RC5_SETUP(unsigned char *K, RC5_ctx *ctx)
 
 void salt_password(unsigned char *p, unsigned char *salt, short sz)
 {
-  return;
     for(int i = 0; i < sz; i++)
     {
       p[i] = p[i] ^ salt[i];
