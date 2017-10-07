@@ -34,11 +34,18 @@ typedef struct _comm_1
   unsigned payload_sz;
 } comm_resp;
 
+typedef struct _payload
+{
+  unsigned action;
+  unsigned data_sz;
+  void *data;
+} comm_payload; 
+
 static const unsigned RES_HSZ = sizeof(comm_resp); 
 static const unsigned REQ_HSZ = sizeof(comm_req); 
 
-#define MAX_SEND_PAYLOAD = DEF_SOCK_BUFF_SIZE - REQ_HSZ
-#define MAX_REC_PAYLOAD = DEF_SOCK_BUFF_SIZE - RES_HSZ
+#define MAX_REQ_PAYLOAD DEF_SOCK_BUFF_SIZE - REQ_HSZ
+#define MAX_RES_PAYLOAD DEF_SOCK_BUFF_SIZE - RES_HSZ
 
 
 #endif

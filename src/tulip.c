@@ -28,6 +28,8 @@ void print_version_info();
 int main(int argc, char **argv)
 {
 
+  char tmp[201] = {0};
+
   /* open syslog */
 #ifdef SYSLOG_USE
   char syslog_ident[] = "TULIP";
@@ -61,6 +63,13 @@ int main(int argc, char **argv)
 
   tul_log(" tulip_boot >>>> loading module callbacks");
   configure_module();
+
+  /* print max payload info */
+  sprintf(tmp, " tulip_boot >>>> max request payload: %d", MAX_REQ_PAYLOAD);
+  tul_log(tmp);
+  memset(tmp, 0, 202);
+  sprintf(tmp, " tulip_boot >>>> max response payload: %d", MAX_RES_PAYLOAD);
+  tul_log(tmp);
 
   while(!TUL_SIGNAL_INT)
   {

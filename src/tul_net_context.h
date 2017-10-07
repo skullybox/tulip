@@ -18,6 +18,7 @@ typedef struct  __tul_net_context
   unsigned _trecv;
   unsigned _ttrecv;
   unsigned _ttsend;
+  unsigned _auth;
   unsigned long long timestamp;
   char payload_in[DEF_SOCK_BUFF_SIZE];
   char payload_out[DEF_SOCK_BUFF_SIZE];
