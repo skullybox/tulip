@@ -26,7 +26,8 @@ int tul_tcp_listen_init(const int port, int *sock)
   _ret_sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if(_ret_sock < 1)
   {
-    fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+    /* fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+     */
     return -1;
   }
 
@@ -37,14 +38,16 @@ int tul_tcp_listen_init(const int port, int *sock)
   _ret_bind = bind(_ret_sock, (struct sockaddr*)&_serv, sizeof(_serv));
   if(_ret_bind)
   {
-    fprintf(stderr, "BIND ERROR: %s(%d)\n", __FILE__, __LINE__);
+    /* fprintf(stderr, "BIND ERROR: %s(%d)\n", __FILE__, __LINE__);
+     */
     return -1;
   }
 
   _ret_list = listen(_ret_sock, 512);
   if(_ret_list)
   {
-    fprintf(stderr, "SOCKET LISTEN: %s(%d)\n", __FILE__, __LINE__);
+    /* fprintf(stderr, "SOCKET LISTEN: %s(%d)\n", __FILE__, __LINE__);
+     */
     return -1;
   }
 
@@ -76,7 +79,8 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   _ret_sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
   if(_ret_sock < 1)
   {
-    fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+    /* fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+     */
     return -1;
   }
 #endif
@@ -93,7 +97,8 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
   if (getaddrinfo(host, NULL, &_hints, &_addr_result))
   {
     freeaddrinfo(_addr_result);
-    fprintf(stderr, "DNS ERROR: %s(%d)\n", __FILE__, __LINE__);
+    /* fprintf(stderr, "DNS ERROR: %s(%d)\n", __FILE__, __LINE__);
+     */
     return -1;
   }
 #if defined(__APPLE__) || defined(__linux__)
@@ -141,7 +146,8 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
 
   if(_ret_sock < 1)
   {
-    fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+    /* fprintf(stderr, "SOCKET ERROR: %s(%d)\n", __FILE__, __LINE__);
+     */
     return -1;
   }
 
@@ -153,8 +159,9 @@ int tul_tcp_connect(const char *host, const int port, int *sock)
 
     if(timeout >= 1000)
     {
-      fprintf(stderr, "CONNECT TIMEOUT ERROR: %s(%d) - %s\n", __FILE__,
-          __LINE__, _ipaddr);
+      /* fprintf(stderr, "CONNECT TIMEOUT ERROR: %s(%d) - %s\n", __FILE__, 
+       * __LINE__, _ipaddr);
+       */
       return -1;
     }
   }

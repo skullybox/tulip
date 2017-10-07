@@ -22,16 +22,6 @@ void parseParams(int argc, char **argv)
     exit(ret);
   }
 
-  /* check for tls enablement */
-  for(int i = 1; i < argc; i++)
-  {
-    if(!strcmp("-n", argv[i]))
-    {
-      tls = 0;
-      break;
-    }
-  }
-
   if(argc == 2 && !strcmp(argv[1], "-D"))
   {
 #if !defined(__APPLE__) && !defined(__linux__)
@@ -46,11 +36,6 @@ void parseParams(int argc, char **argv)
     exit(0);
   }
   else if(argc == 2 && (port = atoi(argv[1])) > 0)
-  {
-    return;
-  }
-  else if(argc == 3 && (port = atoi(argv[1])) > 0 &&
-      !strcmp(argv[2],"-n"))
   {
     return;
   }

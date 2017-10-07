@@ -41,6 +41,16 @@ typedef struct _payload
   void *data;
 } comm_payload; 
 
+enum actions
+{
+    LOGIN = 1000,
+    LOGOUT,
+    GET_LIST, /* list of friends */
+    SEND_MSG,
+    ADDFRIEND, /* friend request */
+    DELFRIEND
+};
+
 static const unsigned RES_HSZ = sizeof(comm_resp); 
 static const unsigned REQ_HSZ = sizeof(comm_req); 
 
