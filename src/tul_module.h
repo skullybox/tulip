@@ -33,6 +33,7 @@ typedef struct _comm_1
   uchar salt[16];
   uchar kek[16];
   uchar hmac[DIGESTBYTES];
+  uchar hmac2[DIGESTBYTES];
   unsigned payload_sz;
 } comm_resp;
 
@@ -40,6 +41,7 @@ typedef struct _payload
 {
   unsigned action;
   unsigned data_sz;
+  unsigned tag;
   void *data;
 } comm_payload; 
 
