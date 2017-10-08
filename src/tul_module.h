@@ -9,6 +9,7 @@
 
 #include "tul_service.h"
 #include "tul_net_context.h"
+#include "whirlpool_hash.h"
 
 void configure_module();
 
@@ -19,18 +20,19 @@ typedef unsigned char uchar;
 
 typedef struct _comm_0
 {
-  uchar salt[16];
-  uchar hmac[64];
   uchar user[30];
+  uchar salt[16];
   uchar kek[16];
+  uchar hmac[DIGESTBYTES]; /* hmac of payload */
+  uchar hmac2[DIGESTBYTES]; /* hmac of header (this struct) */
   unsigned payload_sz;
 } comm_req;
 
 typedef struct _comm_1
 {
   uchar salt[16];
-  uchar hmac[64];
   uchar kek[16];
+  uchar hmac[DIGESTBYTES];
   unsigned payload_sz;
 } comm_resp;
 
