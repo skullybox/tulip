@@ -1,0 +1,24 @@
+# build with the following parameters
+# docker build -f Dockerfile-dev -t mog:dev .
+# docker run --name dev_machine -v /home -p 22:22 <image id>
+
+FROM ubuntu:16.04
+MAINTAINER irfan
+
+RUN useradd -m skully
+RUN echo "skully:password" | chpasswd
+RUN sed -i 's/^skully.*$//g' /etc/passwd
+RUN echo 'skully:x:1000:1000:Linux User,,,:/home/skully:/bin/zsh' >> /etc/passwd
+RUN echo "curl -sLf https://spacevim.org/install.sh" > /home/skully/.readme
+RUN echo "curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh" >> /home/skully/.readme
+RUN echo "curl -sSL https://get.rvm.io | bash -s stable" >> /home/skully/.readme
+
+RUN mkdir -p /var/run/sshd
+RUN apt-get update
+RUN apt-get install -y  make gcc g++ openssh-server zsh bash curl git sudo ctags vim gdb cmake
+RUN apt-get install -y  tar zip unzip openssl gzip tmux bzip2 cpio rsync gnupg
+RUN apt-get install -y  python ircii
+RUN sed -i 's/*PasswordAuthentication*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
