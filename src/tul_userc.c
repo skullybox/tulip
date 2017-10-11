@@ -4,6 +4,7 @@
  **/
 
 #include "tul_userc.h"
+#include "tul_tls_client.h"
 #include "rc5_cipher.h"
 #include "tul_tcp_soc.h"
 #include "tul_random.h"
@@ -166,67 +167,9 @@ int client_connect(char *host, char *port, tul_net_context *conn, int use_tls)
     return 0;
   }
 
-  ret = tls_client_init(&c, 9443);
-  /* prep the rest of the socket context */
   conn->_use_tls = 1;
+  int ret = tls_client_init(&conn->tls, 9443);
 
-  /* do TLS handshake */
-  mbedtls_net_init( &(conn->tls.server_fd) );
-  mbedtls_ssl_init( &(conn->tls.ssl) );
-  mbedtls_ssl_config_init( &(conn->tls.conf) );
-  mbedtls_x509_crt_init( &(conn->tls.cert) );
-  mbedtls_ctr_drbg_init( &(conn->tls.ctr_drbg) );    
-  mbedtls_ssl_config_init( &(conn->tls.conf) );
-  mbedtls_entropy_init( &(conn->tls.entropy) );
-#if defined(MBEDTLS_SSL_CACHE_C)
-  mbedtls_ssl_cache_init( &(conn->tls.cache) );
-#endif
-
-  if(mbedtls_ctr_drbg_seed( &(conn->tls.ctr_drbg), 
-      mbedtls_entropy_func, &(conn->tls.entropy),
-      NULL, 0))
-  {
-    CLEANUP_TLS;
-    return 1;
-  }
- 
-  mbedtls_pk_init( &(conn->tls.pkey) );
-
-  if(mbedtls_ssl_config_defaults( &(conn->tls.conf),
-        MBEDTLS_SSL_IS_CLIENT,
-        MBEDTLS_SSL_TRANSPORT_STREAM,
-        MBEDTLS_SSL_PRESET_DEFAULT ))
-  {
-    CLEANUP_TLS;
-    return 1;
-  }
-
-  mbedtls_x509_crt_parse( &(conn->tls.cert),
-      (const unsigned char *)CA_CERT,
-      CA_CERT_len );
-
-  mbedtls_ssl_conf_authmode( &(conn->tls.conf), MBEDTLS_SSL_VERIFY_REQUIRED);
-  mbedtls_ssl_conf_ca_chain( &(conn->tls.conf), &(conn->tls.cert), NULL );
-  mbedtls_ssl_conf_rng( &(conn->tls.conf), mbedtls_ctr_drbg_random, 
-      &(conn->tls.ctr_drbg) );
-
-  if(mbedtls_ssl_setup( &(conn->tls.ssl), &(conn->tls.conf) ))
-  {
-    CLEANUP_TLS;
-    return 1;
-  }
-
-  mbedtls_ssl_set_bio( &(conn->tls.ssl), &(conn->tls.server_fd), 
-      mbedtls_net_send, mbedtls_net_recv, NULL );
-
-  if(mbedtls_net_connect(&(conn->tls.server_fd), host, 
-        port, MBEDTLS_NET_PROTO_TCP ))
-  {
-    CLEANUP_TLS;
-    return 1;
-  }
-
-  int ret = mbedtls_ssl_handshake( &(conn->tls.ssl));
   if(ret)
   {
     CLEANUP_TLS;
