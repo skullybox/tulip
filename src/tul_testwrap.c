@@ -20,7 +20,6 @@ void run_tests()
   _whirlpool_test();
   _payload_limits_test();
   _tls_server_test();
-  _tls_client_test();
   _tls_client_test_login();
 
   printf("sleeping 30s...\n");

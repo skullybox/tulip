@@ -166,6 +166,7 @@ int client_connect(char *host, char *port, tul_net_context *conn, int use_tls)
     return 0;
   }
 
+  ret = tls_client_init(&c, 9443);
   /* prep the rest of the socket context */
   conn->_use_tls = 1;
 
@@ -177,6 +178,9 @@ int client_connect(char *host, char *port, tul_net_context *conn, int use_tls)
   mbedtls_ctr_drbg_init( &(conn->tls.ctr_drbg) );    
   mbedtls_ssl_config_init( &(conn->tls.conf) );
   mbedtls_entropy_init( &(conn->tls.entropy) );
+#if defined(MBEDTLS_SSL_CACHE_C)
+  mbedtls_ssl_cache_init( &(conn->tls.cache) );
+#endif
 
   if(mbedtls_ctr_drbg_seed( &(conn->tls.ctr_drbg), 
       mbedtls_entropy_func, &(conn->tls.entropy),

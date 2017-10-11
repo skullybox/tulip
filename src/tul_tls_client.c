@@ -7,7 +7,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define CHECK_RET if(ret) return -1;
+#define CHECK_RET if(ret) return ret;
 extern int RUN_TESTS;
 extern const char CA_CERT[];
 extern int CA_CERT_len;

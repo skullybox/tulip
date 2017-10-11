@@ -55,11 +55,13 @@ int tul_add_context(unsigned sock, int tls)
       new->this->_use_tls = 1;
 
       mbedtls_net_init(&(new->this->tls.server_fd));
-      mbedtls_ssl_session_reset(&(tls_serv.ssl));
+      mbedtls_ssl_init(&(new->this->tls.ssl));
       new->this->tls.server_fd.fd = sock;
 
+      //mbedtls_net_set_nonblock(&(new->this->tls.server_fd));
+      mbedtls_ssl_setup(&(new->this->tls.ssl), &(tls_serv.conf));
       mbedtls_ssl_set_bio( 
-          &(tls_serv.ssl), &(new->this->tls.server_fd), 
+          &(new->this->tls.ssl), &(new->this->tls.server_fd), 
           mbedtls_net_send, mbedtls_net_recv, NULL );
 
       while( (ret = mbedtls_ssl_handshake( &(tls_serv.ssl))) != 0)

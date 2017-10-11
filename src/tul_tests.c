@@ -160,25 +160,7 @@ void _tls_server_test()
     return;
   }
   fprintf(stdout, " PASS: tls_server_test\n");
-}
-
-void _tls_client_test()
-{
-  int ret = 0;
-  char buf[1025] = {0};
-  tul_tls_ctx c;
-
   sleep(1);
-  strcpy(c.host, "127.0.0.1");
-  ret = tls_client_init(&c, 9443);
-  if(ret)
-  {
-    fprintf(stderr, " FAIL: tls_client_test\n");
-    return;
-  }
-
-  fprintf(stderr, " PASS: tls_client_test\n");
-
 }
 
 void _tls_rc5_test()
@@ -254,9 +236,11 @@ void _tls_client_test_login()
   char uid[30] = "admin";
   char pass[16] = "tulip!2345";
 
-  if(client_connect("127.0.0.1", "9443", &conn, 1))
+  strcpy(conn.tls.host, "127.0.0.1");
+  ret = tls_client_init(&conn.tls, 9443);
+  if(ret)
   {
-    fprintf(stdout, " FAIL: client_test_login - TLS ERROR\n");
+    fprintf(stdout, " FAIL: client_test_login - TLS ERROR - %d\n", ret);
     return;
   }
 

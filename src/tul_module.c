@@ -34,7 +34,6 @@ void module_read(tul_net_context *c)
   NESSIEstruct hash;
   unsigned char hash_r[DIGESTBYTES] = {0};
 
-  printf("T: %d - %d\n", c->_trecv, c->_ttrecv);
   if(c->_trecv < REQ_HSZ)
     return;
 
@@ -73,7 +72,7 @@ void module_read(tul_net_context *c)
   rc5_decrypt((unsigned*)r.kek, (unsigned *)t_kek, &rc5, 16);
   memcpy(r.kek, t_kek, 16);
 
-  memcpy(&p, &(c->payload_in[REQ_HSZ]), sizeof(comm_req));
+  memcpy(&p, &(c->payload_in[REQ_HSZ]), sizeof(comm_payload));
   p.data = calloc(1, p.data_sz);
 
   /* verify header hash */

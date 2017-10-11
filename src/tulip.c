@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   /* print max payload info */
   sprintf(tmp, " tulip_boot >>>> max request payload: %d", MAX_REQ_PAYLOAD);
   tul_log(tmp);
-  memset(tmp, 0, 202);
+  memset(tmp, 0, 201);
   sprintf(tmp, " tulip_boot >>>> max response payload: %d", MAX_RES_PAYLOAD);
   tul_log(tmp);
 

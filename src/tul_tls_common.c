@@ -8,7 +8,6 @@
 
 #define CHECK_RET if(ret) return -1; 
 
-
 /* returns bytes read. -1 closed connection 
  * -2 error
  */
