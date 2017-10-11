@@ -34,6 +34,7 @@ void module_read(tul_net_context *c)
   NESSIEstruct hash;
   unsigned char hash_r[DIGESTBYTES] = {0};
 
+  printf("T: %d - %d\n", c->_trecv, c->_ttrecv);
   if(c->_trecv < REQ_HSZ)
     return;
 

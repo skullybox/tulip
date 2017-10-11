@@ -5,6 +5,7 @@
 
 
 #include "tul_tests.h"
+#include "tul_globals.h"
 #include "tul_testwrap.h"
 
 int RUN_TESTS = 0;
@@ -21,6 +22,10 @@ void run_tests()
   _tls_server_test();
   _tls_client_test();
   _tls_client_test_login();
+
+  printf("sleeping 30s...\n");
+  sleep(30);
+
 }
 
 

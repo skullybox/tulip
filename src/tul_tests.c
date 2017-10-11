@@ -254,9 +254,9 @@ void _tls_client_test_login()
   char uid[30] = "admin";
   char pass[16] = "tulip!2345";
 
-  if(client_connect("127.0.0.1", "9443", &conn))
+  if(client_connect("127.0.0.1", "9443", &conn, 1))
   {
-    fprintf(stdout, " FAIL: client_test_login\n");
+    fprintf(stdout, " FAIL: client_test_login - TLS ERROR\n");
     return;
   }
 
@@ -265,6 +265,8 @@ void _tls_client_test_login()
     fprintf(stdout, " FAIL: client_test_login\n");
     return;
   }
+
+  client_transmit(&conn);
 
   fprintf(stdout, " PASS: client_test_login\n");
 }

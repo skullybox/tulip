@@ -8,11 +8,19 @@
 #include "tul_tcp_soc.h"
 #include "tul_random.h"
 #include "whirlpool_hash.h"
+#include "tul_tls_common.h"
 
 /* MAX_REQ_PAYLOAD minus payload
  * header of struct
  */
 #define PAYLOAD_CHECK_SZ if(p.data_sz > MAX_REQ_PAYLOAD - sizeof(comm_payload)) return 1;
+
+extern const char CA_CERT[];
+extern const char CLIENT_CERT[];
+extern const char CLIENT_KEY[];
+extern int CLIENT_CERT_len;
+extern int CA_CERT_len;
+extern int CLIENT_KEY_len;
 
 int prep_transmission(char *uid, char *pass, 
     comm_req *r, comm_payload *p, tul_net_context *conn)
@@ -139,17 +147,90 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   return 0;
 }
 
+#define CLEANUP_TLS mbedtls_net_free( &(conn->tls.server_fd) ); \
+  mbedtls_x509_crt_free( &(conn->tls.cert) );\
+mbedtls_ssl_free( &(conn->tls.ssl) );\
+mbedtls_ssl_config_free( &(conn->tls.conf) );\
+mbedtls_ctr_drbg_free( &(conn->tls.ctr_drbg) );\
+mbedtls_entropy_free( &(conn->tls.entropy) );
 
-int client_connect(char *host, char *port, tul_net_context *conn)
+int client_connect(char *host, char *port, tul_net_context *conn, int use_tls)
 {
-    memset(conn, 0, sizeof(tul_net_context));
-    if(tul_tcp_connect(host, atoi(port),&(conn->_sock)))
-        return 1;
-
-    /* prep the rest of the socket context */
-    conn->_use_tls = 1;
-
+  memset(conn, 0, sizeof(tul_net_context));
+  if(!use_tls && tul_tcp_connect(host, atoi(port),&(conn->_sock)))
+  {
+    return 1;
+  }
+  else if(!use_tls)
+  {
     return 0;
+  }
+
+  /* prep the rest of the socket context */
+  conn->_use_tls = 1;
+
+  /* do TLS handshake */
+  mbedtls_net_init( &(conn->tls.server_fd) );
+  mbedtls_ssl_init( &(conn->tls.ssl) );
+  mbedtls_ssl_config_init( &(conn->tls.conf) );
+  mbedtls_x509_crt_init( &(conn->tls.cert) );
+  mbedtls_ctr_drbg_init( &(conn->tls.ctr_drbg) );    
+  mbedtls_ssl_config_init( &(conn->tls.conf) );
+  mbedtls_entropy_init( &(conn->tls.entropy) );
+
+  if(mbedtls_ctr_drbg_seed( &(conn->tls.ctr_drbg), 
+      mbedtls_entropy_func, &(conn->tls.entropy),
+      NULL, 0))
+  {
+    CLEANUP_TLS;
+    return 1;
+  }
+ 
+  mbedtls_pk_init( &(conn->tls.pkey) );
+
+  if(mbedtls_ssl_config_defaults( &(conn->tls.conf),
+        MBEDTLS_SSL_IS_CLIENT,
+        MBEDTLS_SSL_TRANSPORT_STREAM,
+        MBEDTLS_SSL_PRESET_DEFAULT ))
+  {
+    CLEANUP_TLS;
+    return 1;
+  }
+
+  mbedtls_x509_crt_parse( &(conn->tls.cert),
+      (const unsigned char *)CA_CERT,
+      CA_CERT_len );
+
+  mbedtls_ssl_conf_authmode( &(conn->tls.conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+  mbedtls_ssl_conf_ca_chain( &(conn->tls.conf), &(conn->tls.cert), NULL );
+  mbedtls_ssl_conf_rng( &(conn->tls.conf), mbedtls_ctr_drbg_random, 
+      &(conn->tls.ctr_drbg) );
+
+  if(mbedtls_ssl_setup( &(conn->tls.ssl), &(conn->tls.conf) ))
+  {
+    CLEANUP_TLS;
+    return 1;
+  }
+
+  mbedtls_ssl_set_bio( &(conn->tls.ssl), &(conn->tls.server_fd), 
+      mbedtls_net_send, mbedtls_net_recv, NULL );
+
+  if(mbedtls_net_connect(&(conn->tls.server_fd), host, 
+        port, MBEDTLS_NET_PROTO_TCP ))
+  {
+    CLEANUP_TLS;
+    return 1;
+  }
+
+  int ret = mbedtls_ssl_handshake( &(conn->tls.ssl));
+  if(ret)
+  {
+    CLEANUP_TLS;
+    return 1;
+  }
+
+  return 0;
+
 }
 
 
@@ -348,4 +429,31 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *li
   return 0;
 }
 
+int client_transmit(tul_net_context *conn)
+{
+  int bwrite = 0;
+
+  while(conn->_tsend < conn->_ttsend)
+  {
+    if(conn->_use_tls)
+    {
+      bwrite = tls_write(&(conn->tls),
+          &(conn->payload_out[conn->_tsend]),
+          conn->_ttsend-conn->_tsend);
+      if(bwrite > 0)
+        conn->_tsend+=bwrite;
+    }
+    else
+    {
+      bwrite = write(conn->_sock,
+          &(conn->payload_out[conn->_tsend]),
+          conn->_ttsend-conn->_tsend);
+      if(bwrite > 0)
+        conn->_tsend+=bwrite;
+
+    }
+  }
+
+  return 0;
+}
 

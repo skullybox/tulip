@@ -11,7 +11,7 @@
 
 
 
-int client_connect(char *host, char *port, tul_net_context *conn);
+int client_connect(char *host, char *port, tul_net_context *conn, int use_tls);
 
 /* these functions return 0 when
  * they have succesfully constructed the payload
@@ -22,6 +22,9 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, ch
 int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn);
 int client_friend_res(char *uid, char *t_uid, char *pass, tul_net_context *conn);
 int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *list);
+
+int client_transmit(tul_net_context *conn);
+int client_recieve(tul_net_context *conn);
 
 #endif
 
