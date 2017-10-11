@@ -15,11 +15,12 @@ void run_tests()
   _tcp_listen_test();
   _tcp_connect_test();
   _b64_test();
-  _tls_server_test();
-  _tls_client_test();
   _tls_rc5_test();
   _whirlpool_test();
   _payload_limits_test();
+  _tls_server_test();
+  _tls_client_test();
+  _tls_client_test_login();
 }
 
 

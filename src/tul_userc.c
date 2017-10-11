@@ -91,6 +91,7 @@ int prep_transmission(char *uid, char *pass,
   
   memset(r, 0, REQ_HSZ);
   memset(p, 0, sizeof(comm_payload));
+  return 0;
 }
 
 
@@ -110,20 +111,20 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
 
   p.action = LOGIN;
 
-    /* data size with encryption
+  /* data size with encryption
    * block size into account
    */
   if((strlen(uid)+1)%16)
   {
-    p.data_sz = strlen(uid)+1+16;
+    p.data_sz = 16*((strlen(uid)+1)/16)+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(uid)+1+16);
+    p.data = calloc(1,p.data_sz);
   }
   else
   {
-    p.data_sz = strlen(uid)+1;
+    p.data_sz = ((strlen(uid)+1)/16)*16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(uid)+1);
+    p.data = calloc(1,p.data_sz);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -133,10 +134,7 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
    */
   strcpy(p.data, uid);
 
-
-  int ret = prep_transmission(uid, pass, &r, &p, conn);
-  if(ret)
-    return ret;
+  prep_transmission(uid, pass, &r, &p, conn);
 
   return 0;
 }

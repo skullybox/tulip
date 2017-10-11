@@ -1971,5 +1971,17 @@ void hashTostring(char **out, unsigned char * const result)
   }
 }
 
+int verifyHash(unsigned char *h1, unsigned char *h2 )
+{
+  for(int i = 0; i < DIGESTBYTES; i++)
+  {
+    if(h1[i] != h2[i])
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 
 

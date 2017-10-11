@@ -73,9 +73,9 @@ unsigned char * base64_dec(unsigned char *d, size_t sz)
   else  if(d[sz-1] == '=' )
     offset = 1;
 
-  n_sz = ((sz-offset)/4)*3;
+  n_sz = ((sz)/4)*3 - offset;
 
-  n = calloc(1, n_sz+1+offset);
+  n = calloc(1, n_sz+1);
 
   for(int i = 0; i < sz; i+=4)
   {
@@ -100,19 +100,24 @@ unsigned char * base64_dec(unsigned char *d, size_t sz)
 
       if ( offset == 2)
       {
+        n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
         c = 0;
         d = 0;
         e = 0;
       }
       else if ( offset == 1 )
       {
+        n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
+        n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
         d = 0;
         e = 0;
       }
+      else {
+        n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
+        n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
+        n[b_count+2] =  ((c<<6)&0xc0)|((e)&0x03f);
+      }
 
-      n[b_count+0] =  ((a<<2)&0xfc)|((b>>4)&0x03);
-      n[b_count+1] =  ((b<<4)&0xf0)|((c>>2)&0x0f);
-      n[b_count+2] =  ((c<<6)&0xc0)|((e)&0x03f);
 
     }
         

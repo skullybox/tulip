@@ -2,7 +2,9 @@
   Copyright (C) irfan
  **/
 
+#include "tul_db.h"
 #include "tul_b64.h"
+#include "tul_userc.h"
 #include "tul_tests.h"
 #include "rc5_cipher.h"
 #include "tul_random.h"
@@ -150,6 +152,8 @@ void _tls_server_test()
   run_listener(9443, tls);
   configure_module();
 
+  tul_dbinit();
+
   if(ret)
   {
     fprintf(stderr, " FAIL: tls_server_test\n");
@@ -181,8 +185,8 @@ void _tls_rc5_test()
 {
   RC5_ctx c;
   unsigned char key[16] = "G57^h20S'yLR3>mG";
-  char text[8] = "ooHeiw3a";
-  char ct[8] = {0};
+  char text[16] = "ooHeiw3a";
+  char ct[16] = {0};
 
   RC5_SETUP(key, &c);
   RC5_ENCRYPT((unsigned *)text, (unsigned *)ct, &c);
@@ -190,8 +194,7 @@ void _tls_rc5_test()
   memset(text, 0, 8);
   RC5_DECRYPT((unsigned *)ct, (unsigned *)text, &c);
 
-  if(strncmp(text, "ooHeiw3a", 
-  strlen("ooHeiw3a")) == 0)
+  if(strcmp(text, "ooHeiw3a") == 0)
   {
     fprintf(stdout, " PASS: tls_rc5_test\n");
     return;
@@ -241,6 +244,29 @@ void _whirlpool_test()
   }
 
   fprintf(stdout, " PASS: whirlpool_test\n");
+}
+
+
+void _tls_client_test_login()
+{
+  int ret = 0;
+  tul_net_context conn;
+  char uid[30] = "admin";
+  char pass[16] = "tulip!2345";
+
+  if(client_connect("127.0.0.1", "9443", &conn))
+  {
+    fprintf(stdout, " FAIL: client_test_login\n");
+    return;
+  }
+
+  if(client_login(uid, pass, &conn))
+  {
+    fprintf(stdout, " FAIL: client_test_login\n");
+    return;
+  }
+
+  fprintf(stdout, " PASS: client_test_login\n");
 }
 
 

@@ -16,4 +16,5 @@ void _tls_client_test();
 void _tls_rc5_test();
 void _whirlpool_test();
 void _payload_limits_test();
+void _tls_client_test_login();
 #endif
