@@ -135,7 +135,6 @@ int get_user_pass(char *uid, char *pass, char *salt)
   char **res = NULL;
 
   sprintf(SQL, "select salt, password from user where uid='%s'", uid);
-  tul_log(SQL);
 
   tul_query_get(SQL, &res, &row, &col);
   if(row == 1)
