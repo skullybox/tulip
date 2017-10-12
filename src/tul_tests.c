@@ -257,9 +257,6 @@ void _tls_client_test_login()
 
   client_transmit(&conn);
 
-  while(1){}
-
-  fprintf(stdout, " PASS: client_test_login\n");
 }
 
 

@@ -67,7 +67,7 @@ void module_read(tul_net_context *c)
   decrypt_user_pass(pass, salt);
 
   /* decrypt kek */
-  salt_password(pass, salt, 16);
+  salt_password(pass, r.salt, 16);
 
   RC5_SETUP(pass, &rc5);
   rc5_decrypt((unsigned*)r.kek, (unsigned *)t_kek, &rc5, 16);
@@ -81,7 +81,7 @@ void module_read(tul_net_context *c)
   memcpy(t_data, &(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
       p.data_sz);
 
-  salt_password(t_kek, salt, 16);
+  salt_password(t_kek, r.salt, 16);
   RC5_SETUP(t_kek, &rc5);
   rc5_decrypt((unsigned*)t_data, (unsigned*)p.data, &rc5, p.data_sz);
 
@@ -110,15 +110,6 @@ void module_read(tul_net_context *c)
     /* TODO: error case */
     goto RESET_REQ;
   }
-
-
-  /* use the password to decrypt
-   * the payload 
-   */
-  RC5_SETUP(t_kek, &rc5);
-  rc5_decrypt((unsigned *)&(c->payload_in[REQ_HSZ+sizeof(comm_req)]), 
-      (unsigned*)p.data, &rc5, p.data_sz);
-
 
   /* hash payload and verify */
   NESSIEinit(&hash);

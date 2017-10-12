@@ -85,7 +85,6 @@ int prep_transmission(char *uid, char *pass,
   memset(tmp, 0, 16);
   memcpy(tmp, r->kek, 16);
   rc5_encrypt((unsigned*)tmp, (unsigned *)r->kek, &rc5, 16);
-  
 
   /* copy to network context
    * and clean-up any allocation
@@ -124,9 +123,6 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);
   tul_random(&(r.kek), 16);
-
-  memset(r.kek, 0, 16);
-  strcpy(r.kek, "apple");
 
   p.action = LOGIN;
 
