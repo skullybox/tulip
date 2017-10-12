@@ -45,9 +45,10 @@ int prep_transmission(char *uid, char *pass,
   memcpy(r->hmac, hash_r, DIGESTBYTES);
 
   /* encrypt payload using kek */
-  salt_password(r->kek, r->salt, 16);
-  RC5_SETUP(r->kek, &rc5);
-  t_data = calloc(p->data_sz,1);
+  memcpy(tmp, r->kek, 16);
+  salt_password(tmp, r->salt, 16);
+  RC5_SETUP(tmp, &rc5);
+  t_data = calloc(1, p->data_sz);
   rc5_encrypt((unsigned*)p->data,(unsigned*)t_data, &rc5, p->data_sz);
 
   memcpy(p->data, t_data, p->data_sz);
@@ -123,6 +124,9 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);
   tul_random(&(r.kek), 16);
+
+  memset(r.kek, 0, 16);
+  strcpy(r.kek, "apple");
 
   p.action = LOGIN;
 

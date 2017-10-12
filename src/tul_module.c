@@ -31,6 +31,7 @@ void module_read(tul_net_context *c)
   char uid[31] = {0};
   char pass[25] = {0};
   char salt[25] = {0};
+  char *t_data = NULL;
   NESSIEstruct hash;
   unsigned char hash_r[DIGESTBYTES] = {0};
 
@@ -66,14 +67,26 @@ void module_read(tul_net_context *c)
   decrypt_user_pass(pass, salt);
 
   /* decrypt kek */
-  t_salt = base64_dec(salt, strlen(salt));
-  salt_password(pass, t_salt, 16);
+  salt_password(pass, salt, 16);
+
   RC5_SETUP(pass, &rc5);
   rc5_decrypt((unsigned*)r.kek, (unsigned *)t_kek, &rc5, 16);
   memcpy(r.kek, t_kek, 16);
 
+  /* decrypt payload */
   memcpy(&p, &(c->payload_in[REQ_HSZ]), sizeof(comm_payload));
   p.data = calloc(1, p.data_sz);
+  t_data = calloc(1, p.data_sz);
+
+  memcpy(t_data, &(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
+      p.data_sz);
+
+  salt_password(t_kek, salt, 16);
+  RC5_SETUP(t_kek, &rc5);
+  rc5_decrypt((unsigned*)t_data, (unsigned*)p.data, &rc5, p.data_sz);
+
+  free(t_data);
+  t_data = NULL;
 
   /* verify header hash */
   NESSIEinit(&hash);
