@@ -22,8 +22,7 @@ void run_tests()
   _tls_server_test();
   _tls_client_test_login();
 
-  printf("sleeping 30s...\n");
-  sleep(30);
+  while(1){}
 
 }
 
