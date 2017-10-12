@@ -171,10 +171,12 @@ void _tls_rc5_test()
   char ct[16] = {0};
 
   RC5_SETUP(key, &c);
-  RC5_ENCRYPT((unsigned *)text, (unsigned *)ct, &c);
+  rc5_encrypt((unsigned*)text, (unsigned*)ct, &c, 16);
+  //RC5_ENCRYPT((unsigned *)text, (unsigned *)ct, &c);
 
   memset(text, 0, 8);
-  RC5_DECRYPT((unsigned *)ct, (unsigned *)text, &c);
+  rc5_decrypt((unsigned*)ct, (unsigned*)text, &c, 16);
+  //RC5_DECRYPT((unsigned *)ct, (unsigned *)text, &c);
 
   if(strcmp(text, "ooHeiw3a") == 0)
   {
