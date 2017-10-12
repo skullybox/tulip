@@ -108,12 +108,14 @@ void tul_dbinit()
 #ifndef USE_MYSQL
   /* check if db file exists */
   FILE *fp = fopen(TUL_DBNAME, "r");
+  unsigned db_exists = 0;
 
   if(fp)
   {
     tul_log(" tulip_boot >>>> found existing database");
     fclose(fp);
-    return;
+    db_exists = 1;
+    goto DB_POOL_SETUP;
   }
 
   tul_log(" tulip_boot >>>> initializing database");
@@ -136,6 +138,7 @@ void tul_dbinit()
 
   /* initialize database connection pools 
    */
+DB_POOL_SETUP:
   for (int i = 0; i < SQLPOOL; i++)
   {
     rc = sqlite3_open(TUL_DBNAME, &sql_pool[i]);
@@ -163,7 +166,7 @@ void tul_dbinit()
       );
   
   char password_blk[17] = "tulip!2345";
-  if(create_user("admin", "admin", "admin@root", password_blk))
+  if(!db_exists && !create_user("admin", "admin", "admin@root", password_blk))
     tul_log(" tulip_boot >>>> ERROR: db init error");
 
 #endif

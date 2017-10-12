@@ -22,8 +22,6 @@ void run_tests()
   _tls_server_test();
   _tls_client_test_login();
 
-  while(1){}
-
 }
 
 
