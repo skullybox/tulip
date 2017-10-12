@@ -28,6 +28,7 @@ int prep_transmission(char *uid, char *pass,
 {
   RC5_ctx rc5;
   char tmp[16] = {0};
+  char *t_data = NULL;
   NESSIEstruct hash;
   unsigned char hash_r[DIGESTBYTES] = {0};
 
@@ -46,7 +47,12 @@ int prep_transmission(char *uid, char *pass,
   /* encrypt payload using kek */
   salt_password(r->kek, r->salt, 16);
   RC5_SETUP(r->kek, &rc5);
-  rc5_encrypt((unsigned*)r->kek, (unsigned*)p->data, &rc5, p->data_sz);
+  t_data = calloc(p->data_sz,1);
+  rc5_encrypt((unsigned*)p->data,(unsigned*)t_data, &rc5, p->data_sz);
+
+  memcpy(p->data, t_data, p->data_sz);
+  free(t_data);
+  t_data = NULL;
 
   /* take hash of header */
   NESSIEinit(&hash);
@@ -127,13 +133,13 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   {
     p.data_sz = 16*((strlen(uid)+1)/16)+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,p.data_sz);
+    p.data = calloc(p.data_sz, 1);
   }
   else
   {
     p.data_sz = ((strlen(uid)+1)/16)*16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,p.data_sz);
+    p.data = calloc(p.data_sz,1);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -204,13 +210,13 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   {
     p.data_sz = strlen(uid)+1+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(uid)+1+16);
+    p.data = calloc(strlen(uid)+1+16, 1);
   }
   else
   {
     p.data_sz = strlen(uid)+1;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(uid)+1);
+    p.data = calloc(strlen(uid)+1,1);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -259,13 +265,13 @@ int client_message(char *uid, char *t_uid, char *pass,
   {
     p.data_sz = m_len+1+30+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,m_len+1+30+16);
+    p.data = calloc(m_len+1+30+16,1);
   }
   else
   {
     p.data_sz = m_len+1+40;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,m_len+1+30);
+    p.data = calloc(m_len+1+30,1);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -305,13 +311,13 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
   {
     p.data_sz = strlen(t_uid)+1+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(t_uid)+1+16);
+    p.data = calloc(strlen(t_uid)+1+16,1);
   }
   else
   {
     p.data_sz = strlen(t_uid)+1;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(t_uid)+1);
+    p.data = calloc(strlen(t_uid)+1,1);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -353,13 +359,13 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *li
   {
     p.data_sz = strlen(uid)+1+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(uid)+1+16);
+    p.data = calloc(strlen(uid)+1+16,1);
   }
   else
   {
     p.data_sz = strlen(uid)+1;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(1,strlen(uid)+1);
+    p.data = calloc(strlen(uid)+1,1);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;

@@ -166,7 +166,7 @@ DB_POOL_SETUP:
       );
   
   char password_blk[17] = "tulip!2345";
-  if(!db_exists && !create_user("admin", "admin", "admin@root", password_blk))
+  if(!db_exists && create_user("admin", "admin", "admin@root", password_blk))
     tul_log(" tulip_boot >>>> ERROR: db init error");
 
 #endif

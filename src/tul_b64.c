@@ -31,9 +31,9 @@ unsigned char * base64_enc(unsigned char *d, size_t sz)
   int b_count = 0;
 
   if(sz % 3)
-    n = calloc(1, n_sz+4+1);
+    n = calloc(n_sz+4+1, 1);
   else
-    n = calloc(1, n_sz+1);
+    n = calloc(n_sz+1,1);
 
   for(int i = 0; i < sz; i += 3)
   {
