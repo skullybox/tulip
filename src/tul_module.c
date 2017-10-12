@@ -87,7 +87,7 @@ void module_read(tul_net_context *c)
   NESSIEadd((unsigned char*)&(p.data_sz), sizeof(unsigned), &hash); 
   NESSIEadd((unsigned char*)&(p.tag), sizeof(unsigned)*8, &hash); 
 
-  NESSIEadd((unsigned char*)&(c->payload_in[REQ_HSZ+sizeof(comm_req)]), 
+  NESSIEadd((unsigned char*)&(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
       p.data_sz*8, 
       &hash); 
   NESSIEfinalize(&hash, hash_r);
