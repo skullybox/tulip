@@ -58,7 +58,7 @@ int tul_add_context(unsigned sock, int tls)
       mbedtls_ssl_init(&(new->this->tls.ssl));
       new->this->tls.server_fd.fd = sock;
 
-      //mbedtls_net_set_nonblock(&(new->this->tls.server_fd));
+      mbedtls_net_set_nonblock(&(new->this->tls.server_fd));
       mbedtls_ssl_setup(&(new->this->tls.ssl), &(tls_serv.conf));
       mbedtls_ssl_set_bio( 
           &(new->this->tls.ssl), &(new->this->tls.server_fd), 
@@ -66,11 +66,6 @@ int tul_add_context(unsigned sock, int tls)
 
       while( (ret = mbedtls_ssl_handshake( &(tls_serv.ssl))) != 0)
       {
-        /*char error_buf[100];
-        mbedtls_strerror( ret, error_buf, 100 );
-        printf("Last error was: %d - %s\n\n", ret, error_buf );
-        */
-        
         if(ret != MBEDTLS_ERR_SSL_WANT_READ && 
             ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
@@ -83,8 +78,10 @@ int tul_add_context(unsigned sock, int tls)
       if(ret)
       {
         mbedtls_ssl_session_reset(&(tls_serv.ssl));
-       // mbedtls_net_free( &(new->this->net_c));
-       // mbedtls_ssl_session_reset( &(new->this->ssl) );
+        new->this->tls.handshake_done = 0;
+      }
+      else {
+        new->this->tls.handshake_done = 1;
       }
     }
   }

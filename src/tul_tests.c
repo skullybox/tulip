@@ -231,17 +231,20 @@ void _whirlpool_test()
 
 void _tls_client_test_login()
 {
-  int ret = 0;
+  int ret = 1;
   tul_net_context conn;
   char uid[30] = "admin";
   char pass[16] = "tulip!2345";
 
+  conn._use_tls = 1;
   strcpy(conn.tls.host, "127.0.0.1");
-  ret = tls_client_init(&conn.tls, 9443);
-  if(ret)
+  while(ret)
   {
-    fprintf(stdout, " FAIL: client_test_login - TLS ERROR - %d\n", ret);
-    return;
+    ret = tls_client_init(&conn.tls, 9443);
+    if(ret)
+    {
+      fprintf(stdout, " FAIL: client_test_login - TLS ERROR - %d\n", ret);
+    }
   }
 
   if(client_login(uid, pass, &conn))

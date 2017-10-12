@@ -172,6 +172,16 @@ void do_read(int i, int tls)
     }
     else
     {
+      if(!(tls_ctx->handshake_done))
+      {
+        int ret = mbedtls_ssl_handshake(&(tls_ctx->ssl));
+        if(ret)
+          return;
+        else {
+          tls_ctx->handshake_done = 1;
+        }
+
+      }
       bread = tls_read(tls_ctx,
           &(ctx->payload_in[ctx->_trecv]),
           DEF_SOCK_BUFF_SIZE-ctx->_trecv);

@@ -21,6 +21,7 @@
 typedef struct _tls_ctx
 {
   char host[1024];
+  unsigned handshake_done;
   mbedtls_net_context server_fd;
   mbedtls_entropy_context entropy;
   mbedtls_ctr_drbg_context ctr_drbg;
