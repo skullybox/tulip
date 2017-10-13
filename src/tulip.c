@@ -38,7 +38,6 @@ int main(int argc, char **argv)
 
   parseParams(argc, argv);
 
-  print_version_info();
   tul_global_signal_handle_init();
 
 #if defined(__APPLE__) || defined(__linux__)
