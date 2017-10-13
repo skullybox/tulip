@@ -4,6 +4,7 @@
  **/
 
 
+#include "tul_log.h"
 #include "tul_tests.h"
 #include "tul_globals.h"
 #include "tul_testwrap.h"
@@ -22,7 +23,8 @@ void run_tests()
   _tls_server_test();
   _tls_client_test_login();
 
-  sleep(200);
+  tul_log("\n waiting 10s for threads ...\n");
+  sleep(10);
 
 }
 

@@ -189,12 +189,12 @@ void do_read(int i, int tls)
 
 
     /* socket closed */
-    if(bread <= 0)
+    if(bread == -1)
     {
       FD_CLR(i, &active_set);
       tul_rem_context(i);
     }
-    else
+    else if(bread > 0)
     {
       ctx->timestamp = time(NULL);
 
@@ -232,12 +232,12 @@ void do_write(int i, int tls)
           DEF_SOCK_BUFF_SIZE-ctx->_tsend);
     }
 
-    if(bwrite <= 0)
+    if(bwrite == -1)
     {
       FD_CLR(i, &active_set);
       tul_rem_context(i);
     }
-    else
+    else if(bwrite > 0)
     {
       ctx->timestamp = time(NULL);
 

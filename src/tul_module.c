@@ -123,8 +123,6 @@ void module_read(tul_net_context *c)
   }
 
 
-  tul_log("LOGIN!");
-
 RESET_REQ:
   /* reset */
   c->_trecv = 0;

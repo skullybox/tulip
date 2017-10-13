@@ -17,8 +17,10 @@ int tls_read(tul_tls_ctx *c, char *buf, unsigned len)
 
   ret = mbedtls_ssl_read( &(c->ssl), (unsigned char *)buf, len );
 
-  if(ret < 0)
+  if( ret == MBEDTLS_ERR_SSL_WANT_READ  )
     return -2;
+  else if ( ret < 0)
+    return -1;
 
   return ret;
 }
@@ -32,8 +34,11 @@ int tls_write(tul_tls_ctx *c, char *buf, unsigned len)
 
   ret = mbedtls_ssl_write( &(c->ssl), (unsigned char *)buf, len );
 
-  if(ret < 0)
+  if( ret == MBEDTLS_ERR_SSL_WANT_WRITE )
     return -2;
+  else if ( ret < 0)
+    return -1;
+
 
   return ret;
 }
