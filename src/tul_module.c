@@ -165,8 +165,11 @@ void module_read(tul_net_context *c)
   switch(p.action)
   {
     case LOGIN:
+      c->_user_auth = 1;
       sprintf(buff, " user login: %s", r.user);
       tul_log(buff);
+
+
       break;
     case LOGOUT:
       sprintf(buff, " user logout: %s", r.user);
