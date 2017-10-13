@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 #if !defined(__APPLE__) && !defined(__linux__)
   WSACleanup();
 #endif
-  tul_log("exiting (sleeping 2s)");
+  tul_log(" exiting (sleeping 2s)");
   usleep(2000000);
   return 0;
 }

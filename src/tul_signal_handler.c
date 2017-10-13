@@ -38,6 +38,6 @@ void tul_signal_handler_interupt(int i)
   if(!TUL_SIGNAL_INT)
   {
     TUL_SIGNAL_INT = 1;
-    tul_log("signal to shutdown");
+    tul_log(" signal to shutdown");
   }
 }

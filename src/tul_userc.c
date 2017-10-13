@@ -3,6 +3,7 @@
   user client functions
  **/
 
+#include <time.h>
 #include "tul_userc.h"
 #include "tul_tls_client.h"
 #include "rc5_cipher.h"
@@ -385,6 +386,8 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *li
 int client_transmit(tul_net_context *conn)
 {
   int bwrite = 0;
+  clock_t start = clock();
+  clock_t current_time;
 
   while(conn->_tsend < conn->_ttsend)
   {
@@ -405,8 +408,13 @@ int client_transmit(tul_net_context *conn)
         conn->_tsend+=bwrite;
 
     }
+
+    /* 10ms timeout */
+    current_time = clock() - start;
+    if( current_time/1000 || (current_time%1000 > 10))
+      break;
   }
 
-  return 0;
+  return bwrite;
 }
 

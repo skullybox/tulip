@@ -30,7 +30,7 @@ int tul_add_context(unsigned sock, int tls)
    */
   if(cur->this != NULL && cur->this->_sock == sock)
   {
-    tul_log("skipping adding socket; already in list");
+    tul_log(" skipping adding socket; already in list");
   }
   else /* we add the network context here */
   {

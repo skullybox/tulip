@@ -255,7 +255,9 @@ void _tls_client_test_login()
     return;
   }
 
-  client_transmit(&conn);
+  ret = client_transmit(&conn);
+  fprintf(stdout, " PASS: client_test_login - bytes sent: %d\n", ret);
+
 
 }
 

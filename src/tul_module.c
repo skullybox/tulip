@@ -20,11 +20,16 @@ void configure_module()
   tul_WR_callback = (tul_write_callback) &module_write;
 }
 
-void module_read(tul_net_context *c)
+/* verifies payload with decryption and
+ * hmac verfication.
+ *
+ * return 0 on successfully validating payload
+ * return 1 on failure to validate payload
+ * return -1 when waiting on more data
+ */
+int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
 {
   RC5_ctx rc5;
-  comm_req r; 
-  comm_payload p;
   int ret = 0;
   char t_kek[16] = {0};
   char *t_salt = 0;
@@ -36,7 +41,7 @@ void module_read(tul_net_context *c)
   unsigned char hash_r[DIGESTBYTES] = {0};
 
   if(c->_trecv < REQ_HSZ)
-    return;
+    return -1;
 
   if(!c->_ttrecv)
   {
@@ -50,85 +55,136 @@ void module_read(tul_net_context *c)
    * inspect the request sent
    */
   if(c->_trecv < c->_ttrecv)
-    return;
+    return -1;
   
   /* grab the request header */
-  memset(&r, 0, REQ_HSZ);
-  memcpy(&r, c->payload_in, REQ_HSZ);
+  memset(r, 0, REQ_HSZ);
+  memcpy(r, c->payload_in, REQ_HSZ);
 
   /* lookup the user and password */ 
-  strncpy(uid, r.user, 30);
+  strncpy(uid, r->user, 30);
   ret = get_user_pass(uid, pass, salt);
   if(ret)
   {
-    /* TODO: error case */
+    return 1;
   }
 
   decrypt_user_pass(pass, salt);
 
   /* decrypt kek */
-  salt_password(pass, r.salt, 16);
+  salt_password(pass, r->salt, 16);
 
   RC5_SETUP(pass, &rc5);
-  rc5_decrypt((unsigned*)r.kek, (unsigned *)t_kek, &rc5, 16);
-  memcpy(r.kek, t_kek, 16);
+  rc5_decrypt((unsigned*)r->kek, (unsigned *)t_kek, &rc5, 16);
+  memcpy(r->kek, t_kek, 16);
 
   /* decrypt payload */
-  memcpy(&p, &(c->payload_in[REQ_HSZ]), sizeof(comm_payload));
-  p.data = calloc(1, p.data_sz);
-  t_data = calloc(1, p.data_sz);
+  memcpy(p, &(c->payload_in[REQ_HSZ]), sizeof(comm_payload));
+  p->data = calloc(1, p->data_sz);
+  t_data = calloc(1, p->data_sz);
 
   memcpy(t_data, &(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
-      p.data_sz);
+      p->data_sz);
 
-  salt_password(t_kek, r.salt, 16);
+  salt_password(t_kek, r->salt, 16);
   RC5_SETUP(t_kek, &rc5);
-  rc5_decrypt((unsigned*)t_data, (unsigned*)p.data, &rc5, p.data_sz);
+  rc5_decrypt((unsigned*)t_data, (unsigned*)p->data, &rc5, p->data_sz);
 
   free(t_data);
   t_data = NULL;
 
   /* verify header hash */
   NESSIEinit(&hash);
-  NESSIEadd(r.user, 30*8, &hash);
-  NESSIEadd((unsigned char *)&(r.salt), 16*8, &hash);
-  NESSIEadd(r.kek, 16*8, &hash); 
-  NESSIEadd(r.hmac, DIGESTBYTES*8, &hash); 
-  NESSIEadd((unsigned char *)&(r.payload_sz), 
+  NESSIEadd(r->user, 30*8, &hash);
+  NESSIEadd((unsigned char *)&(r->salt), 16*8, &hash);
+  NESSIEadd(r->kek, 16*8, &hash); 
+  NESSIEadd(r->hmac, DIGESTBYTES*8, &hash); 
+  NESSIEadd((unsigned char *)&(r->payload_sz), 
       sizeof(unsigned)*8, &hash); 
-  NESSIEadd((unsigned char *)&(p.action), sizeof(unsigned)*8, &hash); 
-  NESSIEadd((unsigned char*)&(p.data_sz), sizeof(unsigned), &hash); 
-  NESSIEadd((unsigned char*)&(p.tag), sizeof(unsigned)*8, &hash); 
+  NESSIEadd((unsigned char *)&(p->action), sizeof(unsigned)*8, &hash); 
+  NESSIEadd((unsigned char*)&(p->data_sz), sizeof(unsigned), &hash); 
+  NESSIEadd((unsigned char*)&(p->tag), sizeof(unsigned)*8, &hash); 
 
   NESSIEadd((unsigned char*)&(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
-      p.data_sz*8, 
+      p->data_sz*8, 
       &hash); 
   NESSIEfinalize(&hash, hash_r);
 
-  if (verifyHash(hash_r, r.hmac2 ))
+  if (verifyHash(hash_r, r->hmac2 ))
   {
-    /* TODO: error case */
-    goto RESET_REQ;
+    return 1;
   }
 
   /* hash payload and verify */
   NESSIEinit(&hash);
-  NESSIEadd(p.data, p.data_sz*8, &hash);
+  NESSIEadd(p->data, p->data_sz*8, &hash);
   NESSIEfinalize(&hash, hash_r);
 
-  if (verifyHash(hash_r, r.hmac ))
+  if (verifyHash(hash_r, r->hmac ))
   {
-    /* TODO: error case */
-    goto RESET_REQ;
+    return 1;
   }
 
+  return 0;
+}
 
-RESET_REQ:
-  /* reset */
-  c->_trecv = 0;
-  c->_ttrecv = 0;
-  memset(c->payload_in, 0, DEF_SOCK_BUFF_SIZE);
+void module_read(tul_net_context *c)
+{
+  comm_req r; 
+  comm_payload p;
+  char buff[200] = {0};
+  int ret = 0;
 
+  memset(&r, 0, sizeof(comm_req));
+  memset(&p, 0, sizeof(comm_payload));
+  ret = verify_payload(c, &r, &p);
+
+  /* waiting for more data */
+  if(ret == -1)
+    return;
+
+  /* if request is validated or error 
+   * during validation reset recieve buffers
+   * and counters
+   */
+  if(ret == 1 || ret == 0)
+  {
+    /* reset */
+    c->_trecv = 0;
+    c->_ttrecv = 0;
+    memset(c->payload_in, 0, DEF_SOCK_BUFF_SIZE);
+
+    if(ret && !(c->_user_auth))
+    {
+      c->_teardown = 1;
+      return;
+    }
+  }
+
+  /* proceed to action request */
+  switch(p.action)
+  {
+    case LOGIN:
+      sprintf(buff, " user login: %s", r.user);
+      tul_log(buff);
+      break;
+    case LOGOUT:
+      sprintf(buff, " user logout: %s", r.user);
+      tul_log(buff);
+      break;
+    case GET_LIST:
+      break;
+    case SEND_MSG:
+      break;
+    case ADDFRIEND:
+      break;
+    case DELFRIEND:
+      break;
+    default:
+      /* TODO: send error */
+      break;
+  }
+  
 }
 
 
