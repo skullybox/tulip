@@ -30,6 +30,7 @@ typedef struct _comm_0
 
 typedef struct _comm_1
 {
+  uchar user[30];
   uchar salt[16];
   uchar kek[16];
   uchar hmac[DIGESTBYTES];
@@ -41,7 +42,6 @@ typedef struct _payload
 {
   unsigned action;
   unsigned data_sz;
-  unsigned tag;
   void *data;
 } comm_payload; 
 
@@ -52,7 +52,8 @@ enum actions
     GET_LIST, /* list of friends */
     SEND_MSG,
     ADDFRIEND, /* friend request */
-    DELFRIEND
+    DELFRIEND,
+    RESPONSE   /* indicates status payload */
 };
 
 enum status
@@ -62,7 +63,7 @@ enum status
   INVALID,
   PAGING,
   END
-}
+};
 
 static const unsigned RES_HSZ = sizeof(comm_resp); 
 static const unsigned REQ_HSZ = sizeof(comm_req); 

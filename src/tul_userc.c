@@ -11,11 +11,11 @@
 #include "tul_random.h"
 #include "whirlpool_hash.h"
 #include "tul_tls_common.h"
+#include "tul_module_common.h"
 
 /* MAX_REQ_PAYLOAD minus payload
  * header of struct
  */
-#define PAYLOAD_CHECK_SZ if(p.data_sz > MAX_REQ_PAYLOAD - sizeof(comm_payload)) return 1;
 
 extern const char CA_CERT[];
 extern const char CLIENT_CERT[];
@@ -23,93 +23,6 @@ extern const char CLIENT_KEY[];
 extern int CLIENT_CERT_len;
 extern int CA_CERT_len;
 extern int CLIENT_KEY_len;
-
-int prep_transmission(char *uid, char *pass, 
-    comm_req *r, comm_payload *p, tul_net_context *conn)
-{
-  RC5_ctx rc5;
-  char tmp[16] = {0};
-  char *t_data = NULL;
-  NESSIEstruct hash;
-  unsigned char hash_r[DIGESTBYTES] = {0};
-
-  /* take data hash prior to 
-   * encryption
-   */
-  NESSIEinit(&hash);
-  NESSIEadd(p->data, p->data_sz*8, &hash);
-  NESSIEfinalize(&hash, hash_r);
-  
-  /* copy payload hash to payload
-   * header
-   */
-  memcpy(r->hmac, hash_r, DIGESTBYTES);
-
-  /* encrypt payload using kek */
-  memcpy(tmp, r->kek, 16);
-  salt_password(tmp, r->salt, 16);
-  RC5_SETUP(tmp, &rc5);
-  t_data = calloc(1, p->data_sz);
-  rc5_encrypt((unsigned*)p->data,(unsigned*)t_data, &rc5, p->data_sz);
-
-  memcpy(p->data, t_data, p->data_sz);
-  free(t_data);
-  t_data = NULL;
-
-  /* take hash of header */
-  NESSIEinit(&hash);
-
-  NESSIEinit(&hash);
-  NESSIEadd(r->user, 30*8, &hash);
-  NESSIEadd((unsigned char *)&(r->salt), 16*8, &hash);
-
-  /* hash kek before kek is encrypted */
-  NESSIEadd(r->kek, 16*8, &hash); 
-
-  NESSIEadd(r->hmac, DIGESTBYTES*8, &hash); 
-  NESSIEadd((unsigned char *)&(r->payload_sz), 
-      sizeof(unsigned)*8, &hash); 
-
-  NESSIEadd((unsigned char *)&(p->action), sizeof(unsigned)*8, &hash); 
-  NESSIEadd((unsigned char*)&(p->data_sz), sizeof(unsigned), &hash); 
-  NESSIEadd((unsigned char*)&(p->tag), sizeof(unsigned)*8, &hash); 
-  NESSIEadd((unsigned char*)p->data, p->data_sz*8, &hash); 
-  NESSIEfinalize(&hash, hash_r);
-
-  memcpy(r->hmac2, hash_r, DIGESTBYTES);
-
-  /* encrypt kek */
-  memcpy(tmp, pass, 16);
-  salt_password(tmp, r->salt, 16);
-
-  RC5_SETUP(tmp, &rc5);
-  memset(tmp, 0, 16);
-  memcpy(tmp, r->kek, 16);
-  rc5_encrypt((unsigned*)tmp, (unsigned *)r->kek, &rc5, 16);
-
-  /* copy to network context
-   * and clean-up any allocation
-   */
-  conn->_ttsend = REQ_HSZ + sizeof(comm_payload) + p->data_sz;
-  conn->_tsend = 0;
-
-  /* copy header */
-  memcpy(&(conn->payload_out[0]), r, REQ_HSZ);
-
-  /* copy payload */
-  memcpy(&(conn->payload_out[REQ_HSZ]), p, sizeof(comm_payload));
-  memcpy(&(conn->payload_out[REQ_HSZ+sizeof(comm_payload)]), 
-      p->data, p->data_sz);
-  
-  /* clean-up allocation */
-  free(p->data);
-  p->data = NULL;
-  
-  memset(r, 0, REQ_HSZ);
-  memset(p, 0, sizeof(comm_payload));
-  return 0;
-}
-
 
 int client_login(char *uid, char *pass, tul_net_context *conn)
 {
@@ -353,7 +266,7 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *li
 
   p.action = GET_LIST;
 
-    /* data size with encryption
+  /* data size with encryption
    * block size into account
    */
   if((strlen(uid)+1)%16)

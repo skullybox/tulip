@@ -5,14 +5,20 @@
 
 #include "tul_b64.h"
 #include "tul_log.h"
+#include "tul_random.h"
 #include "tul_user.h"
 #include "tul_module.h"
 #include "rc5_cipher.h"
 #include "whirlpool_hash.h"
 #include "tul_net_context.h"
+#include "tul_module_common.h"
 
 extern tul_read_callback tul_RD_callback;
 extern tul_write_callback tul_WR_callback;
+
+/* forward declarations */
+int do_login(char *user, comm_payload *p);
+int send_response(char *u, unsigned s, tul_net_context *c);
 
 void configure_module()
 {
@@ -20,113 +26,6 @@ void configure_module()
   tul_WR_callback = (tul_write_callback) &module_write;
 }
 
-/* verifies payload with decryption and
- * hmac verfication.
- *
- * return 0 on successfully validating payload
- * return 1 on failure to validate payload
- * return -1 when waiting on more data
- */
-int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
-{
-  RC5_ctx rc5;
-  int ret = 0;
-  char t_kek[16] = {0};
-  char *t_salt = 0;
-  char uid[31] = {0};
-  char pass[25] = {0};
-  char salt[25] = {0};
-  char *t_data = NULL;
-  NESSIEstruct hash;
-  unsigned char hash_r[DIGESTBYTES] = {0};
-
-  if(c->_trecv < REQ_HSZ)
-    return -1;
-
-  if(!c->_ttrecv)
-  {
-    comm_req r_tmp;
-    memcpy(&r_tmp, c->payload_in, REQ_HSZ);
-    c->_ttrecv = REQ_HSZ + r_tmp.payload_sz;
-  }
-
-  /* at this point the buffere is filled
-   * with the expected payload we can
-   * inspect the request sent
-   */
-  if(c->_trecv < c->_ttrecv)
-    return -1;
-  
-  /* grab the request header */
-  memset(r, 0, REQ_HSZ);
-  memcpy(r, c->payload_in, REQ_HSZ);
-
-  /* lookup the user and password */ 
-  strncpy(uid, r->user, 30);
-  ret = get_user_pass(uid, pass, salt);
-  if(ret)
-  {
-    return 1;
-  }
-
-  decrypt_user_pass(pass, salt);
-
-  /* decrypt kek */
-  salt_password(pass, r->salt, 16);
-
-  RC5_SETUP(pass, &rc5);
-  rc5_decrypt((unsigned*)r->kek, (unsigned *)t_kek, &rc5, 16);
-  memcpy(r->kek, t_kek, 16);
-
-  /* decrypt payload */
-  memcpy(p, &(c->payload_in[REQ_HSZ]), sizeof(comm_payload));
-  p->data = calloc(1, p->data_sz);
-  t_data = calloc(1, p->data_sz);
-
-  memcpy(t_data, &(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
-      p->data_sz);
-
-  salt_password(t_kek, r->salt, 16);
-  RC5_SETUP(t_kek, &rc5);
-  rc5_decrypt((unsigned*)t_data, (unsigned*)p->data, &rc5, p->data_sz);
-
-  free(t_data);
-  t_data = NULL;
-
-  /* verify header hash */
-  NESSIEinit(&hash);
-  NESSIEadd(r->user, 30*8, &hash);
-  NESSIEadd((unsigned char *)&(r->salt), 16*8, &hash);
-  NESSIEadd(r->kek, 16*8, &hash); 
-  NESSIEadd(r->hmac, DIGESTBYTES*8, &hash); 
-  NESSIEadd((unsigned char *)&(r->payload_sz), 
-      sizeof(unsigned)*8, &hash); 
-  NESSIEadd((unsigned char *)&(p->action), sizeof(unsigned)*8, &hash); 
-  NESSIEadd((unsigned char*)&(p->data_sz), sizeof(unsigned), &hash); 
-  NESSIEadd((unsigned char*)&(p->tag), sizeof(unsigned)*8, &hash); 
-
-  NESSIEadd((unsigned char*)&(c->payload_in[REQ_HSZ+sizeof(comm_payload)]), 
-      p->data_sz*8, 
-      &hash); 
-  NESSIEfinalize(&hash, hash_r);
-
-  if (verifyHash(hash_r, r->hmac2 ))
-  {
-    return 1;
-  }
-
-  /* hash payload and verify */
-  NESSIEinit(&hash);
-  NESSIEadd(p->data, p->data_sz*8, &hash);
-  NESSIEfinalize(&hash, hash_r);
-
-  if (verifyHash(hash_r, r->hmac ))
-  {
-    return 1;
-  }
-
-  return 0;
-}
 
 void module_read(tul_net_context *c)
 {
@@ -170,13 +69,15 @@ void module_read(tul_net_context *c)
       {
         sprintf(buff, " user login: %s", r.user);
         tul_log(buff);
-        /* TODO: send OK */
+
+        /* send OK */
+        send_response(r.user, OK, c);
       }
       else {
         /* this should not happen! */
-        /* TODO: send INVALID */
+        /* send INVALID */
+        send_response(r.user, INVALID, c);
       }
-
 
       break;
     case LOGOUT:
@@ -193,6 +94,7 @@ void module_read(tul_net_context *c)
       break;
     default:
       /* TODO: send error */
+      send_response(r.user, ERROR, c);
       break;
   }
   
@@ -203,29 +105,57 @@ int do_login(char *user, comm_payload *p)
   return strcmp(user, p->data);
 }
 
-int send_response(char *u, int s, tul_net_context *c)
+int send_response(char *u, unsigned s, tul_net_context *c)
 {
   RC5_ctx rc5;
+  comm_resp r;
+  comm_payload p;
   NESSIEstruct hash;
 
   char _user[31] = {0};
   char _pass[25] = {0};
   char _salt[25] = {0};
-  char r_salt[16] = {0};
-  char r_kek[16] = {0};
   int ret = 0;
 
   strncpy(_user, u, 30);
 
   ret = get_user_pass(_user, _pass, _salt);
+  if(ret)
+  {
+      c->_teardown = 1;
+      return 1;
+  }
+  decrypt_user_pass(_pass, _salt);
 
   /* random salt and kek
    * used to encrypt payload data */
-  tul_random(&r_salt, 16);
-  tul_random(&r_kek, 16);
-  
+  tul_random(&r.salt, 16);
+  tul_random(&r.kek, 16);
 
-  return 0;
+  p.action = RESPONSE;
+
+  /* data size with encryption
+   * block size into account
+   */
+  if((sizeof(unsigned))%16)
+  {
+    p.data_sz = 16*((sizeof(unsigned)/16))+16;
+    PAYLOAD_CHECK_SZ;
+    p.data = calloc(p.data_sz, 1);
+  }
+  else
+  {
+    p.data_sz = (sizeof(unsigned)/16)*16;
+    PAYLOAD_CHECK_SZ;
+    p.data = calloc(p.data_sz,1);
+  }
+
+  r.payload_sz = sizeof(comm_payload) + p.data_sz;
+
+  /* copy data */
+  memcpy(p.data, &s, sizeof(s));
+
+  return prep_transmission(u, _pass, (comm_req*)&r, &p, c);
 }
 
 
