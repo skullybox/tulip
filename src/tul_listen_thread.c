@@ -269,6 +269,10 @@ void do_write(int i, int tls)
 
         /* send to context processor */
         tul_service(ctx, 1);
+
+        if(ctx->_teardown)
+          goto DO_WRITE_CLOSE;
+
       }
     }
   }

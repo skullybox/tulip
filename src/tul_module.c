@@ -166,8 +166,16 @@ void module_read(tul_net_context *c)
   {
     case LOGIN:
       c->_user_auth = 1;
-      sprintf(buff, " user login: %s", r.user);
-      tul_log(buff);
+      if(!do_login(r.user, &p))
+      {
+        sprintf(buff, " user login: %s", r.user);
+        tul_log(buff);
+        /* TODO: send OK */
+      }
+      else {
+        /* this should not happen! */
+        /* TODO: send INVALID */
+      }
 
 
       break;
@@ -188,6 +196,36 @@ void module_read(tul_net_context *c)
       break;
   }
   
+}
+
+int do_login(char *user, comm_payload *p)
+{
+  return strcmp(user, p->data);
+}
+
+int send_response(char *u, int s, tul_net_context *c)
+{
+  RC5_ctx rc5;
+  NESSIEstruct hash;
+
+  char _user[31] = {0};
+  char _pass[25] = {0};
+  char _salt[25] = {0};
+  char r_salt[16] = {0};
+  char r_kek[16] = {0};
+  int ret = 0;
+
+  strncpy(_user, u, 30);
+
+  ret = get_user_pass(_user, _pass, _salt);
+
+  /* random salt and kek
+   * used to encrypt payload data */
+  tul_random(&r_salt, 16);
+  tul_random(&r_kek, 16);
+  
+
+  return 0;
 }
 
 

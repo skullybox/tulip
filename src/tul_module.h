@@ -55,6 +55,15 @@ enum actions
     DELFRIEND
 };
 
+enum status
+{
+  OK = 2000,
+  ERROR,
+  INVALID,
+  PAGING,
+  END
+}
+
 static const unsigned RES_HSZ = sizeof(comm_resp); 
 static const unsigned REQ_HSZ = sizeof(comm_req); 
 
