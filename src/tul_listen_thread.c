@@ -162,35 +162,52 @@ void do_read(int i, int tls)
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
 
-  if(ctx != NULL && ctx->_trecv < DEF_SOCK_BUFF_SIZE)
+  if(ctx != NULL )
   {
+    if(ctx->_trecv >= DEF_SOCK_BUFF_SIZE
+        && !ctx->_teardown)
+      goto DO_READ_SERVICE;
+
+    if(ctx->_teardown)
+      goto DO_READ_CLOSE;
+
     if(!tls)
     {
-      bread = read(ctx->_sock,
-          &(ctx->payload_in[ctx->_trecv]),
-          DEF_SOCK_BUFF_SIZE-ctx->_trecv);
+      if(ctx->_trecv < DEF_SOCK_BUFF_SIZE)
+            bread = read(ctx->_sock,
+              &(ctx->payload_in[ctx->_trecv]),
+              DEF_SOCK_BUFF_SIZE-ctx->_trecv);
     }
     else
     {
       if(!(tls_ctx->handshake_done))
       {
         int ret = mbedtls_ssl_handshake(&(tls_ctx->ssl));
-        if(ret)
+        if(ret ==  MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_READ)
+        {
+
           return;
-        else {
+        }
+        else if (!ret){
           tls_ctx->handshake_done = 1;
+        }
+        else {
+          ctx->_teardown = 1; 
+          goto DO_READ_CLOSE;
         }
 
       }
-      bread = tls_read(tls_ctx,
-          &(ctx->payload_in[ctx->_trecv]),
-          DEF_SOCK_BUFF_SIZE-ctx->_trecv);
+      if(ctx->_trecv < DEF_SOCK_BUFF_SIZE)
+        bread = tls_read(tls_ctx,
+            &(ctx->payload_in[ctx->_trecv]),
+            DEF_SOCK_BUFF_SIZE-ctx->_trecv);
     }
 
 
     /* socket closed */
     if(bread == -1)
     {
+DO_READ_CLOSE:
       FD_CLR(i, &active_set);
       tul_rem_context(i);
     }
@@ -201,6 +218,7 @@ void do_read(int i, int tls)
       /* update bytes read */
       ctx->_trecv += bread;
 
+DO_READ_SERVICE:
       /* send to context processor */
       tul_service(ctx, 0);
     }
@@ -216,37 +234,49 @@ void do_write(int i, int tls)
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
 
-  if( ctx->_ttsend )
+  if(ctx != NULL )
   {
 
-    if(!tls)
-    {
-      bwrite = write(ctx->_sock,
-          &(ctx->payload_out[ctx->_tsend]),
-          DEF_SOCK_BUFF_SIZE-ctx->_tsend);
-    }
-    else
-    {
-      bwrite = tls_write(tls_ctx,
-          &(ctx->payload_out[ctx->_tsend]),
-          DEF_SOCK_BUFF_SIZE-ctx->_tsend);
-    }
+    if(ctx->_teardown)
+      goto DO_WRITE_CLOSE;
 
-    if(bwrite == -1)
+    if( ctx->_ttsend && ctx->_tsend < ctx->_ttsend )
     {
-      FD_CLR(i, &active_set);
-      tul_rem_context(i);
-    }
-    else if(bwrite > 0)
-    {
-      ctx->timestamp = time(NULL);
+      if(!tls)
+      {
+        bwrite = write(ctx->_sock,
+            &(ctx->payload_out[ctx->_tsend]),
+            DEF_SOCK_BUFF_SIZE-ctx->_tsend);
+      }
+      else if(tls_ctx->handshake_done)
+      {
+        bwrite = tls_write(tls_ctx,
+            &(ctx->payload_out[ctx->_tsend]),
+            DEF_SOCK_BUFF_SIZE-ctx->_tsend);
+      }
 
-      /* update bytes read */
-      ctx->_tsend += bwrite;
+      if(bwrite == -1)
+      {
+        FD_CLR(i, &active_set);
+        tul_rem_context(i);
+      }
+      else if(bwrite > 0)
+      {
+        ctx->timestamp = time(NULL);
 
-      /* send to context processor */
-      tul_service(ctx, 1);
+        /* update bytes read */
+        ctx->_tsend += bwrite;
+
+        /* send to context processor */
+        tul_service(ctx, 1);
+      }
     }
+  }
+  if(ctx->_teardown)
+  {
+DO_WRITE_CLOSE:
+    FD_CLR(i, &active_set);
+    tul_rem_context(i);
   }
 }
 
