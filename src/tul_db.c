@@ -160,9 +160,9 @@ DB_POOL_SETUP:
 
       "create table friend_request(uid integer, user_from varchar(15), ctime DATETIME DEFAULT CURRENT_TIMESTAMP);",
 
-      "create table friend_list(uid integer, friend integer, ctime DATETIME DEFAULT CURRENT_TIMESTAMP, foreign key(uid) references user(uid), foreign key(friend) references user(uid));",
+      "create table friend_list(id integer not null, uid varchar(15), friend varchar(15), ctime DATETIME DEFAULT CURRENT_TIMESTAMP, foreign key(uid) references user(uid), foreign key(friend) references user(uid), primary key(id));",
 
-      "create table message(msg_id integer not null, uid integer, frm integer, ctime DATETIME DEFAULT CURRENT_TIMESTAMP, msg text, primary key(msg_id), foreign key (uid) references user(uid), foreign key(frm) references user(uid));"
+      "create table message(msg_id integer not null, uid varchar(15), frm varchar(15), ctime DATETIME DEFAULT CURRENT_TIMESTAMP, msg text, primary key(msg_id), foreign key (uid) references user(uid), foreign key(frm) references user(uid));"
       );
   
   char password_blk[17] = "tulip!2345";

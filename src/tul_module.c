@@ -18,7 +18,12 @@ extern tul_write_callback tul_WR_callback;
 
 /* forward declarations */
 int do_login(char *user, comm_payload *p);
-int send_response(char *u, unsigned s, tul_net_context *c);
+int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p);
+int do_get_msg(char *user, comm_payload *p);
+int do_send_msg(char *user, comm_payload *p);
+int do_get_list(char *user, comm_payload *p, unsigned offset);
+int do_add_friend(char *user, comm_payload *p);
+int do_rem_friend(char *user, comm_payload *p);
 
 void configure_module()
 {
@@ -33,6 +38,7 @@ void module_read(tul_net_context *c)
   comm_payload p;
   char buff[200] = {0};
   int ret = 0;
+  unsigned offset = 0;
 
   memset(&r, 0, sizeof(comm_req));
   memset(&p, 0, sizeof(comm_payload));
@@ -71,33 +77,75 @@ void module_read(tul_net_context *c)
         tul_log(buff);
 
         /* send OK */
-        send_response(r.user, OK, c);
+        send_response(r.user, OK, c, NULL);
       }
       else {
-        /* this should not happen! */
-        /* send INVALID */
-        send_response(r.user, INVALID, c);
+        /* this should not happen!
+         * send INVALID
+         */
+        send_response(r.user, INVALID, c, NULL);
       }
 
       break;
     case LOGOUT:
       sprintf(buff, " user logout: %s", r.user);
       tul_log(buff);
+      c->_teardown = 1;
       break;
     case GET_LIST:
+      memcpy(&offset,&((char*)p.data)[4], sizeof(unsigned));
+      sprintf(buff, " user get_list: %s", r.user);
+      tul_log(buff);
+
+      ret = do_get_list(r.user, &p, offset);
+      send_response(r.user, ERROR, c, &p);
       break;
     case SEND_MSG:
+      break;
+    case GET_MSG:
       break;
     case ADDFRIEND:
       break;
     case DELFRIEND:
       break;
     default:
-      /* TODO: send error */
-      send_response(r.user, ERROR, c);
+      /* send error */
+      send_response(r.user, ERROR, c, NULL);
       break;
   }
   
+}
+
+int do_get_msg(char *user, comm_payload *p)
+{
+
+  return 0;
+}
+
+int do_send_msg(char *user, comm_payload *p)
+{
+
+  return 0;
+}
+
+int do_get_list(char *user, comm_payload *p, unsigned offset)
+{
+  char SQL[4096] = {0};
+  //sprintf(SQL, "select salt, password from user where uid='%s'", uid);
+
+  return 0;
+}
+
+int do_add_friend(char *user, comm_payload *p)
+{
+
+  return 0;
+}
+
+int do_rem_friend(char *user, comm_payload *p)
+{
+
+  return 0;
 }
 
 int do_login(char *user, comm_payload *p)
@@ -105,7 +153,7 @@ int do_login(char *user, comm_payload *p)
   return strcmp(user, p->data);
 }
 
-int send_response(char *u, unsigned s, tul_net_context *c)
+int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p)
 {
   RC5_ctx rc5;
   comm_resp r;
@@ -137,25 +185,34 @@ int send_response(char *u, unsigned s, tul_net_context *c)
   /* data size with encryption
    * block size into account
    */
-  if((sizeof(unsigned))%16)
+  if(_p == NULL)
   {
-    p.data_sz = 16*((sizeof(unsigned)/16))+16;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(p.data_sz, 1);
+    if((sizeof(unsigned))%16)
+    {
+      p.data_sz = 16*((sizeof(unsigned)/16))+16;
+      PAYLOAD_CHECK_SZ;
+      p.data = calloc(p.data_sz, 1);
+    }
+    else
+    {
+      p.data_sz = (sizeof(unsigned)/16)*16;
+      PAYLOAD_CHECK_SZ;
+      p.data = calloc(p.data_sz,1);
+    }
+    r.payload_sz = sizeof(comm_payload) + p.data_sz;
   }
   else
   {
-    p.data_sz = (sizeof(unsigned)/16)*16;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(p.data_sz,1);
+    r.payload_sz = sizeof(comm_payload) + _p->data_sz;
   }
-
-  r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
   /* copy data */
   memcpy(p.data, &s, sizeof(s));
 
-  return prep_transmission(u, _pass, (comm_req*)&r, &p, c);
+  if(_p)
+    return prep_transmission(u, _pass, (comm_req*)&r, _p, c);
+  else
+    return prep_transmission(u, _pass, (comm_req*)&r, &p, c);
 }
 
 
