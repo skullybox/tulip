@@ -24,6 +24,7 @@ void run_tests()
   _tls_server_test();
   _create_users();
   _tls_client_test_login();
+  _create_friend_requests();
   _test_get_friends();
 
   tul_log("\n waiting 10s for threads ...\n");

@@ -218,7 +218,7 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 
   p.action = ADDFRIEND;
 
-    /* data size with encryption
+  /* data size with encryption
    * block size into account
    */
   if((strlen(t_uid)+1)%16)
@@ -242,6 +242,11 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
   strcpy(p.data, t_uid);
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
+  if(ret)
+    return ret;
+
+
+  ret = client_transmit(conn);
   if(ret)
     return ret;
 
@@ -313,7 +318,7 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
 int client_transmit(tul_net_context *conn)
 {
   int bwrite = 0;
-  clock_t start = clock();
+  clock_t last_transmission = clock();
   clock_t current_time;
 
   while(conn->_tsend < conn->_ttsend)
@@ -324,7 +329,10 @@ int client_transmit(tul_net_context *conn)
           &(conn->payload_out[conn->_tsend]),
           conn->_ttsend-conn->_tsend);
       if(bwrite > 0)
+      {
         conn->_tsend+=bwrite;
+        last_transmission = clock();
+      }
     }
     else
     {
@@ -332,14 +340,19 @@ int client_transmit(tul_net_context *conn)
           &(conn->payload_out[conn->_tsend]),
           conn->_ttsend-conn->_tsend);
       if(bwrite > 0)
+      {
         conn->_tsend+=bwrite;
-
+        last_transmission = clock();
+      }
     }
 
-    /* 10ms timeout */
-    current_time = clock() - start;
-    if( current_time/1000 || (current_time%1000 > 10))
-      break;
+    /* 100ms timeout */
+    if(bwrite <= 0)
+    {
+      current_time = clock() - last_transmission;
+      if( current_time/1000 || (current_time%1000 > 100))
+        break;
+    }
   }
 
   if(conn->_tsend < conn->_ttsend)

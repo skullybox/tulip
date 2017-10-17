@@ -18,5 +18,6 @@ void _payload_limits_test();
 void _tls_client_test_login();
 void _create_users();
 void _test_get_friends();
+void _create_friend_requests();
 
 #endif

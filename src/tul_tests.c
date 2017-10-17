@@ -266,6 +266,46 @@ void _create_users()
 
 }
 
+void _create_friend_requests()
+{
+  int ret = 1;
+  tul_net_context conn;
+  char *list = NULL;
+  unsigned list_sz = 0;
+  char uid[30] = "admin";
+  char pass[16] = "tulip!2345";
+
+  conn._use_tls = 1;
+  strcpy(conn.tls.host, "127.0.0.1");
+  while(ret)
+  {
+    ret = tls_client_init(&conn.tls, 9443);
+    if(ret)
+    {
+      fprintf(stdout, " FAIL: create_friend_requests_test - TLS ERROR - %d\n", ret);
+    }
+  }
+
+  if(client_login(uid, pass, &conn))
+  {
+    fprintf(stdout, " FAIL: create_friend_requests_test - login error\n");
+    return;
+  }
+
+  ret |= client_transmit(&conn);
+  ret |= client_friend_req(uid, "tommychuckles", pass, &conn);
+  ret |= client_friend_req(uid, "salma99", pass, &conn);
+  ret |= client_friend_req(uid, "tiacarrer", pass, &conn);
+
+  if(ret)
+  {
+    fprintf(stdout, " FAIL: create_friend_requests_test - login error\n");
+    return;
+  }
+
+  fprintf(stdout, " PASS: create_friend_requests_test\n");
+}
+
 void _test_get_friends()
 {
   int ret = 1;
