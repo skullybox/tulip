@@ -4,6 +4,7 @@
  **/
 
 #include "tul_b64.h"
+#include "tul_db.h"
 #include "tul_log.h"
 #include "tul_random.h"
 #include "tul_user.h"
@@ -21,7 +22,7 @@ int do_login(char *user, comm_payload *p);
 int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p);
 int do_get_msg(char *user, comm_payload *p);
 int do_send_msg(char *user, comm_payload *p);
-int do_get_list(char *user, comm_payload *p, unsigned offset);
+int do_get_list(char *user, comm_payload *p, unsigned long long offset);
 int do_add_friend(char *user, comm_payload *p);
 int do_rem_friend(char *user, comm_payload *p);
 
@@ -97,8 +98,8 @@ void module_read(tul_net_context *c)
       sprintf(buff, " user get_list: %s", r.user);
       tul_log(buff);
 
-      ret = do_get_list(r.user, &p, offset);
-      send_response(r.user, ERROR, c, &p);
+      do_get_list(r.user, &p, offset);
+      send_response(r.user, p.action, c, &p);
       break;
     case SEND_MSG:
       break;
@@ -128,11 +129,72 @@ int do_send_msg(char *user, comm_payload *p)
   return 0;
 }
 
-int do_get_list(char *user, comm_payload *p, unsigned offset)
+int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 {
+  unsigned long long id = 0ULL;
+  int row, col = 0;
+  char **res = NULL;
   char SQL[4096] = {0};
-  //sprintf(SQL, "select salt, password from user where uid='%s'", uid);
+  char uid[30] = {0};
+  sprintf(SQL, "select id, friend from friend_list where uid='%s' and id > %llu limit 200", user, offset);
 
+  tul_query_get(SQL, &res, &row, &col);
+  if(row <= 0)
+  {
+    /* TODO: send END */
+
+    p->action = END;
+    p->data_sz = 0;
+    p->data = NULL;
+    goto GETLIST_END;
+  }
+
+  /* maximum of query based on friend column
+   * 30 bytes * 200 records
+   */
+
+  /* allocate based on row response for
+   * payload
+   */
+  p->data = calloc(30*row+8+30, 1);
+  p->data_sz = 30*row+8+30;
+
+  for(int i = col; i < (col*row)+col; i+=col )
+  {
+    memset(uid, 0, 30);
+    strncpy(uid, res[i+1], 30);
+
+    memcpy(&((char*)p->data)[30+8+30*((i-col)/col)], 
+        uid, 
+        30);
+
+    if(i+col >= ((col*row)+col))
+    {
+      /* store last id in payload 
+       * for future offset
+       */
+      id = strtoull(res[i], NULL, 10);
+      if(id == 0)
+      {
+        if(p->data)
+        {
+          free(p->data);
+          p->data = NULL;
+        }
+        p->data_sz = 0;
+        p->action = ERROR;
+        return -1;
+      }
+
+      memcpy(&((char*)p->data)[30], &id, 8);
+
+      p->action = PAGING;
+    }
+  }
+
+
+GETLIST_END:
+  sqlite3_free_table(res);
   return 0;
 }
 

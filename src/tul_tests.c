@@ -125,18 +125,6 @@ void _b64_test()
   }
   free(r); 
 
-  /*
-  r = base64_dec("Tio1LS91d19JKFllOTF9LA==", 
-      strlen("Tio1LS91d19JKFllOTF9LA=="));
-  if(strcmp(r, w))
-  {
-    fprintf(stderr, " FAIL: base64_test(4)\n");
-    return;
-  }
-  free(r); 
-  */
-
-
   fprintf(stdout, " PASS: base64_test\n");
 }
 
@@ -172,11 +160,9 @@ void _tls_rc5_test()
 
   RC5_SETUP(key, &c);
   rc5_encrypt((unsigned*)text, (unsigned*)ct, &c, 16);
-  //RC5_ENCRYPT((unsigned *)text, (unsigned *)ct, &c);
 
   memset(text, 0, 8);
   rc5_decrypt((unsigned*)ct, (unsigned*)text, &c, 16);
-  //RC5_DECRYPT((unsigned *)ct, (unsigned *)text, &c);
 
   if(strcmp(text, "ooHeiw3a") == 0)
   {
@@ -257,7 +243,6 @@ void _tls_client_test_login()
 
   ret = client_transmit(&conn);
   fprintf(stdout, " PASS: client_test_login - bytes sent: %d\n", ret);
-
 
 }
 
