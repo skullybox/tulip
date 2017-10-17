@@ -63,6 +63,8 @@ int tul_query(int num_q,...)
 
   /* release lock */
   pthread_mutex_unlock(&pool_locks[pos]);
+
+  return errors_found;
 #endif
 
 }

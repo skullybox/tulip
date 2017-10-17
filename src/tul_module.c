@@ -35,7 +35,7 @@ void configure_module()
 
 void module_read(tul_net_context *c)
 {
-  comm_req r; 
+  comm_req r;
   comm_payload p;
   char buff[200] = {0};
   int ret = 0;
@@ -49,7 +49,7 @@ void module_read(tul_net_context *c)
   if(ret == -1)
     return;
 
-  /* if request is validated or error 
+  /* if request is validated or error
    * during validation reset recieve buffers
    * and counters
    */
@@ -105,7 +105,13 @@ void module_read(tul_net_context *c)
       break;
     case GET_MSG:
       break;
+    case GET_FREQ:
+      break;
     case ADDFRIEND:
+        if(!do_add_friend(r.user, &p))
+          send_response(r.user, OK, c, NULL);
+        else 
+          send_response(r.user, ERROR, c, NULL);
       break;
     case DELFRIEND:
       break;
@@ -114,7 +120,7 @@ void module_read(tul_net_context *c)
       send_response(r.user, ERROR, c, NULL);
       break;
   }
-  
+
 }
 
 int do_get_msg(char *user, comm_payload *p)
@@ -164,13 +170,13 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
     memset(uid, 0, 30);
     strncpy(uid, res[i+1], 30);
 
-    memcpy(&((char*)p->data)[30+8+30*((i-col)/col)], 
-        uid, 
+    memcpy(&((char*)p->data)[30+8+30*((i-col)/col)],
+        uid,
         30);
 
     if(i+col >= ((col*row)+col))
     {
-      /* store last id in payload 
+      /* store last id in payload
        * for future offset
        */
       id = strtoull(res[i], NULL, 10);
@@ -191,7 +197,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 
       if(row == 200)
         p->action = PAGING;
-      else 
+      else
         p->action = END;
     }
   }
@@ -204,8 +210,22 @@ GETLIST_END:
 
 int do_add_friend(char *user, comm_payload *p)
 {
+  char SQL[4096] = {0};
+  char uid[30] = {0};
+  char t_uid[30] = {0};
 
-  return 0;
+  strncpy(uid, user, 30);
+  if(p->data_sz == 32)
+    strncpy(t_uid, p->data, 30);
+  else 
+    return -1;
+
+  if(!user_exists(t_uid))
+    return -1;
+
+  sprintf(SQL, "insert into friend_request(uid, user_from) values ('%s', '%s')", 
+      uid, t_uid); 
+  return tul_query(1, SQL);
 }
 
 int do_rem_friend(char *user, comm_payload *p)

@@ -221,18 +221,8 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
   /* data size with encryption
    * block size into account
    */
-  if((strlen(t_uid)+1)%16)
-  {
-    p.data_sz = strlen(t_uid)+1+16;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(strlen(t_uid)+1+16,1);
-  }
-  else
-  {
-    p.data_sz = strlen(t_uid)+1;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(strlen(t_uid)+1,1);
-  }
+  p.data_sz = 32;
+  p.data = calloc(32, 1);
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
@@ -275,19 +265,8 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
   /* data size with encryption
    * block size into account
    */
-  if((strlen(uid)+1)%16)
-  {
-    p.data_sz = strlen(uid)+1+16;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(strlen(uid)+1+16,1);
-  }
-  else
-  {
-    p.data_sz = strlen(uid)+1;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(strlen(uid)+1,1);
-  }
-
+  p.data_sz = 32;
+  p.data = calloc(32,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
   /* data stores uid as part of
@@ -364,7 +343,7 @@ int client_transmit(tul_net_context *conn)
 int client_recieve(tul_net_context *conn)
 {
   int bread = 0;
-  clock_t start = clock();
+  clock_t last_transmission = clock();
   clock_t current_time;
   comm_resp t_resp;
 
@@ -404,10 +383,14 @@ int client_recieve(tul_net_context *conn)
         conn->_trecv +=bread;
     }
 
-    /* 10ms timeout */
-    current_time = clock() - start;
-    if( current_time/1000 || (current_time%1000 > 10))
-      break;
+    /* 100ms timeout */
+    if(bread <= 0)
+    {
+      current_time = clock() - last_transmission;
+      if( current_time/1000 || (current_time%1000 > 100))
+        break;
+    }
+
   }
 
   if(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)

@@ -52,6 +52,7 @@ enum actions
     GET_LIST, /* list of friends */
     SEND_MSG,
     GET_MSG,
+    GET_FREQ,
     ADDFRIEND, /* friend request */
     DELFRIEND,
     RESPONSE   /* indicates status payload */

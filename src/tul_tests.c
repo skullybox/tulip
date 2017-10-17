@@ -292,10 +292,14 @@ void _create_friend_requests()
     return;
   }
 
-  ret |= client_transmit(&conn);
-  ret |= client_friend_req(uid, "tommychuckles", pass, &conn);
   ret |= client_friend_req(uid, "salma99", pass, &conn);
+  ret |= client_recieve(&conn);
+
   ret |= client_friend_req(uid, "tiacarrer", pass, &conn);
+  ret |= client_recieve(&conn);
+
+  ret |= client_friend_req(uid, "tommychuckles", pass, &conn);
+  ret |= client_recieve(&conn);
 
   if(ret)
   {
@@ -304,6 +308,7 @@ void _create_friend_requests()
   }
 
   fprintf(stdout, " PASS: create_friend_requests_test\n");
+  sleep(2);
 }
 
 void _test_get_friends()
