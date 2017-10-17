@@ -3,6 +3,7 @@
  **/
 
 #include "tul_db.h"
+#include "tul_user.h"
 #include "tul_b64.h"
 #include "tul_userc.h"
 #include "tul_tests.h"
@@ -242,8 +243,65 @@ void _tls_client_test_login()
   }
 
   ret = client_transmit(&conn);
-  fprintf(stdout, " PASS: client_test_login - bytes sent: %d\n", ret);
+  fprintf(stdout, " PASS: client_test_login\n");
 
 }
 
+void _create_users()
+{
+  int ret = 0; 
+
+  if(!ret)
+    ret = create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
+  if(!ret)
+    ret = create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
+  if(!ret)
+    ret = create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
+
+
+  if(ret)
+    fprintf(stdout, " FAIL: create_user_test\n");
+  else 
+    fprintf(stdout, " PASS: create_user_test\n");
+
+}
+
+void _test_get_friends()
+{
+  int ret = 1;
+  tul_net_context conn;
+  char *list = NULL;
+  unsigned list_sz = 0;
+  char uid[30] = "admin";
+  char pass[16] = "tulip!2345";
+
+  conn._use_tls = 1;
+  strcpy(conn.tls.host, "127.0.0.1");
+  while(ret)
+  {
+    ret = tls_client_init(&conn.tls, 9443);
+    if(ret)
+    {
+      fprintf(stdout, " FAIL: get_friends_test - TLS ERROR - %d\n", ret);
+    }
+  }
+
+  if(client_login(uid, pass, &conn))
+  {
+    fprintf(stdout, " FAIL: get_friends_test - login error\n");
+    return;
+  }
+
+  ret = client_transmit(&conn);
+  ret = client_get_friendlist(uid, pass, &conn, list, &list_sz);
+
+  if(list_sz > 0)
+    fprintf(stdout, " PASS: get_friends_test\n");
+
+  fprintf(stdout, " friends:\n");
+  for(int i = 0; i < 30*list_sz; i+=30)
+  {
+    fprintf(stdout, " %s\n", &list[i]);
+  }
+}
 

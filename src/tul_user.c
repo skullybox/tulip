@@ -70,6 +70,7 @@ int create_user(char *uid, char *name, char *email, char *pass)
   unsigned char salt[25] = {0};
   unsigned char epass[25] = {0};
   unsigned char l_dbk[17] = {0};
+  unsigned char _pass[17] = {0};
 
   /* if everything looks good
    * we can create the user
@@ -84,8 +85,11 @@ int create_user(char *uid, char *name, char *email, char *pass)
     return 4;
   if(strlen(email) < 5)
     return 5;
-  if(strlen(pass) < 10)
+  if(strlen(pass) < 8)
     return 6;
+
+
+  strncpy(_pass, pass, 16);
 
   /* encrypt password
   */
@@ -94,7 +98,7 @@ int create_user(char *uid, char *name, char *email, char *pass)
   salt_password(l_dbk, salt,16);
 
   RC5_SETUP(l_dbk, &rc5);
-  rc5_encrypt((unsigned*)&pass[0], (unsigned*)&epass[0], &rc5, 16);
+  rc5_encrypt((unsigned*)&_pass[0], (unsigned*)&epass[0], &rc5, 16);
 
   /* take base64 of encrypted password
   */

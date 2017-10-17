@@ -21,7 +21,7 @@ int client_logout(char *uid, char *pass, tul_net_context *conn);
 int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, char *msg, unsigned m_len);
 int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn);
 int client_friend_res(char *uid, char *t_uid, char *pass, tul_net_context *conn);
-int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *list);
+int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *list, unsigned *list_sz);
 
 int client_transmit(tul_net_context *conn);
 int client_recieve(tul_net_context *conn);

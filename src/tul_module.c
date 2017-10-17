@@ -141,7 +141,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
   tul_query_get(SQL, &res, &row, &col);
   if(row <= 0)
   {
-    /* TODO: send END */
+    /* send END */
 
     p->action = END;
     p->data_sz = 0;
@@ -183,12 +183,16 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
         }
         p->data_sz = 0;
         p->action = ERROR;
+        sqlite3_free_table(res);
         return -1;
       }
 
       memcpy(&((char*)p->data)[30], &id, 8);
 
-      p->action = PAGING;
+      if(row == 200)
+        p->action = PAGING;
+      else 
+        p->action = END;
     }
   }
 
@@ -242,7 +246,7 @@ int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p)
   tul_random(&r.salt, 16);
   tul_random(&r.kek, 16);
 
-  p.action = RESPONSE;
+  p.action = s;
 
   /* data size with encryption
    * block size into account
@@ -262,14 +266,15 @@ int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p)
       p.data = calloc(p.data_sz,1);
     }
     r.payload_sz = sizeof(comm_payload) + p.data_sz;
+
+    /* copy data */
+    memcpy(p.data, &s, sizeof(s));
   }
   else
   {
     r.payload_sz = sizeof(comm_payload) + _p->data_sz;
   }
 
-  /* copy data */
-  memcpy(p.data, &s, sizeof(s));
 
   if(_p)
     return prep_transmission(u, _pass, (comm_req*)&r, _p, c);

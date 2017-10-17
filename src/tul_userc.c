@@ -250,7 +250,8 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 }
 
 
-int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *list)
+int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, 
+    char *list, unsigned *list_sz)
 {
   comm_req r;
   comm_payload p;
@@ -293,6 +294,19 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *li
   if(ret)
     return ret;
 
+  ret = client_transmit(conn);
+  if(ret)
+    return ret;
+
+  /* now get the list */
+  ret = client_recieve(conn);
+
+  if(ret)
+    return ret;
+
+  *list_sz = p.data_sz;
+  list = p.data;
+
   return 0;
 }
 
@@ -328,6 +342,66 @@ int client_transmit(tul_net_context *conn)
       break;
   }
 
-  return bwrite;
+  if(conn->_tsend < conn->_ttsend)
+    return -1;
+  else
+    return 0;
 }
+
+int client_recieve(tul_net_context *conn)
+{
+  int bread = 0;
+  clock_t start = clock();
+  clock_t current_time;
+  comm_resp t_resp;
+
+  memset(&t_resp, 0, sizeof(comm_resp));
+
+  while(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)
+  {
+    if(conn->_trecv >= RES_HSZ)
+    {
+      memcpy(&t_resp, conn->payload_in, RES_HSZ);
+      conn->_ttrecv = RES_HSZ + t_resp.payload_sz;
+    }
+
+    if(conn->_use_tls)
+    {
+      if(conn->_ttrecv == 0)
+        bread = tls_read(&(conn->tls),
+            &(conn->payload_out[conn->_tsend]),
+            DEF_SOCK_BUFF_SIZE-conn->_tsend);
+        else 
+          bread = tls_read(&(conn->tls),
+              &(conn->payload_out[conn->_tsend]),
+              conn->_ttsend-conn->_tsend);
+      if(bread > 0)
+        conn->_trecv+=bread;
+    }
+    else
+    {
+      if(conn->_ttrecv == 0)
+        bread = read(conn->_sock, &(conn->payload_out[conn->_tsend]), 
+            DEF_CTX_LIST_SZ-conn->_tsend);
+      else 
+        bread = read(conn->_sock, &(conn->payload_out[conn->_tsend]), 
+            conn->_ttsend-conn->_tsend);
+      
+      if(bread > 0)
+        conn->_trecv +=bread;
+    }
+
+    /* 10ms timeout */
+    current_time = clock() - start;
+    if( current_time/1000 || (current_time%1000 > 10))
+      break;
+  }
+
+  if(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)
+    return -1;
+  else
+    return 0;
+
+}
+
 

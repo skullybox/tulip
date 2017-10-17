@@ -5,6 +5,7 @@
 
 
 #include "tul_log.h"
+#include "tul_user.h"
 #include "tul_tests.h"
 #include "tul_globals.h"
 #include "tul_testwrap.h"
@@ -21,7 +22,9 @@ void run_tests()
   _whirlpool_test();
   _payload_limits_test();
   _tls_server_test();
+  _create_users();
   _tls_client_test_login();
+  _test_get_friends();
 
   tul_log("\n waiting 10s for threads ...\n");
   sleep(10);
