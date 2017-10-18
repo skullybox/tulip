@@ -345,7 +345,7 @@ void _test_get_friends()
   fprintf(stdout, " friends:\n");
   for(int i = 0; i < 30*list_sz; i+=30)
   {
-    fprintf(stdout, " %s\n", &list[i]);
+    fprintf(stdout, " %s\n", &list[8+i]);
   }
   free(list);
 }
