@@ -244,8 +244,8 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 }
 
 
-int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, 
-    unsigned *list_sz)
+int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **list,
+    unsigned *list_sz, unsigned long long offset)
 {
   comm_req r;
   comm_payload p;
@@ -264,14 +264,16 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
   /* data size with encryption
    * block size into account
    */
-  p.data_sz = 32;
-  p.data = calloc(32,1);
+  p.data_sz = 48;
+  p.data = calloc(48,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
   /* data stores uid as part of
-   * payload to confirm 
+   * payload to confirm as well as
+   * offset value
    */
   strcpy(p.data, uid);
+  memcpy(&((char*)p.data)[30], &offset, 8);
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
   if(ret)
@@ -288,8 +290,16 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
   if(ret)
     return ret;
 
-  *list_sz = p.data_sz;
+  if(p.data_sz >= 38)
+    *list_sz = (p.data_sz-8)/30;
+  else
+    *list_sz = 0;
 
+  if(*list_sz)
+  {
+    *list = calloc(p.data_sz, 1);
+    memcpy(*list, p.data, p.data_sz);
+  }
   return 0;
 }
 

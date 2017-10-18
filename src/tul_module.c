@@ -40,7 +40,7 @@ void module_read(tul_net_context *c)
   comm_payload p;
   char buff[200] = {0};
   int ret = 0;
-  unsigned offset = 0;
+  unsigned long long offset = 0;
 
   memset(&r, 0, sizeof(comm_req));
   memset(&p, 0, sizeof(comm_payload));
@@ -95,7 +95,7 @@ void module_read(tul_net_context *c)
       c->_teardown = 1;
       break;
     case GET_LIST:
-      memcpy(&offset,&((char*)p.data)[4], sizeof(unsigned));
+      memcpy(&offset,&((char*)p.data)[30], sizeof(unsigned long long));
       sprintf(buff, " user get_list: %s", r.user);
       tul_log(buff);
 
@@ -149,7 +149,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
   char **res = NULL;
   char SQL[4096] = {0};
   char uid[30] = {0};
-  sprintf(SQL, "select id, friend from friend_list where uid='%s' and id > %llu limit 200", user, offset);
+  sprintf(SQL, "select rowid, friend from friend_list where uid='%s' and rowid > %llu limit 200", user, offset);
 
   tul_query_get(SQL, &res, &row, &col);
   if(row <= 0)
@@ -171,15 +171,15 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
   /* allocate based on row response for
    * payload
    */
-  p->data = calloc(30*row+8+30, 1);
-  p->data_sz = 30*row+8+30;
+  p->data = calloc(30*row+8, 1);
+  p->data_sz = 30*row+8;
 
   for(int i = col; i < (col*row)+col; i+=col )
   {
     memset(uid, 0, 30);
     strncpy(uid, res[i+1], 30);
 
-    memcpy(&((char*)p->data)[30+8+30*((i-col)/col)],
+    memcpy(&((char*)p->data)[8+30*((i-col)/col)],
         uid,
         30);
 
@@ -202,7 +202,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
         return -1;
       }
 
-      memcpy(&((char*)p->data)[30], &id, 8);
+      memcpy(&((char*)p->data)[0], &id, 8);
 
       if(row == 200)
         p->action = PAGING;
