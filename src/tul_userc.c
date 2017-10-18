@@ -348,6 +348,9 @@ int client_recieve(tul_net_context *conn)
   comm_resp t_resp;
 
   memset(&t_resp, 0, sizeof(comm_resp));
+  memset(conn->payload_in, 0, DEF_SOCK_BUFF_SIZE);
+  conn->_trecv = 0;
+  conn->_ttrecv = 0;
 
   while(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)
   {
