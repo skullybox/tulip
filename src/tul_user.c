@@ -33,6 +33,49 @@ int user_exists(char *uid)
   return 0;
 }
 
+int friend_in_list(char*uid, char *n_uid)
+{
+  char ** res;
+  int row = 0;
+  int col = 0;
+  char SQL[4096] = {0};
+
+  sprintf(SQL, 
+      "select uid, friend from friend_list where uid='%s' and friend = '%s'",
+      uid, 
+      n_uid);
+
+  tul_query_get(SQL, &res, &row, &col);
+  sqlite3_free_table(res);
+
+  if(row)
+    return 1;
+
+  return 0;
+}
+
+int friend_request_exists(char *uid, char *n_uid)
+{
+  char ** res;
+  int row = 0;
+  int col = 0;
+  char SQL[4096] = {0};
+
+  sprintf(SQL, 
+      "select uid, user_from from friend_request where uid='%s' and user_from = '%s'",
+      uid, 
+      n_uid);
+
+  tul_query_get(SQL, &res, &row, &col);
+  sqlite3_free_table(res);
+
+  if(row)
+    return 1;
+
+  return 0;
+
+}
+
 int email_exists(char *email)
 {
   char ** res;

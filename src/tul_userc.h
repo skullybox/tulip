@@ -25,6 +25,7 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char *li
 
 int client_transmit(tul_net_context *conn);
 int client_recieve(tul_net_context *conn);
+int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_uid);
 
 #endif
 

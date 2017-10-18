@@ -25,6 +25,7 @@ int do_send_msg(char *user, comm_payload *p);
 int do_get_list(char *user, comm_payload *p, unsigned long long offset);
 int do_add_friend(char *user, comm_payload *p);
 int do_rem_friend(char *user, comm_payload *p);
+int do_accept_friend(char *user, comm_payload *p);
 
 void configure_module()
 {
@@ -100,6 +101,12 @@ void module_read(tul_net_context *c)
 
       do_get_list(r.user, &p, offset);
       send_response(r.user, p.action, c, &p);
+      break;
+    case ACCEPTFRIEND:
+      if(!do_accept_friend(r.user, &p))
+        send_response(r.user, OK, c, NULL);
+      else
+        send_response(r.user, INVALID, c, NULL);
       break;
     case SEND_MSG:
       break;
@@ -206,6 +213,35 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 GETLIST_END:
   sqlite3_free_table(res);
   return 0;
+}
+
+int do_accept_friend(char *user, comm_payload *p)
+{
+  char SQL1[4096] = {0};
+  char SQL2[4096] = {0};
+  char uid[30] = {0};
+  char t_uid[30] = {0};
+
+  strncpy(uid, user, 30);
+  if(p->data_sz == 32)
+    strncpy(t_uid, p->data, 30);
+  else 
+    return -1;
+
+  if(!friend_request_exists(user, t_uid))
+    return -1;
+
+  if(friend_in_list(user, t_uid))
+    return 0;
+
+  sprintf(SQL1, "insert into friend_list(uid, friend) values ('%s', '%s')", 
+      uid, t_uid); 
+
+  sprintf(SQL2, "delete from friend_request where uid='%s' and user_from='%s'",
+      uid, t_uid); 
+
+  return tul_query(2, SQL1, SQL2);
+
 }
 
 int do_add_friend(char *user, comm_payload *p)

@@ -235,7 +235,6 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
   if(ret)
     return ret;
 
-
   ret = client_transmit(conn);
   if(ret)
     return ret;
@@ -284,6 +283,7 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
 
   /* now get the list */
   ret = client_recieve(conn);
+  ret = verify_payload(conn, &r, &p);
 
   if(ret)
     return ret;
@@ -411,4 +411,55 @@ int client_recieve(tul_net_context *conn)
 
 }
 
+
+int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_uid)
+{
+  comm_req r;
+  comm_payload p;
+
+  memset(&r, 0, REQ_HSZ);
+  memset(&p, 0, sizeof(comm_payload));
+  
+  strncpy(r.user, uid, 30);
+
+  /* random encryption key and salt */
+  tul_random(&(r.salt), 16);
+  tul_random(&(r.kek), 16);
+
+  p.action = ACCEPTFRIEND;
+
+  /* data size with encryption
+   * block size into account
+   */
+  p.data_sz = 32;
+  p.data = calloc(32,1);
+  r.payload_sz = sizeof(comm_payload) + p.data_sz;
+
+  /* data stores uid as part of
+   * payload to confirm 
+   */
+  strcpy(p.data, f_uid);
+
+  int ret = prep_transmission(uid, pass, &r, &p, conn);
+  if(ret)
+    return ret;
+
+  ret = client_transmit(conn);
+  if(ret)
+    return ret;
+
+  /* now get the confirmation */
+  ret = 0;
+  ret |= client_recieve(conn);
+  ret |= verify_payload(conn, &r, &p);
+
+  if(ret)
+    return ret;
+
+  if(p.action != OK)
+    return -1;
+
+  return 0;
+
+}
 

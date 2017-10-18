@@ -217,7 +217,6 @@ void _whirlpool_test()
   fprintf(stdout, " PASS: whirlpool_test\n");
 }
 
-
 void _tls_client_test_login()
 {
   int ret = 1;
@@ -292,6 +291,7 @@ void _create_friend_requests()
     return;
   }
 
+  ret = 0;
   ret |= client_friend_req(uid, "salma99", pass, &conn);
   ret |= client_recieve(&conn);
 
@@ -337,16 +337,57 @@ void _test_get_friends()
     return;
   }
 
-  ret = client_transmit(&conn);
-  ret = client_get_friendlist(uid, pass, &conn, list, &list_sz);
+  ret = 0;
+  ret |= client_transmit(&conn);
+  ret |= client_get_friendlist(uid, pass, &conn, list, &list_sz);
 
   if(list_sz > 0)
     fprintf(stdout, " PASS: get_friends_test\n");
+  else
+    fprintf(stdout, " FAIL: get_friends_test\n");
 
   fprintf(stdout, " friends:\n");
   for(int i = 0; i < 30*list_sz; i+=30)
   {
     fprintf(stdout, " %s\n", &list[i]);
   }
+}
+
+
+
+void _send_friend_accept_tests()
+{
+  int ret = 1;
+  tul_net_context conn;
+  char *list = NULL;
+  unsigned list_sz = 0;
+  char uid[30] = "admin";
+  char pass[16] = "tulip!2345";
+
+  conn._use_tls = 1;
+  strcpy(conn.tls.host, "127.0.0.1");
+  while(ret)
+  {
+    ret = tls_client_init(&conn.tls, 9443);
+    if(ret)
+    {
+      fprintf(stdout, " FAIL: send_friend_accept_test - TLS ERROR - %d\n", ret);
+    }
+  }
+
+  if(client_login(uid, pass, &conn))
+  {
+    fprintf(stdout, " FAIL: send_friend_accept_test - login error\n");
+    return;
+  }
+
+  ret |= client_accept_friend(uid, pass, &conn, "salma99");
+  ret |= client_accept_friend(uid, pass, &conn, "tiacarrer");
+  ret |= client_accept_friend(uid, pass, &conn, "tommychuckles");
+
+  if(ret)
+    fprintf(stdout, " FAIL: send_friend_accept_test\n");
+  else
+    fprintf(stdout, " PASS: send_friend_accept_test\n");
 }
 
