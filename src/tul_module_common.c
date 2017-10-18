@@ -177,8 +177,6 @@ int verify_client_payload(tul_net_context *c, comm_req *r, comm_payload *p, char
       &hash); 
   NESSIEfinalize(&hash, hash_r);
 
-  char *hashtostr = NULL;
-  
   if (verifyHash(hash_r, r->hmac2 ))
   {
     return 1;
