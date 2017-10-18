@@ -325,11 +325,11 @@ int client_transmit(tul_net_context *conn)
       }
     }
 
-    /* 100ms timeout */
+    /* 3000ms timeout */
     if(bwrite <= 0)
     {
       current_time = clock() - last_transmission;
-      if( current_time/1000 || (current_time%1000 > 100))
+      if( current_time/3000 )
         break;
     }
   }
@@ -368,7 +368,10 @@ int client_recieve(tul_net_context *conn)
               &(conn->payload_out[conn->_tsend]),
               conn->_ttsend-conn->_tsend);
       if(bread > 0)
-        conn->_trecv+=bread;
+      {
+        conn->_trecv +=bread;
+        last_transmission = clock();
+      }
     }
     else
     {
@@ -380,21 +383,26 @@ int client_recieve(tul_net_context *conn)
             conn->_ttsend-conn->_tsend);
       
       if(bread > 0)
+      {
         conn->_trecv +=bread;
+        last_transmission = clock();
+      }
     }
 
-    /* 100ms timeout */
+    /* 300ms timeout */
     if(bread <= 0)
     {
       current_time = clock() - last_transmission;
-      if( current_time/1000 || (current_time%1000 > 100))
+      if( current_time/3000 )
         break;
     }
 
   }
 
   if(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)
+  {
     return -1;
+  }
   else
     return 0;
 
