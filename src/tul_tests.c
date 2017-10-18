@@ -335,8 +335,7 @@ void _test_get_friends()
   }
 
   ret = 0;
-  ret |= client_transmit(&conn);
-  ret |= client_get_friendlist(uid, pass, &conn, list, &list_sz);
+  ret |= client_get_friendlist(uid, pass, &conn, &list_sz);
 
   if(list_sz > 0)
     fprintf(stdout, " PASS: get_friends_test\n");

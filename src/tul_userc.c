@@ -245,7 +245,7 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 
 
 int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, 
-    char *list, unsigned *list_sz)
+    unsigned *list_sz)
 {
   comm_req r;
   comm_payload p;
@@ -289,7 +289,6 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
     return ret;
 
   *list_sz = p.data_sz;
-  list = p.data;
 
   return 0;
 }
@@ -364,11 +363,11 @@ int client_recieve(tul_net_context *conn)
     {
       if(conn->_ttrecv == 0)
         bread = tls_read(&(conn->tls),
-            &(conn->payload_out[conn->_trecv]),
+            &(conn->payload_in[conn->_trecv]),
             RES_HSZ-conn->_trecv);
         else 
           bread = tls_read(&(conn->tls),
-              &(conn->payload_out[conn->_trecv]),
+              &(conn->payload_in[conn->_trecv]),
               conn->_ttrecv-conn->_trecv);
       if(bread > 0)
       {

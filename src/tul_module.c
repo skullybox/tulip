@@ -158,6 +158,8 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 
     p->action = END;
     p->data_sz = 0;
+    if(p->data)
+      free(p->data);
     p->data = NULL;
     goto GETLIST_END;
   }

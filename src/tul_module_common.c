@@ -145,9 +145,9 @@ int verify_client_payload(tul_net_context *c, comm_req *r, comm_payload *p, char
   memcpy(r->kek, t_kek, 16);
 
   /* decrypt payload */
-  memcpy(p, &(c->payload_in[RES_HSZ]), sizeof(comm_payload));
   if(p->data)
     free(p->data);
+  memcpy(p, &(c->payload_in[RES_HSZ]), sizeof(comm_payload));
   p->data = calloc(1, p->data_sz);
   t_data = calloc(1, p->data_sz);
 
