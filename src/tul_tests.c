@@ -250,12 +250,9 @@ void _create_users()
 {
   int ret = 0; 
 
-  if(!ret)
-    ret = create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
-  if(!ret)
-    ret = create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
-  if(!ret)
-    ret = create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
+    ret |= create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
+    ret |= create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
+    ret |= create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
 
 
   if(ret)

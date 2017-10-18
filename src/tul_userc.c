@@ -283,7 +283,7 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn,
 
   /* now get the list */
   ret = client_recieve(conn);
-  ret = verify_payload(conn, &r, &p);
+  ret = verify_client_payload(conn, &r, &p, pass);
 
   if(ret)
     return ret;
@@ -364,12 +364,12 @@ int client_recieve(tul_net_context *conn)
     {
       if(conn->_ttrecv == 0)
         bread = tls_read(&(conn->tls),
-            &(conn->payload_out[conn->_tsend]),
-            DEF_SOCK_BUFF_SIZE-conn->_tsend);
+            &(conn->payload_out[conn->_trecv]),
+            RES_HSZ-conn->_trecv);
         else 
           bread = tls_read(&(conn->tls),
-              &(conn->payload_out[conn->_tsend]),
-              conn->_ttsend-conn->_tsend);
+              &(conn->payload_out[conn->_trecv]),
+              conn->_ttrecv-conn->_trecv);
       if(bread > 0)
       {
         conn->_trecv +=bread;
@@ -379,11 +379,11 @@ int client_recieve(tul_net_context *conn)
     else
     {
       if(conn->_ttrecv == 0)
-        bread = read(conn->_sock, &(conn->payload_out[conn->_tsend]), 
-            DEF_CTX_LIST_SZ-conn->_tsend);
+        bread = read(conn->_sock, &(conn->payload_out[conn->_trecv]), 
+            RES_HSZ-conn->_trecv);
       else 
-        bread = read(conn->_sock, &(conn->payload_out[conn->_tsend]), 
-            conn->_ttsend-conn->_tsend);
+        bread = read(conn->_sock, &(conn->payload_out[conn->_trecv]), 
+            conn->_ttrecv-conn->_trecv);
       
       if(bread > 0)
       {
@@ -451,7 +451,7 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
   /* now get the confirmation */
   ret = 0;
   ret |= client_recieve(conn);
-  ret |= verify_payload(conn, &r, &p);
+  ret |= verify_client_payload(conn, &r, &p, pass);
 
   if(ret)
     return ret;

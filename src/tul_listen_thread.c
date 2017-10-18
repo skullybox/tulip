@@ -246,13 +246,13 @@ void do_write(int i, int tls)
       {
         bwrite = write(ctx->_sock,
             &(ctx->payload_out[ctx->_tsend]),
-            DEF_SOCK_BUFF_SIZE-ctx->_tsend);
+            ctx->_ttsend-ctx->_tsend);
       }
       else if(tls_ctx->handshake_done)
       {
         bwrite = tls_write(tls_ctx,
             &(ctx->payload_out[ctx->_tsend]),
-            DEF_SOCK_BUFF_SIZE-ctx->_tsend);
+            ctx->_ttsend-ctx->_tsend);
       }
 
       if(bwrite == -1)

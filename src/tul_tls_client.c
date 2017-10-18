@@ -31,8 +31,8 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_x509_crt_init( &(c->cert) );
   mbedtls_ctr_drbg_init( &(c->ctr_drbg) );
   mbedtls_pk_init( &(c->pkey) );
-
   mbedtls_entropy_init( &(c->entropy) );
+  mbedtls_net_set_nonblock(&(c->server_fd));
 
   ret = mbedtls_ctr_drbg_seed( &(c->ctr_drbg), 
       mbedtls_entropy_func, &(c->entropy),

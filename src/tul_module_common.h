@@ -17,5 +17,6 @@ int prep_transmission(char *uid, char *pass,
     comm_req *r, comm_payload *p, tul_net_context *conn);
 
 int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p);
+int verify_client_payload(tul_net_context *c, comm_req *r, comm_payload *p, char *pass);
 
 #endif
