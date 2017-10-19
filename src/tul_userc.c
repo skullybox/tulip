@@ -31,7 +31,7 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
-  
+
   strncpy(r.user, uid, 30);
 
   /* random encryption key and salt */
@@ -47,12 +47,16 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   {
     p.data_sz = 16*((strlen(uid)+1)/16)+16;
     PAYLOAD_CHECK_SZ;
+    if(p.data)
+      free(p.data);
     p.data = calloc(p.data_sz, 1);
   }
   else
   {
     p.data_sz = ((strlen(uid)+1)/16)*16;
     PAYLOAD_CHECK_SZ;
+    if(p.data)
+      free(p.data);
     p.data = calloc(p.data_sz,1);
   }
 
@@ -108,7 +112,7 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
-  
+
   strncpy(r.user, uid, 30);
 
   /* random encryption key and salt */
@@ -117,19 +121,23 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
 
   p.action = LOGOUT;
 
-    /* data size with encryption
+  /* data size with encryption
    * block size into account
    */
   if((strlen(uid)+1)%16)
   {
     p.data_sz = strlen(uid)+1+16;
     PAYLOAD_CHECK_SZ;
+    if(p.data)
+      free(p.data);
     p.data = calloc(strlen(uid)+1+16, 1);
   }
   else
   {
     p.data_sz = strlen(uid)+1;
     PAYLOAD_CHECK_SZ;
+    if(p.data)
+      free(p.data);
     p.data = calloc(strlen(uid)+1,1);
   }
 
@@ -157,7 +165,7 @@ int client_message(char *uid, char *t_uid, char *pass,
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
-  
+
   strncpy(r.user, uid, 30);
 
   /* random encryption key and salt */
@@ -179,12 +187,16 @@ int client_message(char *uid, char *t_uid, char *pass,
   {
     p.data_sz = m_len+1+30+16;
     PAYLOAD_CHECK_SZ;
+    if(p.data)
+      free(p.data);
     p.data = calloc(m_len+1+30+16,1);
   }
   else
   {
     p.data_sz = m_len+1+40;
     PAYLOAD_CHECK_SZ;
+    if(p.data)
+      free(p.data);
     p.data = calloc(m_len+1+30,1);
   }
 
@@ -209,7 +221,7 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
-  
+
   strncpy(r.user, uid, 30);
 
   /* random encryption key and salt */
@@ -222,6 +234,8 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
    * block size into account
    */
   p.data_sz = 32;
+  if(p.data)
+    free(p.data);
   p.data = calloc(32, 1);
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -243,6 +257,67 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 
 }
 
+int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **list, unsigned *list_sz)
+{
+  comm_req r;
+  comm_payload p;
+
+  memset(&r, 0, REQ_HSZ);
+  memset(&p, 0, sizeof(comm_payload));
+
+  strncpy(r.user, uid, 30);
+
+  /* random encryption key and salt */
+  tul_random(&(r.salt), 16);
+  tul_random(&(r.kek), 16);
+
+  p.action = GET_FREQ;
+
+  /* data size with encryption
+   * block size into account
+   */
+  p.data_sz = 32;
+  if(p.data)
+    free(p.data);
+  p.data = calloc(32,1);
+  r.payload_sz = sizeof(comm_payload) + p.data_sz;
+
+  /* data stores uid as part of
+   * payload to confirm as well as
+   * offset value
+   */
+  strcpy(p.data, uid);
+
+  int ret = prep_transmission(uid, pass, &r, &p, conn);
+  if(ret)
+    return ret;
+
+  ret = client_transmit(conn);
+  if(ret)
+    return ret;
+
+  /* now get the list */
+  ret = client_recieve(conn);
+  ret = verify_client_payload(conn, &r, &p, pass);
+
+  if(ret)
+    return ret;
+
+  if(p.data_sz >= 32)
+    *list_sz = (p.data_sz)/30;
+  else
+    *list_sz = 0;
+
+  if(*list_sz)
+  {
+    if(*list)
+      free(*list);
+    *list = calloc(p.data_sz, 1);
+    memcpy(*list, p.data, p.data_sz);
+  }
+  return 0;
+
+}
 
 int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **list,
     unsigned *list_sz, unsigned long long offset)
@@ -252,7 +327,7 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
-  
+
   strncpy(r.user, uid, 30);
 
   /* random encryption key and salt */
@@ -265,6 +340,8 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
    * block size into account
    */
   p.data_sz = 48;
+  if(p.data)
+    free(p.data);
   p.data = calloc(48,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
@@ -297,6 +374,8 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   if(*list_sz)
   {
+    if(*list)
+      free(*list);
     *list = calloc(p.data_sz, 1);
     memcpy(*list, p.data, p.data_sz);
   }
@@ -375,10 +454,10 @@ int client_recieve(tul_net_context *conn)
         bread = tls_read(&(conn->tls),
             &(conn->payload_in[conn->_trecv]),
             RES_HSZ-conn->_trecv);
-        else 
-          bread = tls_read(&(conn->tls),
-              &(conn->payload_in[conn->_trecv]),
-              conn->_ttrecv-conn->_trecv);
+      else 
+        bread = tls_read(&(conn->tls),
+            &(conn->payload_in[conn->_trecv]),
+            conn->_ttrecv-conn->_trecv);
       if(bread > 0)
       {
         conn->_trecv +=bread;
@@ -393,7 +472,7 @@ int client_recieve(tul_net_context *conn)
       else 
         bread = read(conn->_sock, &(conn->payload_out[conn->_trecv]), 
             conn->_ttrecv-conn->_trecv);
-      
+
       if(bread > 0)
       {
         conn->_trecv +=bread;
@@ -428,7 +507,7 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
-  
+
   strncpy(r.user, uid, 30);
 
   /* random encryption key and salt */
@@ -441,6 +520,8 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
    * block size into account
    */
   p.data_sz = 32;
+  if(p.data)
+    free(p.data);
   p.data = calloc(32,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 

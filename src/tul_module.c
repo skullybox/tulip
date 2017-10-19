@@ -23,6 +23,7 @@ int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p);
 int do_get_msg(char *user, comm_payload *p);
 int do_send_msg(char *user, comm_payload *p);
 int do_get_list(char *user, comm_payload *p, unsigned long long offset);
+int do_get_addreq(char *user, comm_payload *p);
 int do_add_friend(char *user, comm_payload *p);
 int do_rem_friend(char *user, comm_payload *p);
 int do_accept_friend(char *user, comm_payload *p);
@@ -96,7 +97,7 @@ void module_read(tul_net_context *c)
       break;
     case GET_LIST:
       memcpy(&offset,&((char*)p.data)[30], sizeof(unsigned long long));
-      sprintf(buff, " user get_list: %s", r.user);
+      sprintf(buff, " user <<< %s", r.user);
       tul_log(buff);
 
       do_get_list(r.user, &p, offset);
@@ -109,21 +110,37 @@ void module_read(tul_net_context *c)
         send_response(r.user, INVALID, c, NULL);
       break;
     case SEND_MSG:
+      sprintf(buff, " user <<< %s", r.user);
+      tul_log(buff);
+      do_send_msg(r.user, &p);
       break;
     case GET_MSG:
+      sprintf(buff, " user <<< %s", r.user);
+      tul_log(buff);
+      do_get_msg(r.user, &p);
       break;
     case GET_FREQ:
+      sprintf(buff, " user <<< %s", r.user);
+      tul_log(buff);
+      do_get_addreq(r.user, &p);
+      send_response(r.user, p.action, c, &p);
       break;
     case ADDFRIEND:
+      sprintf(buff, " user <<< %s", r.user);
+      tul_log(buff);
         if(!do_add_friend(r.user, &p))
           send_response(r.user, OK, c, NULL);
         else 
           send_response(r.user, ERROR, c, NULL);
       break;
     case DELFRIEND:
+      sprintf(buff, " user <<< %s", r.user);
+      tul_log(buff);
       break;
     default:
       /* send error */
+      sprintf(buff, " user <<< %s", r.user);
+      tul_log(buff);
       send_response(r.user, ERROR, c, NULL);
       break;
   }
@@ -141,6 +158,68 @@ int do_send_msg(char *user, comm_payload *p)
 
   return 0;
 }
+
+int do_get_addreq(char *user, comm_payload *p)
+{
+  int row, col = 0;
+  char **res = NULL;
+  char SQL[4096] = {0};
+  char uid[30] = {0};
+  sprintf(SQL, "select user_from from friend_request where uid='%s' limit 20", user);
+
+  tul_query_get(SQL, &res, &row, &col);
+  if(row <= 0)
+  {
+    /* send END */
+    p->action = END;
+    p->data_sz = 0;
+    if(p->data)
+      free(p->data);
+    p->data = NULL;
+    goto GETADDRQ_END;
+  }
+
+  /* maximum of query based on friend column
+   * 30 bytes * 20 records
+   */
+
+  /* allocate based on row response for
+   * payload
+   */
+  if((30*row)%16)
+    p->data_sz = 16;
+  else 
+    p->data_sz = 0;
+  p->data_sz += ((30*row)/16)*16;
+
+  if(p->data)
+    free(p->data);
+  p->data = calloc(p->data_sz, 1);
+
+  for(int i = col; i < (col*row)+col; i+=col )
+  {
+    memset(uid, 0, 30);
+    strncpy(uid, res[i+1], 30);
+
+    memcpy(&((char*)p->data)[30*((i-col)/col)],
+        uid,
+        30);
+
+    if(i+col >= ((col*row)+col))
+    {
+      if(row == 20)
+        p->action = PAGING;
+      else
+        p->action = END;
+    }
+  }
+
+GETADDRQ_END:
+  sqlite3_free_table(res);
+  return 0;
+
+}
+
 
 int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 {
@@ -171,8 +250,15 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
   /* allocate based on row response for
    * payload
    */
-  p->data = calloc(30*row+8, 1);
-  p->data_sz = 30*row+8;
+  if((30*row+8)%16)
+    p->data_sz = 16;
+  else 
+    p->data_sz = 0;
+  p->data_sz += ((30*row+8)/16)*16;
+
+  if(p->data)
+    free(p->data);
+  p->data = calloc(p->data_sz, 1);
 
   for(int i = col; i < (col*row)+col; i+=col )
   {
