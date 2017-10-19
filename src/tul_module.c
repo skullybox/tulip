@@ -199,7 +199,7 @@ int do_get_addreq(char *user, comm_payload *p)
   for(int i = col; i < (col*row)+col; i+=col )
   {
     memset(uid, 0, 30);
-    strncpy(uid, res[i+1], 30);
+    strncpy(uid, res[i], 30);
 
     memcpy(&((char*)p->data)[30*((i-col)/col)],
         uid,

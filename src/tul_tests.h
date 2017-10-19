@@ -17,6 +17,7 @@ void _whirlpool_test();
 void _payload_limits_test();
 void _tls_client_test_login();
 void _create_users();
+void _test_get_add_reqests();
 void _test_get_friends();
 void _create_friend_requests();
 void _send_friend_accept_tests();

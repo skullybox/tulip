@@ -345,12 +345,55 @@ void _test_get_friends()
   fprintf(stdout, " friends:\n");
   for(int i = 0; i < 30*list_sz; i+=30)
   {
-    fprintf(stdout, " %s\n", &list[8+i]);
+    fprintf(stdout, "  >%s\n", &list[8+i]);
   }
   free(list);
 }
 
 
+void _test_get_add_reqests()
+{
+  int ret = 1;
+  tul_net_context conn;
+  char *list = NULL;
+  unsigned list_sz = 0;
+  char uid[30] = "admin";
+  char pass[16] = "tulip!2345";
+
+  conn._use_tls = 1;
+  strcpy(conn.tls.host, "127.0.0.1");
+  while(ret)
+  {
+    ret = tls_client_init(&conn.tls, 9443);
+    if(ret)
+    {
+      fprintf(stdout, " FAIL: get_add_request_test - TLS ERROR - %d\n", ret);
+    }
+  }
+
+  if(client_login(uid, pass, &conn))
+  {
+    fprintf(stdout, " FAIL: get_add_request_test - login error\n");
+    return;
+  }
+
+  ret = 0;
+  ret |= client_get_addreqlist(uid, pass, &conn, &list, &list_sz);
+
+
+  if(list_sz > 0)
+    fprintf(stdout, " PASS: get_add_request_test\n");
+  else
+    fprintf(stdout, " FAIL: get_add_request_test\n");
+
+  fprintf(stdout, " add friend requests:\n");
+  for(int i = 0; i < 30*list_sz; i+=30)
+  {
+    fprintf(stdout, "  >%s\n", &list[i]);
+  }
+  free(list);
+
+}
 
 void _send_friend_accept_tests()
 {
