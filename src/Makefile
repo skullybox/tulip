@@ -46,9 +46,7 @@ win: crypt ${objects}
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o .obj/$@
 
-clean-all:
-	@-rm -rf .obj || true
-	@-rm -f tulip || true
+clean-all: clean
 	@-rm -rf tls/mbedtls-2.4.2 || true
 	@-rm -rf mysql/mysql-connector-c-6.1.10-src || true
 
@@ -60,6 +58,7 @@ install:
 clean:
 	@-rm -rf .obj || true
 	@-rm -f tulip || true
+	@-rm -f tulip.db || true
 
 tls:
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
