@@ -47,16 +47,12 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   {
     p.data_sz = 16*((strlen(uid)+1)/16)+16;
     PAYLOAD_CHECK_SZ;
-    if(p.data)
-      free(p.data);
     p.data = calloc(p.data_sz, 1);
   }
   else
   {
     p.data_sz = ((strlen(uid)+1)/16)*16;
     PAYLOAD_CHECK_SZ;
-    if(p.data)
-      free(p.data);
     p.data = calloc(p.data_sz,1);
   }
 
@@ -69,6 +65,8 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
 
   prep_transmission(uid, pass, &r, &p, conn);
 
+  if(p.data)
+    free(p.data);
   return 0;
 }
 
@@ -128,16 +126,12 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   {
     p.data_sz = strlen(uid)+1+16;
     PAYLOAD_CHECK_SZ;
-    if(p.data)
-      free(p.data);
     p.data = calloc(strlen(uid)+1+16, 1);
   }
   else
   {
     p.data_sz = strlen(uid)+1;
     PAYLOAD_CHECK_SZ;
-    if(p.data)
-      free(p.data);
     p.data = calloc(strlen(uid)+1,1);
   }
 
@@ -149,6 +143,9 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   strcpy(p.data, uid);
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
+
+  if(p.data)
+    free(p.data);
   if(ret)
     return ret;
 
@@ -187,16 +184,12 @@ int client_message(char *uid, char *t_uid, char *pass,
   {
     p.data_sz = m_len+1+30+16;
     PAYLOAD_CHECK_SZ;
-    if(p.data)
-      free(p.data);
     p.data = calloc(m_len+1+30+16,1);
   }
   else
   {
     p.data_sz = m_len+1+40;
     PAYLOAD_CHECK_SZ;
-    if(p.data)
-      free(p.data);
     p.data = calloc(m_len+1+30,1);
   }
 
@@ -207,6 +200,10 @@ int client_message(char *uid, char *t_uid, char *pass,
   memcpy(&(tmp[30]), msg, m_len);
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
+
+  if(p.data)
+    free(p.data);
+
   if(ret)
     return ret;
 
@@ -234,8 +231,6 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
    * block size into account
    */
   p.data_sz = 32;
-  if(p.data)
-    free(p.data);
   p.data = calloc(32, 1);
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
@@ -247,14 +242,20 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
   if(ret)
-    return ret;
+    goto FRIEND_REQ_ERROR;
 
   ret = client_transmit(conn);
   if(ret)
-    return ret;
+    goto FRIEND_REQ_ERROR;
 
+  if(p.data)
+    free(p.data);
   return 0;
 
+FRIEND_REQ_ERROR:
+  if(p.data)
+    free(p.data);
+  return ret;
 }
 
 int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **list, unsigned *list_sz)
@@ -277,8 +278,6 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
    * block size into account
    */
   p.data_sz = 32;
-  if(p.data)
-    free(p.data);
   p.data = calloc(32,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
@@ -290,18 +289,18 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
   if(ret)
-    return ret;
+    goto RETURN_ADDREQLIST_ERROR;
 
   ret = client_transmit(conn);
   if(ret)
-    return ret;
+    goto RETURN_ADDREQLIST_ERROR;
 
   /* now get the list */
   ret = client_recieve(conn);
   ret = verify_client_payload(conn, &r, &p, pass);
 
   if(ret)
-    return ret;
+    goto RETURN_ADDREQLIST_ERROR;
 
   if(p.data_sz >= 32)
     *list_sz = (p.data_sz)/30;
@@ -315,9 +314,18 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
     *list = calloc(p.data_sz, 1);
     memcpy(*list, p.data, p.data_sz);
   }
+
+  if(p.data)
+    free(p.data);
   return 0;
 
+RETURN_ADDREQLIST_ERROR:
+
+  if(p.data)
+    free(p.data);
+  return ret;
 }
+
 
 int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **list,
     unsigned *list_sz, unsigned long long offset)
@@ -340,8 +348,6 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
    * block size into account
    */
   p.data_sz = 48;
-  if(p.data)
-    free(p.data);
   p.data = calloc(48,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
@@ -354,18 +360,18 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
   if(ret)
-    return ret;
+    goto RETURN_FRIENDLIST_ERROR;
 
   ret = client_transmit(conn);
   if(ret)
-    return ret;
+    goto RETURN_FRIENDLIST_ERROR;
 
   /* now get the list */
   ret = client_recieve(conn);
   ret = verify_client_payload(conn, &r, &p, pass);
 
   if(ret)
-    return ret;
+    goto RETURN_FRIENDLIST_ERROR;
 
   if(p.data_sz >= 38)
     *list_sz = (p.data_sz-8)/30;
@@ -379,7 +385,16 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
     *list = calloc(p.data_sz, 1);
     memcpy(*list, p.data, p.data_sz);
   }
+
+  if(p.data)
+    free(p.data);
   return 0;
+
+RETURN_FRIENDLIST_ERROR:
+
+  if(p.data)
+    free(p.data);
+  return ret;
 }
 
 int client_transmit(tul_net_context *conn)
@@ -520,8 +535,6 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
    * block size into account
    */
   p.data_sz = 32;
-  if(p.data)
-    free(p.data);
   p.data = calloc(32,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
@@ -542,6 +555,9 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
   ret = 0;
   ret |= client_recieve(conn);
   ret |= verify_client_payload(conn, &r, &p, pass);
+
+  if(p.data)
+    free(p.data);
 
   if(ret)
     return ret;
