@@ -59,7 +59,7 @@ clean-all: clean
 install:
 	-mkdir -p "../${PREFIX}/etc/init.d/"
 	-mkdir -p "../${PREFIX}/etc/tulip"
-	cp "tulip" "../${PREFIX}/etc/tulip/tulip"
+	cp "out/tulip" "../${PREFIX}/etc/tulip/tulip"
 
 clean:
 	@-rm -rf out || true
