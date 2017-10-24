@@ -1,6 +1,7 @@
 # Top-level make file
 C = gcc
 
+ANDROID_CC = "~/Android/Sdk/ndk-bundle/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-gcc"
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
