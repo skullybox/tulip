@@ -5,7 +5,6 @@
 
 #include "tul_tls_client.h"
 #include <string.h>
-#include <assert.h>
 
 #define CHECK_RET if(ret) return ret;
 extern int RUN_TESTS;
