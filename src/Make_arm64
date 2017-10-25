@@ -1,2 +1,4 @@
 android_arch := "aarch64-linux-android-4.9"
+ANDROID_CC := arm/bin/aarch64-linux-android-gcc
+ANDROID_CPP := arm/bin/aarch64-linux-android-g++
 include Makefile

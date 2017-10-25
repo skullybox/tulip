@@ -1,2 +1,4 @@
 android_arch := "mipsel-linux-android-4.9"
+ANDROID_CC := arm/bin/mipsel-linux-android-gcc
+ANDROID_CPP := arm/bin/mipsel-linux-android-g++
 include Makefile

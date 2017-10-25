@@ -2,8 +2,6 @@
 C = gcc
 
 ANDROID_CC_TOOLS = "$(HOME)/Android/Sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh"
-ANDROID_CC = "arm/bin/clang"
-ANDROID_CPP = "arm/bin/clang++"
 
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
