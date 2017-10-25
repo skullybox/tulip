@@ -1,0 +1,2 @@
+android_abi := "arm64_v8a"
+include Makefile

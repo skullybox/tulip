@@ -1,0 +1,2 @@
+android_abi := "armeabi"
+include Makefile
