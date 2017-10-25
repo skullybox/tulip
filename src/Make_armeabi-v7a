@@ -1,2 +1,0 @@
-android_abi := "armeabi-v7a"
-include Makefile

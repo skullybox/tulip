@@ -1,0 +1,2 @@
+android_arch := "aarch64-linux-android-4.9"
+include Makefile

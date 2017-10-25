@@ -1,0 +1,2 @@
+android_arch := "arm-linux-androideabi-4.9"
+include Makefile

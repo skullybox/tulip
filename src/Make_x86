@@ -1,2 +1,2 @@
-android_abi := "x86"
+android_arch := "x86-4.9"
 include Makefile

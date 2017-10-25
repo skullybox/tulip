@@ -1,2 +1,2 @@
-android_abi := "mips"
+android_arch := "mipsel-linux-android-4.9"
 include Makefile

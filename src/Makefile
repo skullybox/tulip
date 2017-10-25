@@ -2,8 +2,8 @@
 C = gcc
 
 ANDROID_CC_TOOLS = "$(HOME)/Android/Sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh"
-ANDROID_CC = "arm/bin/arm-linux-androideabi-gcc"
-ANDROID_CPP = "arm/bin/arm-linux-androideabi-g++"
+ANDROID_CC = "arm/bin/clang"
+ANDROID_CPP = "arm/bin/clang++"
 
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
@@ -51,7 +51,7 @@ win: crypt ${objects}
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o .obj/$@
 
-clean-all: clean
+clean-libs: 
 	@-rm -rf tls/mbedtls-2.4.2 || true
 	@-rm -rf mysql/mysql-connector-c-6.1.10-src || true
 
@@ -83,7 +83,7 @@ mysqlc:
 android_setup: 
 	@-rm -rf arm || true
 	if [ ! -d arm ]; then \
-		${ANDROID_CC_TOOLS}  --platform=android-19 --abis=${android_abi} --install-dir=arm;\
+		${ANDROID_CC_TOOLS} --toolchain=${android_arch} --install-dir=arm;\
 		fi
 
 tls_android: android_setup
@@ -94,22 +94,22 @@ tls_android: android_setup
 	fi
 
 
-android: clean-all prep android_setup tls_android
-	@-mkdir -p out/${android_abi}
-	cp tls/mbedtls-2.4.2/library/libmbedcrypto.so.2.4.2 ./out/${android_abi}/libmbedcrypto.so
-	cp tls/mbedtls-2.4.2/library/libmbedtls.so.2.4.2 ./out/${android_abi}/libmbedtls.so
-	cp tls/mbedtls-2.4.2/library/libmbedx509.so.2.4.2 ./out/${android_abi}/libmbedx509.so
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_userc.c -o out/${android_abi}/tul_userc.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tls_common.c -o out/${android_abi}/tul_tls_common.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tls_client.c -o out/${android_abi}/tul_tls_client.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_module_common.c -o out/${android_abi}/tul_module_common.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c whirlpool_hash.c -o out/${android_abi}/whirlpool_hash.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_random.c -o out/${android_abi}/tul_random.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c rc5_cipher.c -o out/${android_abi}/rc5_cipher.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_b64.c -o out/${android_abi}/tul_b64.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tcp_soc.c -o out/${android_abi}/tul_tcp_soc.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/ca_cert.c -o out/${android_abi}/ca_cert.o
-	${ANDROID_CC} -shared ${android_abi} -fPIC -Wl,-soname,tulipc.so -o ./out/${android_abi}/libtulipc.so out/${android_abi}/tul_userc.o out/${android_abi}/tul_tls_common.o out/${android_abi}/tul_tls_client.o out/${android_abi}/tul_module_common.o out/${android_abi}/whirlpool_hash.o out/${android_abi}/tul_random.o out/${android_abi}/rc5_cipher.o out/${android_abi}/tul_b64.o out/${android_abi}/tul_tcp_soc.o out/${android_abi}/ca_cert.o
+android: clean-libs prep android_setup tls_android
+	@-mkdir -p out/${android_arch}
+	cp tls/mbedtls-2.4.2/library/libmbedcrypto.so.2.4.2 ./out/${android_arch}/libmbedcrypto.so
+	cp tls/mbedtls-2.4.2/library/libmbedtls.so.2.4.2 ./out/${android_arch}/libmbedtls.so
+	cp tls/mbedtls-2.4.2/library/libmbedx509.so.2.4.2 ./out/${android_arch}/libmbedx509.so
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_userc.c -o out/${android_arch}/tul_userc.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tls_common.c -o out/${android_arch}/tul_tls_common.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tls_client.c -o out/${android_arch}/tul_tls_client.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_module_common.c -o out/${android_arch}/tul_module_common.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c whirlpool_hash.c -o out/${android_arch}/whirlpool_hash.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_random.c -o out/${android_arch}/tul_random.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c rc5_cipher.c -o out/${android_arch}/rc5_cipher.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_b64.c -o out/${android_arch}/tul_b64.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tcp_soc.c -o out/${android_arch}/tul_tcp_soc.o
+	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/ca_cert.c -o out/${android_arch}/ca_cert.o
+	${ANDROID_CC} -shared -fPIC -Wl,-soname,tulipc.so -o ./out/${android_arch}/libtulipc.so out/${android_arch}/tul_userc.o out/${android_arch}/tul_tls_common.o out/${android_arch}/tul_tls_client.o out/${android_arch}/tul_module_common.o out/${android_arch}/whirlpool_hash.o out/${android_arch}/tul_random.o out/${android_arch}/rc5_cipher.o out/${android_arch}/tul_b64.o out/${android_arch}/tul_tcp_soc.o out/${android_arch}/ca_cert.o
 
 
 
