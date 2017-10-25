@@ -51,6 +51,10 @@ win: crypt ${objects}
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o .obj/$@
 
+clean-all: clean-libs clean
+	@-rm -rf out || true
+	@-rm -rf arm || true
+
 clean-libs: 
 	@-rm -rf tls/mbedtls-2.4.2 || true
 	@-rm -rf mysql/mysql-connector-c-6.1.10-src || true
@@ -62,7 +66,7 @@ install:
 
 clean:
 	@-rm -rf .obj || true
-	@-rm -f tulip || true
+	@-rm -f out/tulip || true
 	@-rm -f tulip.db || true
 
 tls:
@@ -83,7 +87,7 @@ mysqlc:
 android_setup: 
 	@-rm -rf arm || true
 	if [ ! -d arm ]; then \
-		${ANDROID_CC_TOOLS} --toolchain=${android_arch} --install-dir=arm;\
+		${ANDROID_CC_TOOLS} --toolchain=${android_arch} --platform=android-22 --install-dir=arm;\
 		fi
 
 tls_android: android_setup
