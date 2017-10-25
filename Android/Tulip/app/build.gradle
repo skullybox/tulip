@@ -12,7 +12,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11"
+                cppFlags "-std=c++11 -I../../../../../../../src/ -I../../../../../../../src/tls/mbedtls-2.4.2/include/"
             }
         }
     }
@@ -25,6 +25,7 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
+
         }
     }
 }

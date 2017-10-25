@@ -29,7 +29,7 @@ typedef struct  __tul_net_context
 
 typedef struct __tul_int_context_struct
 {
-  tul_net_context *this;
+  tul_net_context *_this;
   struct __tul_int_context_struct *next;
   struct __tul_int_context_struct *back;
 } _tul_int_context_struct;
