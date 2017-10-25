@@ -92,7 +92,7 @@ tls_android: android_setup
 	@-rm -rf tls/mbedtls-2.4.2 || true
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
 		tar zxf "tls/mbedtls-2.4.2-apache.tgz" -C "tls";\
-		cd "tls/mbedtls-2.4.2" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
+		cd "tls/mbedtls-2.4.2" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} CXXFLAGS="${AN_FLAGS}" CFLAGS="${AN_FLAGS}" cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
 	fi
 
 
@@ -101,16 +101,16 @@ android: clean-libs prep android_setup tls_android
 	cp tls/mbedtls-2.4.2/library/libmbedcrypto.so.2.4.2 ./out/${android_arch}/libmbedcrypto.so
 	cp tls/mbedtls-2.4.2/library/libmbedtls.so.2.4.2 ./out/${android_arch}/libmbedtls.so
 	cp tls/mbedtls-2.4.2/library/libmbedx509.so.2.4.2 ./out/${android_arch}/libmbedx509.so
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_userc.c -o out/${android_arch}/tul_userc.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tls_common.c -o out/${android_arch}/tul_tls_common.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tls_client.c -o out/${android_arch}/tul_tls_client.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_module_common.c -o out/${android_arch}/tul_module_common.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c whirlpool_hash.c -o out/${android_arch}/whirlpool_hash.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_random.c -o out/${android_arch}/tul_random.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c rc5_cipher.c -o out/${android_arch}/rc5_cipher.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_b64.c -o out/${android_arch}/tul_b64.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c tul_tcp_soc.c -o out/${android_arch}/tul_tcp_soc.o
-	${ANDROID_CC} -fPIC -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/ca_cert.c -o out/${android_arch}/ca_cert.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_userc.c -o out/${android_arch}/tul_userc.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_tls_common.c -o out/${android_arch}/tul_tls_common.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_tls_client.c -o out/${android_arch}/tul_tls_client.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_module_common.c -o out/${android_arch}/tul_module_common.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c whirlpool_hash.c -o out/${android_arch}/whirlpool_hash.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_random.c -o out/${android_arch}/tul_random.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c rc5_cipher.c -o out/${android_arch}/rc5_cipher.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_b64.c -o out/${android_arch}/tul_b64.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c tul_tcp_soc.c -o out/${android_arch}/tul_tcp_soc.o
+	${ANDROID_CC} ${AN_FLAGS} ${inc} ${my_inc} -c certs/$(CL)/ca_cert.c -o out/${android_arch}/ca_cert.o
 	${ANDROID_CC} -shared -fPIC -Wl,-soname,tulipc.so -o ./out/${android_arch}/libtulipc.so out/${android_arch}/tul_userc.o out/${android_arch}/tul_tls_common.o out/${android_arch}/tul_tls_client.o out/${android_arch}/tul_module_common.o out/${android_arch}/whirlpool_hash.o out/${android_arch}/tul_random.o out/${android_arch}/rc5_cipher.o out/${android_arch}/tul_b64.o out/${android_arch}/tul_tcp_soc.o out/${android_arch}/ca_cert.o
 
 

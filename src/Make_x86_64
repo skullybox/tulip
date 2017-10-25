@@ -1,4 +1,5 @@
 android_arch := "x86_64-4.9"
 ANDROID_CC := arm/bin/x86_64-linux-android-gcc
 ANDROID_CPP := arm/bin/x86_64-linux-android-g++
+AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -Wa,--noexecstack -fPIC
 include Makefile

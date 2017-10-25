@@ -1,4 +1,5 @@
 android_arch := "mipsel-linux-android-4.9"
 ANDROID_CC := arm/bin/mipsel-linux-android-gcc
 ANDROID_CPP := arm/bin/mipsel-linux-android-g++
+AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -mips32 -Wa,--noexecstack -fPIC
 include Makefile
