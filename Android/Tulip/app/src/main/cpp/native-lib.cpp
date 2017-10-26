@@ -2,6 +2,7 @@
 #include <string>
 #include "tul_net_context.h"
 
+extern "C"
 JNIEXPORT jint JNICALL
 Java_org_tulip_project_tulip_Tulip_ClientLogin(JNIEnv *env, jobject instance, jstring user_,
                                                jstring pass_) {
