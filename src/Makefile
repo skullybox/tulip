@@ -92,15 +92,16 @@ tls_android: android_setup
 	@-rm -rf tls/mbedtls-2.4.2 || true
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
 		tar zxf "tls/mbedtls-2.4.2-apache.tgz" -C "tls";\
+		cp "tls/CMakeLists.txt" "tls/mbedtls-2.4.2/library/";\
 		cd "tls/mbedtls-2.4.2" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} CXXFLAGS="${AN_FLAGS}" CFLAGS="${AN_FLAGS}" cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
 	fi
 
 
 android: clean-libs prep android_setup tls_android
 	@-mkdir -p out/${android_arch}
-	cp tls/mbedtls-2.4.2/library/libmbedcrypto.so.2.4.2 ./out/${android_arch}/libmbedcrypto.so
-	cp tls/mbedtls-2.4.2/library/libmbedtls.so.2.4.2 ./out/${android_arch}/libmbedtls.so
-	cp tls/mbedtls-2.4.2/library/libmbedx509.so.2.4.2 ./out/${android_arch}/libmbedx509.so
+	cp tls/mbedtls-2.4.2/library/libmbedcrypto.so ./out/${android_arch}/libmbedcrypto.so
+	cp tls/mbedtls-2.4.2/library/libmbedtls.so ./out/${android_arch}/libmbedtls.so
+	cp tls/mbedtls-2.4.2/library/libmbedx509.so ./out/${android_arch}/libmbedx509.so
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_userc.c -o out/${android_arch}/tul_userc.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_tls_common.c -o out/${android_arch}/tul_tls_common.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_tls_client.c -o out/${android_arch}/tul_tls_client.o

@@ -1,0 +1,6 @@
+The CMakeLists is modified to not created shared objects with version numbers
+when building mbedtls. This is a requirement for android when loading
+shared objects
+
+
+CMakeLists.txt needs to go here => mbedtls-2.4.2/library 
