@@ -112,7 +112,9 @@ android: clean-libs prep android_setup tls_android
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_b64.c -o out/${android_arch}/tul_b64.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_tcp_soc.c -o out/${android_arch}/tul_tcp_soc.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/ca_cert.c -o out/${android_arch}/ca_cert.o
-	${ANDROID_CC} -shared -fPIC -Wl,-soname,tulipc.so -o ./out/${android_arch}/libtulipc.so out/${android_arch}/tul_userc.o out/${android_arch}/tul_tls_common.o out/${android_arch}/tul_tls_client.o out/${android_arch}/tul_module_common.o out/${android_arch}/whirlpool_hash.o out/${android_arch}/tul_random.o out/${android_arch}/rc5_cipher.o out/${android_arch}/tul_b64.o out/${android_arch}/tul_tcp_soc.o out/${android_arch}/ca_cert.o
+	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/client_cert.c -o out/${android_arch}/client_cert.o
+	${ANDROID_CC} -shared -fPIC -Wl,-soname,tulipc.so ${libs} -o ./out/${android_arch}/libtulipc.so out/${android_arch}/tul_userc.o out/${android_arch}/tul_tls_common.o out/${android_arch}/tul_tls_client.o out/${android_arch}/tul_module_common.o out/${android_arch}/whirlpool_hash.o out/${android_arch}/tul_random.o out/${android_arch}/rc5_cipher.o out/${android_arch}/tul_b64.o out/${android_arch}/tul_tcp_soc.o out/${android_arch}/ca_cert.o out/${android_arch}/client_cert.o
+
 
 
 

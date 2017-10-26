@@ -9,10 +9,10 @@ public class Login extends AppCompatActivity {
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
-        System.loadLibrary("tulipc");
         System.loadLibrary("mbedtls");
         System.loadLibrary("mbedx509");
         System.loadLibrary("mbedcrypto");
+        System.loadLibrary("tulipc");
 
     }
 

@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
+#include <linux/in6.h>
 #include "tul_net_context.h"
+
 
 extern "C"
 JNIEXPORT jint JNICALL
@@ -8,7 +10,7 @@ Java_org_tulip_project_tulip_Tulip_ClientLogin(JNIEnv *env, jobject instance, js
                                                jstring pass_) {
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
-
+in6addr_any;
     // TODO
 
     env->ReleaseStringUTFChars(user_, user);
