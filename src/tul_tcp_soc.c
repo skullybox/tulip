@@ -7,6 +7,7 @@
 #include "tul_globals.h"
 #include <unistd.h>
 
+#ifndef ANDROID
 int tul_tcp_listen_init(const int port, int *sock)
 {
   struct sockaddr_in6 _serv;
@@ -63,6 +64,7 @@ int tul_tcp_listen_init(const int port, int *sock)
   *sock = _ret_sock;
   return 0;
 }
+#endif
 
 int tul_tcp_connect(const char *host, const int port, int *sock)
 {

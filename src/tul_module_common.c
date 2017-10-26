@@ -202,6 +202,7 @@ int verify_client_payload(tul_net_context *c, comm_req *r, comm_payload *p, char
  * return 1 on failure to validate payload
  * return -1 when waiting on more data
  */
+#ifndef ANDROID
 int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
 {
   RC5_ctx rc5;
@@ -303,5 +304,6 @@ int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
 
   return 0;
 }
+#endif
 
 
