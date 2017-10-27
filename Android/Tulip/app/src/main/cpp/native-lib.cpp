@@ -1,17 +1,23 @@
 #include <jni.h>
 #include <string>
-#include <linux/in6.h>
 #include "tul_net_context.h"
-
+#include "tul_tls_client.h"
+#include "tul_userc.h"
 
 extern "C"
 JNIEXPORT jint JNICALL
 Java_org_tulip_project_tulip_Tulip_ClientLogin(JNIEnv *env, jobject instance, jstring user_,
                                                jstring pass_) {
+
+    int ret = 0;
+    tul_net_context conn;
+
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
-in6addr_any;
-    // TODO
+
+    conn._use_tls = 1;
+    strcpy(conn.tls.host,"127.0.0.1");
+
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
