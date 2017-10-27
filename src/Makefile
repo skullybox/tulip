@@ -25,8 +25,8 @@ endif
 
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
-.PHONY: tls
-all: prep tls sql main
+.PHONY: tls tools
+all: prep tls sql main tools
 mysql: prep tls mysqlc with_mysql
 
 tags: 
@@ -37,14 +37,14 @@ prep:
 	@-mkdir out
 	@-mkdir .obj
 
+tools: tls
+	${MAKE} -C tools
+
 main: ${objects}
 	${C} ${ldflgs} ${certs} -o out/tulip ${objects_bin} .obj/sqlite3.o ${inc} -lpthread ${libs} -ldl
 
 with_mysql: ${objects}
 	${C} ${ldflgs} ${certs} -o out/tulip ${objects_bin} ${inc} ${my_inc} -lpthread ${libs} -ldl ${my_lib}
-
-win: crypt ${objects}
-	${C} ${ldflgs} ${certs} -o out/tulip ${objects_bin} ${inc} -lpthread -lws2_32 
 
 %.o : %.c
 	${C} ${cflgs} ${incflgs} $^ -o .obj/$@
