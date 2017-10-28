@@ -2,7 +2,7 @@
 #include <string>
 #include "tul_userc.h"
 #include "tul_tls_client.h"
-#include "tul_net_context.h"
+#include "tul_tls_common.h"
 
 
 
@@ -21,8 +21,8 @@ Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, js
     strcpy(conn.tls.host,"127.0.0.1");
 
     ret |= tls_client_init(&(conn.tls), 9443);
-    if (!ret)
-        ret |= client_login((char *) user, (char *) pass, &conn);
+   /* if (!ret)
+        ret |= client_login((char *) user, (char *) pass, &conn);*/
 
 
     env->ReleaseStringUTFChars(user_, user);

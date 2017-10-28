@@ -16,9 +16,6 @@ android {
 
             }
         }
-        ndk {
-            abiFilters "armeabi", "armeabi-v7a", "x86", "x86_64", "mips", "mips64"
-        }
     }
     buildTypes {
         release {
@@ -28,7 +25,8 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['src']
+
+            jniLibs.srcDirs = ['src/main/jniLibs']
         }
     }
 
