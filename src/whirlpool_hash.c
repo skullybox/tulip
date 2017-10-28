@@ -1748,7 +1748,9 @@ void makeNESSIETestVectors() {
         NESSIEadd(digest, 512, &w);
         NESSIEfinalize(&w, digest);
     }
+#ifndef ANDROID
     fflush(stdout);
+#endif
     printf("Iterated message digest computation (%d times): ", LONG_ITERATION);
     display(digest, DIGESTBYTES); printf("\n");
 }
@@ -1938,9 +1940,11 @@ static void makeIntermediateValues() {
     NESSIEfinalize(&w, digest);
     printf("The hash-code is the following 512-bit string.\n\n");
     display(digest, DIGESTBYTES); printf("\n\n");
+#ifndef ANDROID
     fflush(stdout);
 
     fflush(stdout);
+#endif
 }
 #endif /* ?TRACE_INTERMEDIATE_VALUES */
 

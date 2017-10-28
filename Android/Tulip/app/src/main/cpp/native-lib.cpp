@@ -1,12 +1,14 @@
 #include <jni.h>
 #include <string>
-#include "tul_net_context.h"
-#include "tul_tls_client.h"
 #include "tul_userc.h"
+#include "tul_tls_client.h"
+#include "tul_net_context.h"
+
+
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_org_tulip_project_tulip_Tulip_ClientLogin(JNIEnv *env, jobject instance, jstring user_,
+Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, jstring user_,
                                                jstring pass_) {
 
     int ret = 0;
@@ -17,6 +19,10 @@ Java_org_tulip_project_tulip_Tulip_ClientLogin(JNIEnv *env, jobject instance, js
 
     conn._use_tls = 1;
     strcpy(conn.tls.host,"127.0.0.1");
+
+    ret |= tls_client_init(&(conn.tls), 9443);
+    if (!ret)
+        ret |= client_login((char *) user, (char *) pass, &conn);
 
 
     env->ReleaseStringUTFChars(user_, user);

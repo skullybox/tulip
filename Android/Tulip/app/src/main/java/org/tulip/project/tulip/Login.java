@@ -8,11 +8,11 @@ public class Login extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("native-lib");
         System.loadLibrary("mbedtls");
         System.loadLibrary("mbedx509");
         System.loadLibrary("mbedcrypto");
         System.loadLibrary("tulipc");
+        System.loadLibrary("native-lib");
 
     }
 
@@ -29,4 +29,6 @@ public class Login extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+    public native int ClientLogin(String user, String pass);
 }

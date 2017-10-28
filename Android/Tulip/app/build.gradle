@@ -5,7 +5,7 @@ android {
     buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "org.tulip.project.tulip"
-        minSdkVersion 19
+        minSdkVersion 22
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -13,7 +13,11 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++11 -I../../../../../../../src/ -I../../../../../../../src/tls/mbedtls-2.4.2/include/"
+
             }
+        }
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "x86_64", "mips", "mips64"
         }
     }
     buildTypes {
@@ -24,7 +28,7 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['libs']
+            jniLibs.srcDirs = ['src']
         }
     }
 
@@ -38,7 +42,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile fileTree(include: ['*.so'], dir: 'src/main/jnilibs')
+
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
