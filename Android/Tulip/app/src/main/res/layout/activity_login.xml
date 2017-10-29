@@ -4,20 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="33dp"
+    android:layout_margin="22dp"
+    android:background="@android:color/background_light"
     tools:context="org.tulip.project.tulip.Login">
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="368dp"
-        android:layout_height="495dp"
+        android:layout_width="362dp"
+        android:layout_height="489dp"
+        android:background="@android:color/background_light"
         android:orientation="vertical"
         android:paddingTop="22dp"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="-10dp">
+        tools:layout_editor_absoluteX="14dp"
+        tools:layout_editor_absoluteY="-10dp"
+        tools:ignore="MissingConstraints">
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/tx_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -31,7 +34,7 @@
             app:layout_constraintVertical_bias="0.017" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/tx_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -47,11 +50,17 @@
             android:layout_width="wrap_content"
             android:layout_height="282dp"
             android:baselineAlignBottom="false"
+            android:paddingBottom="22dp"
+            android:paddingEnd="22dp"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp"
+            android:paddingStart="22dp"
+            android:paddingTop="22dp"
             android:textAlignment="center"
             app:srcCompat="@drawable/tulip_m" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/t_signin"
             android:layout_width="337dp"
             android:layout_height="wrap_content"
             android:text="Sign In"

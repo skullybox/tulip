@@ -2,6 +2,9 @@ package org.tulip.project.tulip;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class Login extends AppCompatActivity {
@@ -21,8 +24,38 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        Button btn = (Button) findViewById(R.id.t_signin);
+        btn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                int ret = 0;
+                String user = "";
+                String pass = "";
+
+                EditText username = (EditText) findViewById(R.id.tx_user);
+                EditText password = (EditText) findViewById(R.id.tx_password);
+
+                // disable edit text while we login
+                username.setFocusable(false);
+                password.setFocusable(false);
+
+                user = username.getText().toString();
+                pass = password.getText().toString();
+                ret = ClientLogin(user, pass);
+
+                if(ret != 0) {
+                    /* login failed */
+                    username.setFocusable(true);
+                    password.setFocusable(true);
+                }
+
+            }
+        });
 
     }
+
+
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
