@@ -1,13 +1,12 @@
 # database configuration settings
 
-create table user(uid varchar(30) unique not null, name varchar(50) not null, email varchar(50) unique not null, password varchar(25) not null, salt varchar(25) not null, ctime DATETIME DEFAULT now(), primary key(uid));
+CREATE TABLE user (uid int(11) unique NOT NULL AUTO_INCREMENT, ctime datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, name varchar(50) unique NOT NULL, email varchar(50) NOT NULL, password varchar(25) NOT NULL, salt varchar(25) NOT NULL, PRIMARY KEY (uid));
 
-create table friend_request(uid varchar(30), user_from varchar(30), ctime DATETIME DEFAULT now());
+create table friend_request(uid int(11), user_from varchar(30), ctime DATETIME not null DEFAULT now());
 
-create table friend_list(uid varchar(30), friend varchar(30), ctime DATETIME DEFAULT now(), foreign key(uid) references user(uid), foreign key(friend) references user(uid));
+create table friend_list(uid int(11), friend varchar(30), ctime DATETIME not null DEFAULT now(), foreign key (uid) references user(uid));
 
-create table message(uid varchar(30), frm varchar(30), ctime DATETIME DEFAULT now(), msg text, foreign key (uid) references user(uid), foreign key(frm) references user(uid));
-
+create table message(uid int(11), frm varchar(30), ctime DATETIME not null DEFAULT now(), msg text, foreign key (uid) references user(uid));
 
 
 
