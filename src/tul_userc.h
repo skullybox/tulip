@@ -9,7 +9,9 @@
 
 #include "tul_net_context.h"
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int client_connect(char *host, char *port, tul_net_context *conn, int use_tls);
 
@@ -32,3 +34,6 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
 
 #endif
 
+#ifdef __cplusplus
+}
+#endif
