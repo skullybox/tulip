@@ -243,7 +243,7 @@ void _tls_client_test_login()
 
   ret |= client_transmit(&conn);
   if(!ret)
-    ret |= client_get_ok(&conn);
+    ret |= client_get_ok(&conn, pass);
 
   if(ret)
   {
