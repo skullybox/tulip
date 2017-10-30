@@ -5,27 +5,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<base target="body">
 <title>Add Record Form</title>
 </head>
 <body>
-<a href = "welcome.php">Back</a>
 <form action="insert.php" method="post">
-    <p>
-        <label for="name">Name:</label>
-        <input type="text" name="name" id="name">
-    </p>
-    <p>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password">
-    </p>
-    <p>
-        <label for="salt">Salt:</label>
-        <input type="text" name="salt" id="salt">
-    </p>
-    <p>
-        <label for="email">Email Address:</label>
-        <input type="text" name="email" id="email">
-    </p>
+    <table><tr><td><label for="name">Name:</label></td/><td><input type="text" name="name" id="name"></td></tr>
+           <tr><td><label for="password">Password:</label></td><td><input type="password" name="password" id="password"></td></tr>
+           <tr><td><label for="salt">Salt:</label></td><td><input type="text" name="salt" id="salt"></td></tr>
+           <tr><td><label for="email">Email:</label></td><td><input type="text" name="email" id="email"></td></tr></table>
     <input type="submit" value="Submit">
 </form>
 </body>
