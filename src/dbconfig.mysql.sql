@@ -8,5 +8,5 @@ create table friend_list(uid int(11), friend varchar(30), ctime DATETIME not nul
 
 create table message(uid int(11), frm varchar(30), ctime DATETIME not null DEFAULT now(), msg text, foreign key (uid) references user(uid));
 
-
+insert into user set name = "admin",email = "admin@tulipsecure.com",password = "tulipPa55",salt = "verysalty";
 
