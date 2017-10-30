@@ -554,7 +554,8 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
   /* now get the confirmation */
   ret = 0;
   ret |= client_recieve(conn);
-  ret |= verify_client_payload(conn, &r, &p, pass);
+  if(!ret)
+    ret |= verify_client_payload(conn, &r, &p, pass);
 
   if(p.data)
     free(p.data);
@@ -568,4 +569,34 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
   return 0;
 
 }
+
+
+int client_get_ok(tul_net_context *conn, char *pass) 
+{
+  /* validate response */
+  comm_req r;
+  comm_payload p;
+  int ret = 0;
+
+  memset(&r, 0, sizeof(comm_req));
+  memset(&p, 0, sizeof(comm_payload));
+
+  ret |= client_recieve(conn);
+  if(!ret)
+    ret |= verify_client_payload(conn, &r, &p, pass);
+
+  if(p.data)
+    free(p.data);
+
+  if(ret)
+    return ret;
+
+  if(p.action != OK)
+    return -1;
+
+
+
+  return 0;
+}
+
 

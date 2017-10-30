@@ -241,8 +241,18 @@ void _tls_client_test_login()
     return;
   }
 
-  ret = client_transmit(&conn);
-  fprintf(stdout, " PASS: client_test_login\n");
+  ret |= client_transmit(&conn);
+  if(!ret)
+    ret |= client_get_ok(&conn);
+
+  if(ret)
+  {
+    fprintf(stdout, " FAIL: client_test_login\n");
+    return;
+  }
+  else {
+    fprintf(stdout, " PASS: client_test_login\n");
+  }
 
 }
 
@@ -250,9 +260,9 @@ void _create_users()
 {
   int ret = 0; 
 
-    ret |= create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
-    ret |= create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
-    ret |= create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
+  ret |= create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
+  ret |= create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
+  ret |= create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
 
 
   if(ret)

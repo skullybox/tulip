@@ -31,6 +31,7 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
 int client_transmit(tul_net_context *conn);
 int client_recieve(tul_net_context *conn);
 int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_uid);
+int client_getok(tul_net_context *conn, char *pass);
 
 #endif
 
