@@ -1,7 +1,10 @@
 # Tulip
 
-This project uses docker, to define services and tasks. They are as follows:
+This is a Secure Chat platform, written in c++, with mysql backend and php admin UI.
 
-backend (API that talks with database and runs c code for linux pam module)
-frontend (PHP and apache, talks with API)
-mysql (master & slave images)
+## Clients
+
+# commandline/w c++
+# android/w c++
+# ios/w c++
+# web/w php
