@@ -1,3 +1,4 @@
+<html><body><base target="body"></body></html>
 <?php
 include('session.php');
 include("config.php");
@@ -34,7 +35,7 @@ if (empty($email)) {
 $sql = "INSERT INTO user (name, password, salt, email) VALUES ('$name', '$password', '$salt', '$email')";
 if(mysqli_query($db, $sql)){
     echo "Records added successfully.<br>";
-    header("location: welcome.php");
+    header("location: body.php");
     
 } else{
     echo "ERROR: Could not able to execute $sql. " . mysqli_error($link);

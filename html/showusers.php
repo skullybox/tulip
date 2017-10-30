@@ -46,6 +46,5 @@ if ($result->num_rows > 0) {
 }
 $conn->close();
 ?>
-<a href = "welcome.php">Back</a>
 </html>
 

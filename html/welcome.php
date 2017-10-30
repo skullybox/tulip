@@ -4,16 +4,14 @@
 <html">
    
    <head>
-      <title>Welcome </title>
+      <title>Welcome to Tulip Secure Chat</title>
+      <base target="body">
    </head>
    
    <body>
-      <table><tr><td><img src="logo.jpeg" alt="Smiley face" height="168" width="340"></td>
-      <td style="font-size: 25px;">Welcome, <font color=lightblue>(<?php echo $login_session; ?>)</font><br><br><br>
-      <a href = "adduser.php">Add a User</a>  
-      <a href = "showusers.php">List Users</a>
-      <a href = "logout.php">Sign Out</a></td></table>
-      
+     <iframe src="header.php" name="header" height="230" width="685" style="border:none;"></iframe>
+     <br>
+     <iframe src="body.php" name="body" height="400" width="685" style="border:none;"></iframe>
    </body>
    
 </html>
