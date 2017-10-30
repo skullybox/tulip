@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.tulip.project.tulip">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,7 +13,6 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <uses-permission android:name="android.permission.INTERNET"></uses-permission>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

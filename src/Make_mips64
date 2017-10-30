@@ -1,5 +1,5 @@
 android_arch := "mips64el-linux-android-4.9"
-ANDROID_CC := arm/bin/mips64el-linux-android-gcc
-ANDROID_CPP := arm/bin/mips64el-linux-android-g++
-AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -fPIC
+ANDROID_CC := arm/bin/mips64el-linux-android-clang
+ANDROID_CPP := arm/bin/mips64el-linux-android-clang++
+AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -fPIC -D__ANDROID_API__=22 -std=c++11
 include Makefile

@@ -1,5 +1,5 @@
 android_arch := "aarch64-linux-android-4.9"
-ANDROID_CC := arm/bin/aarch64-linux-android-gcc
-ANDROID_CPP := arm/bin/aarch64-linux-android-g++
-AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -fPIC
+ANDROID_CC := arm/bin/aarch64-linux-android-clang
+ANDROID_CPP := arm/bin/aarch64-linux-android-clang++
+AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -fPIC -D__ANDROID_API__=22 -std=c++11
 include Makefile

@@ -1,5 +1,5 @@
 android_arch := "arm-linux-androideabi-4.9"
-ANDROID_CC := arm/bin/arm-linux-androideabi-gcc
-ANDROID_CPP := arm/bin/arm-linux-androideabi-g++
-AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -Wa,--noexecstack -fPIC
+ANDROID_CC := arm/bin/arm-linux-androideabi-clang
+ANDROID_CPP := arm/bin/arm-linux-androideabi-clang++
+AN_FLAGS := -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -Wa,--noexecstack -fPIC -D__ANDROID_API__=22 -std=c++11
 include Makefile

@@ -36,19 +36,9 @@ public class Login extends AppCompatActivity {
                 EditText username = (EditText) findViewById(R.id.tx_user);
                 EditText password = (EditText) findViewById(R.id.tx_password);
 
-                // disable edit text while we login
-                username.setFocusable(false);
-                password.setFocusable(false);
-
                 user = username.getText().toString();
                 pass = password.getText().toString();
                 ret = ClientLogin(user, pass);
-
-                if(ret != 0) {
-                    /* login failed */
-                    username.setFocusable(true);
-                    password.setFocusable(true);
-                }
 
             }
         });

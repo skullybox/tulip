@@ -26,7 +26,7 @@ endif
 PREFIX := "rpmbuild/BUILDROOT/tulip-1.0-1.x86_64"
 
 .PHONY: tls tools
-all: prep tls sql main tools
+all: prep tls sql main 
 mysql: prep tls mysqlc with_mysql
 
 tags: 
@@ -93,7 +93,7 @@ tls_android: android_setup
 	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
 		tar zxf "tls/mbedtls-2.4.2-apache.tgz" -C "tls";\
 		cp "tls/CMakeLists.txt" "tls/mbedtls-2.4.2/library/";\
-		cd "tls/mbedtls-2.4.2" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} CXXFLAGS="${AN_FLAGS}" CFLAGS="${AN_FLAGS}" cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
+		cd "tls/mbedtls-2.4.2" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} CXXFLAGS="${AN_FLAGS}" cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
 	fi
 
 
