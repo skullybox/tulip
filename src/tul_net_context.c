@@ -177,8 +177,10 @@ CHECK_LIST:
     {
       memset(cur->_this, 0, sizeof(tul_net_context));
       free(cur->_this);
+      cur->_this = NULL;
       memset(cur, 0, sizeof(_tul_int_context_struct));
       free(cur);
+      cur = NULL;
     }
     if(tmp)
       tmp->next = NULL;
