@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
   strncpy(uid, argv[1], 30);
   strncpy(name, argv[2], 50);
-  strncpy(email, argv[2], 50);
+  strncpy(email, argv[3], 50);
 
   fprintf(stdout, "password: ");
   while(count < 17)

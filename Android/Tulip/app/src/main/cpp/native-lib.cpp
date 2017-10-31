@@ -25,7 +25,7 @@ Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, js
     const char *pass = env->GetStringUTFChars(pass_, 0);
 
     conn->_use_tls = 1;
-    strcpy(conn->tls.host, "skullybox.no-ip.net");
+    strcpy(conn->tls.host, "stabby.no-ip.org");
 
     ret |= tls_client_init(&(conn->tls), 9999);
     if (!ret)
