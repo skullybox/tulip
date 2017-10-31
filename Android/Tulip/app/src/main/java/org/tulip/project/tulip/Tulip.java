@@ -7,5 +7,5 @@ package org.tulip.project.tulip;
 
 public class Tulip {
 
-    public native int ClientLogin(String user, String pass);
+
 }

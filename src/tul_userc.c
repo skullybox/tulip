@@ -24,25 +24,15 @@ extern int CLIENT_CERT_len;
 extern int CA_CERT_len;
 extern int CLIENT_KEY_len;
 
-/* special return android_return( when interfacing with
- * android
- */
-int android_return(int i)
-{
-#ifdef ANDROID
-  return ((i>>24)&0xff) | // move byte 3 to byte 0
-    ((i<<8)&0xff0000) | // move byte 1 to byte 2
-    ((i>>8)&0xff00) | // move byte 2 to byte 1
-    ((i<<24)&0xff000000);
-#else
-  return i;
-#endif
-}
-
 int client_login(char *uid, char *pass, tul_net_context *conn)
 {
   comm_req r;
   comm_payload p;
+  char _uid[30] = {0};
+  char _pass[16] = {0};
+  
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 16);
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
@@ -58,15 +48,15 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   /* data size with encryption
    * block size into account
    */
-  if((strlen(uid)+1)%16)
+  if((strlen(_uid)+1)%16)
   {
-    p.data_sz = 16*((strlen(uid)+1)/16)+16;
+    p.data_sz = 16*((strlen(_uid)+1)/16)+16;
     PAYLOAD_CHECK_SZ;
     p.data = calloc(p.data_sz, 1);
   }
   else
   {
-    p.data_sz = ((strlen(uid)+1)/16)*16;
+    p.data_sz = ((strlen(_uid)+1)/16)*16;
     PAYLOAD_CHECK_SZ;
     p.data = calloc(p.data_sz,1);
   }
@@ -76,13 +66,13 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   /* data stores uid as part of
    * payload to confirm login
    */
-  strcpy(p.data, uid);
+  strcpy(p.data, _uid);
 
-  prep_transmission(uid, pass, &r, &p, conn);
+  prep_transmission(_uid, _pass, &r, &p, conn);
 
   if(p.data)
     free(p.data);
-  return android_return(0);
+  return 0;
 }
 
 #define CLEANUP_TLS mbedtls_net_free( &(conn->tls.server_fd) ); \
@@ -97,11 +87,11 @@ int client_connect(char *host, char *port, tul_net_context *conn, int use_tls)
   memset(conn, 0, sizeof(tul_net_context));
   if(!use_tls && tul_tcp_connect(host, atoi(port),&(conn->_sock)))
   {
-    return android_return(1);
+    return 1;
   }
   else if(!use_tls)
   {
-    return android_return(0);
+    return 0;
   }
 
   conn->_use_tls = 1;
@@ -110,10 +100,10 @@ int client_connect(char *host, char *port, tul_net_context *conn, int use_tls)
   if(ret)
   {
     CLEANUP_TLS;
-    return android_return(1);
+    return 1;
   }
 
-  return android_return(0);
+  return 0;
 
 }
 
@@ -162,9 +152,9 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   if(p.data)
     free(p.data);
   if(ret)
-    return android_return(ret);
+    return ret;
 
-  return android_return(0);
+  return 0;
 }
 
 
@@ -220,9 +210,9 @@ int client_message(char *uid, char *t_uid, char *pass,
     free(p.data);
 
   if(ret)
-    return android_return(ret);
+    return ret;
 
-  return android_return(0);
+  return 0;
 }
 
 
@@ -265,12 +255,12 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 
   if(p.data)
     free(p.data);
-  return android_return(0);
+  return 0;
 
 FRIEND_REQ_ERROR:
   if(p.data)
     free(p.data);
-  return android_return(ret);
+  return ret;
 }
 
 int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **list, unsigned *list_sz)
@@ -332,13 +322,13 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   if(p.data)
     free(p.data);
-  return android_return(0);
+  return 0;
 
 RETURN_ADDREQLIST_ERROR:
 
   if(p.data)
     free(p.data);
-  return android_return(ret);
+  return ret;
 }
 
 
@@ -403,13 +393,13 @@ int client_get_friendlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   if(p.data)
     free(p.data);
-  return android_return(0);
+  return 0;
 
 RETURN_FRIENDLIST_ERROR:
 
   if(p.data)
     free(p.data);
-  return android_return(ret);
+  return ret;
 }
 
 int client_transmit(tul_net_context *conn)
@@ -453,9 +443,9 @@ int client_transmit(tul_net_context *conn)
   }
 
   if(conn->_tsend < conn->_ttsend)
-    return android_return(-1);
+    return -1;
   else
-    return android_return(0);
+    return 0;
 }
 
 int client_recieve(tul_net_context *conn)
@@ -522,10 +512,10 @@ int client_recieve(tul_net_context *conn)
 
   if(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)
   {
-    return android_return(-1);
+    return -1;
   }
   else
-    return android_return(0);
+    return 0;
 
 }
 
@@ -560,11 +550,11 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
 
   int ret = prep_transmission(uid, pass, &r, &p, conn);
   if(ret)
-    return android_return(ret);
+    return ret;
 
   ret = client_transmit(conn);
   if(ret)
-    return android_return(ret);
+    return ret;
 
   /* now get the confirmation */
   ret = 0;
@@ -576,12 +566,12 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
     free(p.data);
 
   if(ret)
-    return android_return(ret);
+    return ret;
 
   if(p.action != OK)
-    return android_return(-1);
+    return -1;
 
-  return android_return(0);
+  return 0;
 
 }
 
@@ -604,14 +594,12 @@ int client_get_ok(tul_net_context *conn, char *pass)
     free(p.data);
 
   if(ret)
-    return android_return(ret);
+    return ret;
 
   if(p.action != OK)
-    return android_return(-1);
+    return -1;
 
-
-
-  return android_return(0);
+  return 0;
 }
 
 

@@ -60,7 +60,7 @@ int prep_transmission(char *uid, char *pass,
   memcpy(r->hmac2, hash_r, DIGESTBYTES);
 
   /* encrypt kek */
-  memcpy(tmp, pass, 16);
+  strncpy(tmp, pass, 16);
   salt_password(tmp, r->salt, 16);
 
   RC5_SETUP(tmp, &rc5);
@@ -135,7 +135,7 @@ int verify_client_payload(tul_net_context *c, comm_req *r, comm_payload *p, char
   /* lookup the user and password */ 
   strncpy(uid, r->user, 30);
 
-  strcpy(c_pass, pass);
+  strncpy(c_pass, pass,16);
 
   /* decrypt kek */
   salt_password(c_pass, r->salt, 16);
