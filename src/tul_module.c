@@ -48,6 +48,11 @@ void module_read(tul_net_context *c)
   ret = verify_payload(c, &r, &p);
 
   /* waiting for more data */
+  if(ret)
+  {
+  sprintf(buff, "payload verification error: %d", ret);
+  tul_log(buff);
+  }
   if(ret == -1)
     return;
 

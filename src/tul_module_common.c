@@ -3,6 +3,7 @@
   common module functions
  **/
 
+#include "tul_log.h"
 #include "rc5_cipher.h"
 #include "tul_module_common.h"
 
@@ -238,7 +239,7 @@ int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
   memcpy(r, c->payload_in, REQ_HSZ);
 
   /* lookup the user and password */ 
-  strncpy(uid, r->user, 30);
+  strcpy(uid, r->user);
   ret = get_user_pass(uid, pass, salt);
   if(ret)
   {
@@ -289,7 +290,7 @@ int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
 
   if (verifyHash(hash_r, r->hmac2 ))
   {
-    return 1;
+    return -1;
   }
 
   /* hash payload and verify */
@@ -299,7 +300,7 @@ int verify_payload(tul_net_context *c, comm_req *r, comm_payload *p)
 
   if (verifyHash(hash_r, r->hmac ))
   {
-    return 1;
+    return -1;
   }
 
   return 0;
