@@ -47,12 +47,6 @@ void module_read(tul_net_context *c)
   memset(&p, 0, sizeof(comm_payload));
   ret = verify_payload(c, &r, &p);
 
-  /* waiting for more data */
-  if(ret)
-  {
-  sprintf(buff, "payload verification error: %d", ret);
-  tul_log(buff);
-  }
   if(ret == -1)
     return;
 
@@ -78,9 +72,9 @@ void module_read(tul_net_context *c)
   switch(p.action)
   {
     case LOGIN:
-      c->_user_auth = 1;
       if(!do_login(r.user, &p))
       {
+        c->_user_auth = 1;
         sprintf(buff, " user login: %s", r.user);
         tul_log(buff);
 
