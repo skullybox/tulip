@@ -40,7 +40,6 @@ int main(int argc, char **argv)
 
   tul_global_signal_handle_init();
 
-#if defined(__APPLE__) || defined(__linux__)
   if(daemon_mode)
   {
     tul_log(" tulip_boot >>>> starting in daemon mode");
@@ -48,12 +47,6 @@ int main(int argc, char **argv)
   }
   else
     tul_log(" tulip_boot >>>> starting in foreground");
-
-#else
-  WSADATA wsaData;
-  ZeroMemory(&wsaData,sizeof(wsaData));
-  WSAStartup(MAKEWORD(2,2),&wsaData);
-#endif
 
   tul_dbinit();
 
