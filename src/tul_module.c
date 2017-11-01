@@ -4,7 +4,7 @@
  **/
 
 #include "tul_b64.h"
-#include "tul_db.h"
+#include "tul_mysql.h"
 #include "tul_log.h"
 #include "tul_random.h"
 #include "tul_user.h"
@@ -166,7 +166,7 @@ int do_get_addreq(char *user, comm_payload *p)
   char uid[30] = {0};
   sprintf(SQL, "select user_from from friend_request where uid='%s' limit 20", user);
 
-  tul_query_get(SQL, &res, &row, &col);
+  //tul_query_get(SQL, &res, &row, &col);
   if(row <= 0)
   {
     /* send END */
@@ -214,7 +214,7 @@ int do_get_addreq(char *user, comm_payload *p)
   }
 
 GETADDRQ_END:
-  sqlite3_free_table(res);
+  //sqlite3_free_table(res);
   return 0;
 
 }
@@ -283,7 +283,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
         }
         p->data_sz = 0;
         p->action = ERROR;
-        sqlite3_free_table(res);
+        //sqlite3_free_table(res);
         return -1;
       }
 
@@ -298,7 +298,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 
 
 GETLIST_END:
-  sqlite3_free_table(res);
+  //sqlite3_free_table(res);
   return 0;
 }
 

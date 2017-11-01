@@ -3,7 +3,6 @@
   mysql client
  **/
 
-#ifdef USE_MYSQL
 #include "mysql.h"
 #include "tul_mysql.h"
 
@@ -18,9 +17,10 @@ static pthread_mutex_t my_mutex;
 static unsigned my_inited = 0;
 static MYSQL *conn_pool[30] = {0};
 
-int db_init()
+int tul_dbinit()
 {
   int ret = 0;
+  /*
   pthread_mutex_lock(&my_mutex);
 
   /* already initialized */
@@ -61,12 +61,55 @@ int db_init()
   return ret;
 }
 
-
-int db_query(uchar *q)
+void tul_dbclean()
 {
+  /* already initialized */
+  if(!my_inited)
+    return;
 
+  for(int i = 0; i < MAX_MYSQL_POOL; i++)
+  {
+    if(conn_pool[i])
+      mysql_close(conn_pool[i]);
+  }
+
+  my_inited = 0;
+}
+
+int tul_query(int num_q, ...)
+{
+  /*
+  while(!locked)
+  {
+    if(!pthread_mutex_trylock(&pool_locks[pos]))
+    {
+      locked = 1;
+      break;
+    }
+    pos++;
+    if(pos >= SQLPOOL)
+      pos = 0;
+  }
+
+  */
+
+  /*
+  va_start(ap, num_q);
+  for(int i = 0; i < num_q; i++)
+  {
+    q = va_arg(ap, char*);
+    ret = sqlite3_exec(sql_pool[pos], q, NULL, NULL, NULL);
+    if(ret)
+      errors_found = 1;
+  }
+  va_end(ap);
+  */
 
   return 1;
 }
 
-#endif
+
+int tul_query_get()
+{
+
+}

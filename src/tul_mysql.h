@@ -8,10 +8,9 @@
 #ifndef _tul_mysql
 #define _tul_mysql
 
-#ifdef USE_MYSQL
-int db_init();
-int db_query(uchar *q);
-#endif
-
+int tul_dbinit();
+int tul_query(int num_q, ...);
+int tul_query_get();
+void tul_dbclean();
 #endif
 

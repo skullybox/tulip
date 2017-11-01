@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "tul_b64.h"
 #include "tul_log.h"
-#include "tul_db.h"
+#include "tul_mysql.h"
 #include "tul_user.h"
 #include "tul_random.h"
 #include "rc5_cipher.h"
@@ -24,8 +24,10 @@ int user_exists(char *uid)
   sprintf(SQL,
       "select uid from user where uid='%s'", uid);
 
+  /*
   tul_query_get(SQL, &res, &row, &col);
   sqlite3_free_table(res);
+  */
 
   if(row)
     return 1;
@@ -45,8 +47,9 @@ int friend_in_list(char*uid, char *n_uid)
       uid, 
       n_uid);
 
-  tul_query_get(SQL, &res, &row, &col);
+/*  tul_query_get(SQL, &res, &row, &col);
   sqlite3_free_table(res);
+  */
 
   if(row)
     return 1;
@@ -66,8 +69,10 @@ int friend_request_exists(char *uid, char *n_uid)
       uid, 
       n_uid);
 
+  /*
   tul_query_get(SQL, &res, &row, &col);
   sqlite3_free_table(res);
+  */
 
   if(row)
     return 1;
@@ -86,8 +91,10 @@ int email_exists(char *email)
   sprintf(SQL,
       "select email from user where email='%s'", email);
 
+  /*
   tul_query_get(SQL, &res, &row, &col);
   sqlite3_free_table(res);
+  */
 
   if(row)
     return 1;
@@ -183,8 +190,8 @@ int get_user_pass(char *uid, char *pass, char *salt)
 
   sprintf(SQL, "select salt, password from user where uid='%s'", uid);
 
-  tul_query_get(SQL, &res, &row, &col);
-  if(row == 1)
+  //tul_query_get(SQL, &res, &row, &col);
+  /*if(row == 1)
   {
     strcpy(salt, res[col]);
     strcpy(pass, res[col+1]);
@@ -193,6 +200,7 @@ int get_user_pass(char *uid, char *pass, char *salt)
   }
 
   sqlite3_free_table(res);
+  */
   return 1;
 }
 
