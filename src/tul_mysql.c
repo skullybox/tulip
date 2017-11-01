@@ -6,13 +6,12 @@
 #include "mysql.h"
 #include "tul_mysql.h"
 
-#define SQL_HST "db001"
-#define SQL_USR "root"
-#define SQL_PAS "04d8bpgxdadOlZfIQFw0pm"
-#define SQL_DB  "csms"
-
+#define SQL_USR "tulip"
+#define SQL_PAS "TuliPP455#"
 #define MAX_MYSQL_POOL 30
 
+static char SQL_HST[100] = {0};
+static unsigned SQL_PORT = 0;
 static pthread_mutex_t my_mutex;
 static unsigned my_inited = 0;
 static MYSQL *conn_pool[30] = {0};
@@ -46,7 +45,7 @@ int tul_dbinit()
             conn_pool[i],
             SQL_HST, SQL_USR, 
             SQL_PAS, SQL_DB,
-            3306, NULL, 0) == NULL)
+            SQL_PORT, NULL, 0) == NULL)
       {
         mysql_close(conn_pool[i]);
         conn_pool[i] = NULL;

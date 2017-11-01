@@ -19,7 +19,7 @@ int usage(int argc)
         \t  -d: run as daemon\n\n\
         \tmysql usage:\n\
         \t set the following environment variables:\n\
-        \t MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD\n\n");
+        \t MYSQL_HOST, MYSQL_PORT\n\n");
     return 1;
   }
   return 0;
