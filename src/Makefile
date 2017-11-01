@@ -7,8 +7,8 @@ sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
-inc := -I./tls/mbedtls-2.4.2/include -Isqlite
-libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
+inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
+libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmysqlclient
 cflgs := -DSYSLOG_USE -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 ifeq ($(USE_MYSQL),1)
@@ -74,7 +74,10 @@ tls:
 	fi
 
 sql:
-	gcc ${cflgs} -DSQLITE_THREADSAFE=2 -Isqlite sqlite/sqlite3.c -o .obj/sqlite3.o
+	if [ ! -d "mysql/mysql-connector-c-6.1.10-src" ]; then \
+		tar zxf "mysql/mysql-connector-c-6.1.10-src.tar.gz" -C "mysql";\
+		cd "mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
+	fi
 
 mysqlc:
 	if [ ! -d "mysql/mysql-connector-c-6.1.10-src" ]; then \
