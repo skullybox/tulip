@@ -8,6 +8,7 @@ objects := $(patsubst %.c, %.o, ${sources})
 objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
 inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
+androidlibs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
 libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmysqlclient
 cflgs := -DSYSLOG_USE -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
@@ -41,7 +42,7 @@ tools: tls
 	${MAKE} -C tools
 
 main: ${objects}
-	${C} ${ldflgs} ${certs} -o out/tulip ${objects_bin} .obj/sqlite3.o ${inc} -lpthread ${libs} -ldl
+	${C} ${ldflgs} ${certs} -o out/tulip ${objects_bin} ${inc} -lpthread ${libs} -ldl
 
 with_mysql: ${objects}
 	${C} ${ldflgs} ${certs} -o out/tulip ${objects_bin} ${inc} ${my_inc} -lpthread ${libs} -ldl ${my_lib}
@@ -111,7 +112,7 @@ android: clean-libs prep android_setup tls_android
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_tcp_soc.c -o out/${android_arch}/tul_tcp_soc.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/ca_cert.c -o out/${android_arch}/ca_cert.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c certs/$(CL)/client_cert.c -o out/${android_arch}/client_cert.o
-	${ANDROID_CC} -shared -fPIC -Wl,-soname,libtulipc.so ${libs} -o ./out/${android_arch}/libtulipc.so out/${android_arch}/tul_userc.o out/${android_arch}/tul_tls_common.o out/${android_arch}/tul_tls_client.o out/${android_arch}/tul_module_common.o out/${android_arch}/whirlpool_hash.o out/${android_arch}/tul_random.o out/${android_arch}/rc5_cipher.o out/${android_arch}/tul_b64.o out/${android_arch}/tul_tcp_soc.o out/${android_arch}/ca_cert.o out/${android_arch}/client_cert.o
+	${ANDROID_CC} -shared -fPIC -Wl,-soname,libtulipc.so ${androidlibs} -o ./out/${android_arch}/libtulipc.so out/${android_arch}/tul_userc.o out/${android_arch}/tul_tls_common.o out/${android_arch}/tul_tls_client.o out/${android_arch}/tul_module_common.o out/${android_arch}/whirlpool_hash.o out/${android_arch}/tul_random.o out/${android_arch}/rc5_cipher.o out/${android_arch}/tul_b64.o out/${android_arch}/tul_tcp_soc.o out/${android_arch}/ca_cert.o out/${android_arch}/client_cert.o
 
 
 

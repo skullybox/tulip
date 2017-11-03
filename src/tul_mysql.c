@@ -8,6 +8,7 @@
 
 #define SQL_USR "tulip"
 #define SQL_PAS "TuliPP455#"
+#define SQL_DB "tulip"
 #define MAX_MYSQL_POOL 30
 
 static char SQL_HST[100] = {0};
@@ -19,7 +20,22 @@ static MYSQL *conn_pool[30] = {0};
 int tul_dbinit()
 {
   int ret = 0;
-  /*
+  char *_ptr = NULL;
+  char SQL_HST[201]={0};
+  unsigned SQL_PORT = 0;
+
+  /* grab environment variable values
+   * MYSQL_HOST
+   * MYSQL_PORT
+   */
+  _ptr = getenv("MYSQL_HOST");
+  if(_ptr)
+    strncpy(SQL_HST, _ptr, 200);
+  _ptr = getenv("MYSQL_PORT");
+  if(_ptr)
+    SQL_PORT = atoi(_ptr);
+
+
   pthread_mutex_lock(&my_mutex);
 
   /* already initialized */
