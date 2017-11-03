@@ -79,11 +79,6 @@ sql:
 		cd "mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
 	fi
 
-mysqlc:
-	if [ ! -d "mysql/mysql-connector-c-6.1.10-src" ]; then \
-	tar zxf "mysql/mysql-connector-c-6.1.10-src.tar.gz" -C "mysql";\
-	cd "mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
-	fi
 
 android_setup: 
 	@-rm -rf arm || true
