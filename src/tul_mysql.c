@@ -113,8 +113,10 @@ int tul_query(int num_q, ...)
   for(int i = 0; i < num_q; i++)
   {
     q = va_arg(ap, char*);
-    sprintf(buff, "start transaction; %s; commit;", q);
-    ret = mysql_query(conn_pool[pos], buff);
+    sprintf(buff, "%s; ", q);
+    ret = mysql_query(conn_pool[pos],"begin transaction");
+    ret |= mysql_query(conn_pool[pos], buff);
+    ret |= mysql_query(conn_pool[pos],"commit");
 
     /* stop on error */
     if(ret)
