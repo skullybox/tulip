@@ -97,7 +97,7 @@ int tul_query(int num_q, ...)
   unsigned pos;
   char *q = NULL;
   unsigned ret = 0;
-  char buff[500] = {0};
+  char buff[2500] = {0};
   unsigned errors_found = 0;
 
   while(1)
@@ -113,12 +113,13 @@ int tul_query(int num_q, ...)
   for(int i = 0; i < num_q; i++)
   {
     q = va_arg(ap, char*);
-    ret = mysql_query(conn_pool[pos], q);
+    sprintf(buff, "start transaction; %s; commit;", q);
+    ret = mysql_query(conn_pool[pos], buff);
 
     /* stop on error */
     if(ret)
     {
-      sprintf(buff, "DB Error: %s", q);
+      tul_log("db query error");
       tul_log(buff);
       errors_found = 1;
       pthread_mutex_unlock(&pool_locks[pos]);
@@ -136,6 +137,7 @@ int tul_query_get(char *SQL, MYSQL_RES **res)
 {
   unsigned ret = 0;
   unsigned pos = 0;
+  unsigned sz = 0;
 
   *res = NULL;
 
@@ -149,13 +151,15 @@ int tul_query_get(char *SQL, MYSQL_RES **res)
   }
 
   ret = mysql_query(conn_pool[pos], SQL);
-
-  if(ret)
-    return -1;
+  if( ret || (!ret && mysql_field_count(conn_pool[pos]) == 0))
+  {
+    pthread_mutex_unlock(&pool_locks[pos]);
+    return 1;
+  }
 
   *res = mysql_store_result(conn_pool[pos]);
+  pthread_mutex_unlock(&pool_locks[pos]);
   return 0;
-
 }
 
 

@@ -75,7 +75,7 @@ void module_read(tul_net_context *c)
       if(!do_login(r.user, &p))
       {
         c->_user_auth = 1;
-        sprintf(buff, " user login: %s", r.user);
+        sprintf(buff, " login <<< %s", r.user);
         tul_log(buff);
 
         /* send OK */
@@ -90,13 +90,13 @@ void module_read(tul_net_context *c)
 
       break;
     case LOGOUT:
-      sprintf(buff, " user logout: %s", r.user);
+      sprintf(buff, "logout <<< %s", r.user);
       tul_log(buff);
       c->_teardown = 1;
       break;
     case GET_LIST:
       memcpy(&offset,&((char*)p.data)[30], sizeof(unsigned long long));
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, "getlist <<< %s", r.user);
       tul_log(buff);
 
       do_get_list(r.user, &p, offset);
@@ -104,28 +104,35 @@ void module_read(tul_net_context *c)
       break;
     case ACCEPTFRIEND:
       if(!do_accept_friend(r.user, &p))
+      {
+        sprintf(buff, "add friend >>> %s", r.user);
         send_response(r.user, OK, c, NULL);
+      }
       else
+      {
+        sprintf(buff, "add friend error >>> %s", r.user);
+        send_response(r.user, OK, c, NULL);
         send_response(r.user, INVALID, c, NULL);
+      }
       break;
     case SEND_MSG:
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, "send msg <<< %s", r.user);
       tul_log(buff);
       do_send_msg(r.user, &p);
       break;
     case GET_MSG:
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, "get msg <<< %s", r.user);
       tul_log(buff);
       do_get_msg(r.user, &p);
       break;
     case GET_FREQ:
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, "fiend request <<< %s", r.user);
       tul_log(buff);
       do_get_addreq(r.user, &p);
       send_response(r.user, p.action, c, &p);
       break;
     case ADDFRIEND:
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, "add user <<< %s", r.user);
       tul_log(buff);
         if(!do_add_friend(r.user, &p))
           send_response(r.user, OK, c, NULL);
@@ -133,12 +140,12 @@ void module_read(tul_net_context *c)
           send_response(r.user, ERROR, c, NULL);
       break;
     case DELFRIEND:
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, "del friend <<< %s", r.user);
       tul_log(buff);
       break;
     default:
       /* send error */
-      sprintf(buff, " user <<< %s", r.user);
+      sprintf(buff, " error >>> %s", r.user);
       tul_log(buff);
       send_response(r.user, ERROR, c, NULL);
       break;
@@ -160,16 +167,19 @@ int do_send_msg(char *user, comm_payload *p)
 
 int do_get_addreq(char *user, comm_payload *p)
 {
-  int row, col = 0;
-  char **res = NULL;
-  char SQL[4096] = {0};
+  unsigned long long rows = 0ULL;
+  int ret = 0;
+  MYSQL_RES *res = NULL;
+  MYSQL_ROW irow;
+  char SQL[2048] = {0};
   char uid[30] = {0};
   sprintf(SQL, "select user_from from friend_request where uid='%s' limit 20", user);
 
-  //tul_query_get(SQL, &res, &row, &col);
-  if(row <= 0)
+  ret = tul_query_get(SQL, &res);
+  if(res == NULL || mysql_num_fields(res) == 0)
   {
     /* send END */
+    mysql_free_result(res);
     p->action = END;
     p->data_sz = 0;
     if(p->data)
@@ -185,36 +195,35 @@ int do_get_addreq(char *user, comm_payload *p)
   /* allocate based on row response for
    * payload
    */
-  if((30*row)%16)
+  rows = mysql_num_rows(res);
+  if((30*rows)%16)
     p->data_sz = 16;
   else 
     p->data_sz = 0;
-  p->data_sz += ((30*row)/16)*16;
+  p->data_sz += ((30*rows)/16)*16;
 
   if(p->data)
     free(p->data);
   p->data = calloc(p->data_sz, 1);
 
-  for(int i = col; i < (col*row)+col; i+=col )
+  for(int i = 0; i < rows; i++)
   {
+    irow = mysql_fetch_row(res);
     memset(uid, 0, 30);
-    strncpy(uid, res[i], 30);
+    strncpy(uid, irow[0], 30);
 
-    memcpy(&((char*)p->data)[30*((i-col)/col)],
+    memcpy(&((char*)p->data)[30*i],
         uid,
         30);
 
-    if(i+col >= ((col*row)+col))
-    {
-      if(row == 20)
-        p->action = PAGING;
-      else
-        p->action = END;
-    }
   }
+  if(rows == 20)
+    p->action = PAGING;
+  else
+    p->action = END;
 
 GETADDRQ_END:
-  //sqlite3_free_table(res);
+  mysql_free_result(res);
   return 0;
 
 }
@@ -223,14 +232,15 @@ GETADDRQ_END:
 int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 {
   MYSQL_RES *res = NULL;
-  unsigned long long id = 0ULL;
-  int row, col = 0;
-  char SQL[4096] = {0};
+  MYSQL_ROW irow;
+  unsigned ret = 0;
+  unsigned long long id, rows = 0ULL;
+  char SQL[2048] = {0};
   char uid[30] = {0};
   sprintf(SQL, "select rowid, friend from friend_list where uid='%s' and rowid > %llu limit 200", user, offset);
 
-  tul_query_get(SQL, &res);
-  if(res = NULL || mysql_num_fields(res) == 0)
+  ret = tul_query_get(SQL, &res);
+  if(res == NULL || mysql_num_fields(res) == 0)
   {
     /* send END */
     if(res)
@@ -251,31 +261,33 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
   /* allocate based on row response for
    * payload
    */
-  if((30*row+8)%16)
+  rows = mysql_num_rows(res);
+  if((30*rows+8)%16)
     p->data_sz = 16;
   else 
     p->data_sz = 0;
-  p->data_sz += ((30*row+8)/16)*16;
+  p->data_sz += ((30*rows+8)/16)*16;
 
   if(p->data)
     free(p->data);
   p->data = calloc(p->data_sz, 1);
 
-  for(int i = col; i < (col*row)+col; i+=col )
+  for(int i = 0; i < rows; i++)
   {
+    irow = mysql_fetch_row(res);
     memset(uid, 0, 30);
-    strncpy(uid, res[i+1], 30);
+    strncpy(uid, irow[1], 30);
 
-    memcpy(&((char*)p->data)[8+30*((i-col)/col)],
+    memcpy(&((char*)p->data)[8+30*i],
         uid,
         30);
 
-    if(i+col >= ((col*row)+col))
+    if(i+1 >= rows)
     {
       /* store last id in payload
        * for future offset
        */
-      id = strtoull(res[i], NULL, 10);
+      id = strtoull(irow[0], NULL, 10);
       if(id == 0)
       {
         if(p->data)
@@ -285,13 +297,13 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
         }
         p->data_sz = 0;
         p->action = ERROR;
-        //sqlite3_free_table(res);
+        mysql_free_result(res);
         return -1;
       }
 
       memcpy(&((char*)p->data)[0], &id, 8);
 
-      if(row == 200)
+      if(rows == 200)
         p->action = PAGING;
       else
         p->action = END;
@@ -300,7 +312,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 
 
 GETLIST_END:
-  //sqlite3_free_table(res);
+  mysql_free_result(res);
   return 0;
 }
 
@@ -335,7 +347,7 @@ int do_accept_friend(char *user, comm_payload *p)
 
 int do_add_friend(char *user, comm_payload *p)
 {
-  char SQL[4096] = {0};
+  char SQL[2048] = {0};
   char uid[30] = {0};
   char t_uid[30] = {0};
 
