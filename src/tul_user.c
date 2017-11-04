@@ -166,7 +166,7 @@ int create_user(char *uid, char *name, char *email, char *pass)
 
   /* store user
   */
-  sprintf(SQL, "BEGIN; insert into user(uid, name, email, password, salt) values ('%s', '%s', '%s','%s','%s'); COMMIT;",
+  sprintf(SQL, "insert into user(uid, name, email, password, salt) values ('%s', '%s', '%s','%s','%s') ",
       uid, name, email, epass, salt);
 
   if(tul_query(1,SQL))
