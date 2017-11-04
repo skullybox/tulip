@@ -3,7 +3,7 @@
   mysql client
  **/
 
-#include "mysql.h"
+#include "tul_log.h"
 #include "tul_mysql.h"
 
 #define SQL_USR "tulip"
@@ -16,7 +16,7 @@ static unsigned SQL_PORT = 0;
 static pthread_mutex_t my_mutex;
 static unsigned my_inited = 0;
 static MYSQL *conn_pool[30] = {0};
-
+static pthread_mutex_t pool_locks[30];
 int tul_dbinit()
 {
   int ret = 0;
@@ -93,38 +93,69 @@ void tul_dbclean()
 
 int tul_query(int num_q, ...)
 {
-  /*
-  while(!locked)
+  va_list ap;
+  unsigned pos;
+  char *q = NULL;
+  unsigned ret = 0;
+  char buff[500] = {0};
+  unsigned errors_found = 0;
+
+  while(1)
   {
     if(!pthread_mutex_trylock(&pool_locks[pos]))
-    {
-      locked = 1;
       break;
-    }
     pos++;
-    if(pos >= SQLPOOL)
+    if(pos >= MAX_MYSQL_POOL)
       pos = 0;
   }
 
-  */
-
-  /*
   va_start(ap, num_q);
   for(int i = 0; i < num_q; i++)
   {
     q = va_arg(ap, char*);
-    ret = sqlite3_exec(sql_pool[pos], q, NULL, NULL, NULL);
+    ret = mysql_query(conn_pool[pos], q);
+
+    /* stop on error */
     if(ret)
+    {
+      sprintf(buff, "DB Error: %s", q);
+      tul_log(buff);
       errors_found = 1;
+      pthread_mutex_unlock(&pool_locks[pos]);
+      return errors_found;
+    }
   }
   va_end(ap);
-  */
 
-  return 1;
+  pthread_mutex_unlock(&pool_locks[pos]);
+  return 0;
 }
 
 
-int tul_query_get()
+int tul_query_get(char *SQL, MYSQL_RES **res)
 {
+  unsigned ret = 0;
+  unsigned pos = 0;
+
+  *res = NULL;
+
+  while(1)
+  {
+    if(!pthread_mutex_trylock(&pool_locks[pos]))
+      break;
+    pos++;
+    if(pos >= MAX_MYSQL_POOL)
+      pos = 0;
+  }
+
+  ret = mysql_query(conn_pool[pos], SQL);
+
+  if(ret)
+    return -1;
+
+  *res = mysql_store_result(conn_pool[pos]);
+  return 0;
 
 }
+
+

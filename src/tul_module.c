@@ -222,17 +222,19 @@ GETADDRQ_END:
 
 int do_get_list(char *user, comm_payload *p, unsigned long long offset)
 {
+  MYSQL_RES *res = NULL;
   unsigned long long id = 0ULL;
   int row, col = 0;
-  char **res = NULL;
   char SQL[4096] = {0};
   char uid[30] = {0};
   sprintf(SQL, "select rowid, friend from friend_list where uid='%s' and rowid > %llu limit 200", user, offset);
 
-  tul_query_get(SQL, &res, &row, &col);
-  if(row <= 0)
+  tul_query_get(SQL, &res);
+  if(res = NULL || mysql_num_fields(res) == 0)
   {
     /* send END */
+    if(res)
+      mysql_free_result(res);
 
     p->action = END;
     p->data_sz = 0;
