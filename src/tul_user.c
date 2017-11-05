@@ -16,7 +16,7 @@
 unsigned char dbk[17]="sxUq##X~$ml/<|6.";
 int user_exists(char *uid)
 {
-  char ** res;
+  MYSQL_RES * res;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
@@ -24,10 +24,9 @@ int user_exists(char *uid)
   sprintf(SQL,
       "select uid from user where uid='%s'", uid);
 
-  /*
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
-  */
+  tul_query_get(SQL, &res);
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -47,9 +46,9 @@ int friend_in_list(char*uid, char *n_uid)
       uid, 
       n_uid);
 
-/*  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
-  */
+  tul_query_get(SQL, &res);
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -69,10 +68,9 @@ int friend_request_exists(char *uid, char *n_uid)
       uid, 
       n_uid);
 
-  /*
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
-  */
+  tul_query_get(SQL, &res);
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -91,10 +89,10 @@ int email_exists(char *email)
   sprintf(SQL,
       "select email from user where email='%s'", email);
 
-  /*
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
-  */
+  tul_query_get(SQL, &res);
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
+
 
   if(row)
     return 1;
@@ -186,21 +184,24 @@ int get_user_pass(char *uid, char *pass, char *salt)
   char SQL[4096] = {0};
   int col = 0;
   int row = 0;
-  char **res = NULL;
+  unsigned ret = 0;
+  MYSQL_RES **res;
+  MYSQL_ROW irow;
 
   sprintf(SQL, "select salt, password from user where uid='%s'", uid);
 
-  //tul_query_get(SQL, &res, &row, &col);
-  /*if(row == 1)
+  ret = tul_query_get(SQL, &res);
+  if(!ret)
+    row = mysql_num_rows(res);
+  if(!ret && row == 1)
   {
-    strcpy(salt, res[col]);
-    strcpy(pass, res[col+1]);
-    sqlite3_free_table(res);
+    strcpy(salt, res[0]);
+    strcpy(pass, res[1]);
+    mysql_free_result(res);
     return 0;
   }
 
-  sqlite3_free_table(res);
-  */
+  mysql_free_result(res);
   return 1;
 }
 

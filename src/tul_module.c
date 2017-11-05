@@ -176,7 +176,7 @@ int do_get_addreq(char *user, comm_payload *p)
   sprintf(SQL, "select user_from from friend_request where uid='%s' limit 20", user);
 
   ret = tul_query_get(SQL, &res);
-  if(res == NULL || mysql_num_fields(res) == 0)
+  if(res == NULL || mysql_num_rows(res) == 0)
   {
     /* send END */
     mysql_free_result(res);
