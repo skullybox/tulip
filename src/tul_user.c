@@ -22,7 +22,7 @@ int user_exists(char *uid)
   char SQL[4096] = {0};
 
   sprintf(SQL,
-      "select uid from user where uid='%s'", uid);
+      "select uid from user where uname='%s'", uid);
 
   tul_query_get(SQL, &res);
   row = mysql_num_rows(res);
@@ -42,7 +42,7 @@ int friend_in_list(char*uid, char *n_uid)
   char SQL[4096] = {0};
 
   sprintf(SQL, 
-      "select uid, friend from friend_list where uid='%s' and friend = '%s'",
+      "select uname, friend from friend_list where uname='%s' and friend = '%s'",
       uid, 
       n_uid);
 
@@ -64,7 +64,7 @@ int friend_request_exists(char *uid, char *n_uid)
   char SQL[4096] = {0};
 
   sprintf(SQL, 
-      "select uid, user_from from friend_request where uid='%s' and user_from = '%s'",
+      "select uname, user_from from friend_request where uname='%s' and user_from = '%s'",
       uid, 
       n_uid);
 
@@ -163,8 +163,8 @@ int create_user(char *uid, char *name, char *email, char *pass)
 
   /* store user
   */
-  sprintf(SQL, "insert into user(uid, name, email, password, salt) values ('%s', '%s', '%s','%s','%s') ",
-      uid, name, email, epass, salt);
+  sprintf(SQL, "insert into user(uname, email, password, salt) values ('%s', '%s', '%s','%s') ",
+      uid, email, epass, salt);
 
   if(tul_query(1,SQL))
     return 7;
@@ -187,7 +187,7 @@ int get_user_pass(char *uid, char *pass, char *salt)
   MYSQL_RES *res;
   MYSQL_ROW irow;
 
-  sprintf(SQL, "select salt, password from user where uid='%s'", uid);
+  sprintf(SQL, "select salt, password from user where uname='%s'", uid);
 
   ret = tul_query_get(SQL, &res);
   if(!ret)

@@ -174,7 +174,7 @@ int do_get_addreq(char *user, comm_payload *p)
   MYSQL_ROW irow;
   char SQL[2048] = {0};
   char uid[30] = {0};
-  sprintf(SQL, "select user_from from friend_request where uid='%s' limit 20", user);
+  sprintf(SQL, "select user_from from friend_request where uname='%s' limit 20", user);
 
   ret = tul_query_get(SQL, &res);
   if(res == NULL || mysql_num_rows(res) == 0)
@@ -238,7 +238,7 @@ int do_get_list(char *user, comm_payload *p, unsigned long long offset)
   unsigned long long id, rows = 0ULL;
   char SQL[2048] = {0};
   char uid[30] = {0};
-  sprintf(SQL, "select rowid, friend from friend_list where uid='%s' and rowid > %llu limit 200", user, offset);
+  sprintf(SQL, "select rowid, friend from friend_list where uname='%s' and rowid > %llu limit 200", user, offset);
 
   ret = tul_query_get(SQL, &res);
   if(res == NULL || mysql_num_fields(res) == 0)
@@ -336,10 +336,10 @@ int do_accept_friend(char *user, comm_payload *p)
   if(friend_in_list(user, t_uid))
     return 0;
 
-  sprintf(SQL1, "insert into friend_list(uid, friend) values ('%s', '%s')", 
+  sprintf(SQL1, "insert into friend_list(uname, friend) values ('%s', '%s')", 
       uid, t_uid); 
 
-  sprintf(SQL2, "delete from friend_request where uid='%s' and user_from='%s'",
+  sprintf(SQL2, "delete from friend_request where uname='%s' and user_from='%s'",
       uid, t_uid); 
 
   return tul_query(2, SQL1, SQL2);
@@ -361,7 +361,7 @@ int do_add_friend(char *user, comm_payload *p)
   if(!user_exists(t_uid))
     return -1;
 
-  sprintf(SQL, "insert into friend_request(uid, user_from) values ('%s', '%s')", 
+  sprintf(SQL, "insert into friend_request(uname, user_from) values ('%s', '%s')", 
       uid, t_uid); 
   return tul_query(1, SQL);
 }
