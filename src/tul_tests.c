@@ -7,6 +7,7 @@
 #include "tul_b64.h"
 #include "tul_userc.h"
 #include "tul_tests.h"
+#include "tul_tests.h"
 #include "rc5_cipher.h"
 #include "tul_random.h"
 #include "tul_module.h"
@@ -260,6 +261,7 @@ void _create_users()
 {
   int ret = 0; 
 
+  ret |= create_user("admin", "admin", "root@project-tulip.org", "tulip!2345");
   ret |= create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
   ret |= create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
   ret |= create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
@@ -440,4 +442,18 @@ void _send_friend_accept_tests()
   else
     fprintf(stdout, " PASS: send_friend_accept_test\n");
 }
+
+void _cleanup()
+{
+  fprintf(stdout, " about to wipe db-clean!...");
+  sleep(10);
+  tul_query(4,
+      "delete from friend_list",
+      "delete from friend_request",
+      "delete from message",
+      "delete from user"
+      );
+  TUL_SIGNAL_INT = 1;
+}
+
 

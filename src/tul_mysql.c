@@ -15,8 +15,8 @@ static char SQL_HST[100] = {0};
 static unsigned SQL_PORT = 0;
 static pthread_mutex_t my_mutex;
 static unsigned my_inited = 0;
-static MYSQL *conn_pool[30] = {0};
-static pthread_mutex_t pool_locks[30];
+static MYSQL *conn_pool[MAX_MYSQL_POOL] = {0};
+static pthread_mutex_t pool_locks[MAX_MYSQL_POOL];
 int tul_dbinit()
 {
   int ret = 0;
@@ -44,6 +44,9 @@ int tul_dbinit()
     pthread_mutex_unlock(&my_mutex);
     return 0;
   }
+
+  for(int i = 0; i < MAX_MYSQL_POOL; i ++)
+    pthread_mutex_init(&pool_locks[i], NULL);
 
   /* initialize structure */
   for(int i = 0; i < MAX_MYSQL_POOL; i++)
@@ -94,7 +97,7 @@ void tul_dbclean()
 int tul_query(int num_q, ...)
 {
   va_list ap;
-  unsigned pos;
+  unsigned pos = 0;
   char *q = NULL;
   unsigned ret = 0;
   char buff[2500] = {0};
