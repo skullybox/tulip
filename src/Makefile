@@ -10,7 +10,7 @@ objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
 androidlibs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
 libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmysqlclient
-cflgs := -DSYSLOG_USE -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
+cflgs := -DSYSLOG_USE -O0 -g -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 ifeq ($(USE_MYSQL),1)
   cflgs := -DUSE_MYSQL $(cflgs)

@@ -16,7 +16,7 @@
 unsigned char dbk[17]="sxUq##X~$ml/<|6.";
 int user_exists(char *uid)
 {
-  MYSQL_RES * res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
@@ -36,7 +36,7 @@ int user_exists(char *uid)
 
 int friend_in_list(char*uid, char *n_uid)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
@@ -58,7 +58,7 @@ int friend_in_list(char*uid, char *n_uid)
 
 int friend_request_exists(char *uid, char *n_uid)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
@@ -81,7 +81,7 @@ int friend_request_exists(char *uid, char *n_uid)
 
 int email_exists(char *email)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
@@ -92,7 +92,6 @@ int email_exists(char *email)
   tul_query_get(SQL, &res);
   row = mysql_num_rows(res);
   mysql_free_result(res);
-
 
   if(row)
     return 1;
@@ -185,7 +184,7 @@ int get_user_pass(char *uid, char *pass, char *salt)
   int col = 0;
   int row = 0;
   unsigned ret = 0;
-  MYSQL_RES **res;
+  MYSQL_RES *res;
   MYSQL_ROW irow;
 
   sprintf(SQL, "select salt, password from user where uid='%s'", uid);
@@ -195,8 +194,9 @@ int get_user_pass(char *uid, char *pass, char *salt)
     row = mysql_num_rows(res);
   if(!ret && row == 1)
   {
-    strcpy(salt, res[0]);
-    strcpy(pass, res[1]);
+    irow = mysql_fetch_row(res);
+    strcpy(salt, irow[0]);
+    strcpy(pass, irow[1]);
     mysql_free_result(res);
     return 0;
   }
