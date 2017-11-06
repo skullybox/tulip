@@ -446,6 +446,7 @@ void _send_friend_accept_tests()
 void _cleanup()
 {
   fprintf(stdout, " about to wipe db-clean!...");
+  fflush(stdout);
   sleep(10);
   tul_query(4,
       "delete from friend_list",
@@ -453,6 +454,7 @@ void _cleanup()
       "delete from message",
       "delete from user"
       );
+  tul_dbclean();
   TUL_SIGNAL_INT = 1;
 }
 

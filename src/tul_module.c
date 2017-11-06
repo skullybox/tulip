@@ -90,13 +90,14 @@ void module_read(tul_net_context *c)
 
       break;
     case LOGOUT:
-      sprintf(buff, "logout <<< %s", r.user);
+      sprintf(buff, " logout <<< %s", r.user);
       tul_log(buff);
+      c->_user_auth = 0;
       c->_teardown = 1;
       break;
     case GET_LIST:
       memcpy(&offset,&((char*)p.data)[30], sizeof(unsigned long long));
-      sprintf(buff, "getlist <<< %s", r.user);
+      sprintf(buff, " getlist <<< %s", r.user);
       tul_log(buff);
 
       do_get_list(r.user, &p, offset);
@@ -105,34 +106,34 @@ void module_read(tul_net_context *c)
     case ACCEPTFRIEND:
       if(!do_accept_friend(r.user, &p))
       {
-        sprintf(buff, "add friend >>> %s", r.user);
+        sprintf(buff, " add friend >>> %s", r.user);
         send_response(r.user, OK, c, NULL);
       }
       else
       {
-        sprintf(buff, "add friend error >>> %s", r.user);
+        sprintf(buff, " add friend error >>> %s", r.user);
         send_response(r.user, OK, c, NULL);
         send_response(r.user, INVALID, c, NULL);
       }
       break;
     case SEND_MSG:
-      sprintf(buff, "send msg <<< %s", r.user);
+      sprintf(buff, " send msg <<< %s", r.user);
       tul_log(buff);
       do_send_msg(r.user, &p);
       break;
     case GET_MSG:
-      sprintf(buff, "get msg <<< %s", r.user);
+      sprintf(buff, " get msg <<< %s", r.user);
       tul_log(buff);
       do_get_msg(r.user, &p);
       break;
     case GET_FREQ:
-      sprintf(buff, "fiend request <<< %s", r.user);
+      sprintf(buff, " fiend request <<< %s", r.user);
       tul_log(buff);
       do_get_addreq(r.user, &p);
       send_response(r.user, p.action, c, &p);
       break;
     case ADDFRIEND:
-      sprintf(buff, "add user <<< %s", r.user);
+      sprintf(buff, " add user <<< %s", r.user);
       tul_log(buff);
         if(!do_add_friend(r.user, &p))
           send_response(r.user, OK, c, NULL);
@@ -140,7 +141,7 @@ void module_read(tul_net_context *c)
           send_response(r.user, ERROR, c, NULL);
       break;
     case DELFRIEND:
-      sprintf(buff, "del friend <<< %s", r.user);
+      sprintf(buff, " del friend <<< %s", r.user);
       tul_log(buff);
       break;
     default:
