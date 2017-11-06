@@ -104,12 +104,11 @@ int email_exists(char *email)
  * 1 - uid taken
  * 2 - email taken
  * 3 - uid length
- * 4 - name length
- * 5 - email length
- * 6 - pass length
- * 7 - db error
+ * 4 - email length
+ * 5 - pass length
+ * 6 - db error
  */
-int create_user(char *uid, char *name, char *email, char *pass)
+int create_user(char *uid, char *email, char *pass)
 {
   RC5_ctx rc5;
   unsigned char *tmp = NULL;
@@ -128,12 +127,10 @@ int create_user(char *uid, char *name, char *email, char *pass)
     return 2;
   if(strlen(uid) < 3)
     return 3;
-  if(strlen(name) < 3)
-    return 4;
   if(strlen(email) < 5)
-    return 5;
+    return 4;
   if(strlen(pass) < 8)
-    return 6;
+    return 5;
 
 
   strncpy(_pass, pass, 16);
@@ -167,9 +164,9 @@ int create_user(char *uid, char *name, char *email, char *pass)
       uid, email, epass, salt);
 
   if(tul_query(1,SQL))
-    return 7;
+    return 6;
   if(!user_exists(uid))
-    return 7;
+    return 6;
 
   return 0;
 }

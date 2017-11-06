@@ -25,15 +25,14 @@ int main(int argc, char **argv)
   char ch = '0';
   char buff[17] = {0};
 
-  if(argc < 4)
+  if(argc < 3)
   {
     usage();
     return -1;
   }
 
   strncpy(uid, argv[1], 30);
-  strncpy(name, argv[2], 50);
-  strncpy(email, argv[3], 50);
+  strncpy(email, argv[2], 50);
 
   fprintf(stdout, "password: ");
   while(count < 17)
@@ -49,7 +48,7 @@ int main(int argc, char **argv)
 
   strncpy(pass, buff, 16);
   tul_dbinit();
-  ret = create_user(uid, name, email, pass);
+  ret = create_user(uid, email, pass);
 
   if(!ret)
   {
@@ -65,15 +64,14 @@ int main(int argc, char **argv)
 
 void usage()
 {
-    fprintf(stdout, "t_adduser <username> <name> <email>\n");
+    fprintf(stdout, "t_adduser <username> <email>\n");
     fprintf(stdout, "returns: \n");
     fprintf(stdout, "\t %s\n", "1 - uid taken");
     fprintf(stdout, "\t %s\n", "2 - email taken");
     fprintf(stdout, "\t %s\n", "3 - uid length");
-    fprintf(stdout, "\t %s\n", "4 - name length");
-    fprintf(stdout, "\t %s\n", "5 - email length");
-    fprintf(stdout, "\t %s\n", "6 - pass length");
-    fprintf(stdout, "\t %s\n", "7 - db error");
+    fprintf(stdout, "\t %s\n", "4 - email length");
+    fprintf(stdout, "\t %s\n", "5 - pass length");
+    fprintf(stdout, "\t %s\n", "6 - db error");
 
 }
 
