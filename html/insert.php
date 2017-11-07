@@ -4,7 +4,7 @@ include('session.php');
 include("config.php");
  
 // Escape user inputs for security
-$name = mysqli_real_escape_string($db, $_REQUEST['name']);
+$name = mysqli_real_escape_string($db, $_REQUEST['uname']);
 $password = mysqli_real_escape_string($db, $_REQUEST['password']);
 $salt = mysqli_real_escape_string($db, $_REQUEST['salt']);
 $email = mysqli_real_escape_string($db, $_REQUEST['email']);
@@ -32,7 +32,7 @@ if (empty($email)) {
 
  
 // attempt insert query execution
-$sql = "INSERT INTO user (name, password, salt, email) VALUES ('$name', '$password', '$salt', '$email')";
+$sql = "INSERT INTO user (uname, password, salt, email) VALUES ('$name', '$password', '$salt', '$email')";
 if(mysqli_query($db, $sql)){
     echo "Records added successfully.<br>";
     header("location: body.php");

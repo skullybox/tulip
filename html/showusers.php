@@ -26,14 +26,14 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "select name,email from user";
+$sql = "select uname,email from user";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // output data of each row
     echo "<table><tr><th>Name</th><th>email</th></tr>";
     while($row = $result->fetch_assoc()) {
-        $name = $row["name"];
+        $name = $row["uname"];
         $bgcolor = gray;
         if ($name == terry) { $bgcolor = lightgreen; }
         if ($name == irfan) { $bgcolor = red; }
