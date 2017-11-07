@@ -22,9 +22,11 @@ int user_exists(char *uid)
   char SQL[4096] = {0};
 
   sprintf(SQL,
-      "select uid from user where uname='%s'", uid);
+      "select uname from user where uname='%s'", uid);
 
   tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 0;
   row = mysql_num_rows(res);
   mysql_free_result(res);
 
@@ -47,6 +49,8 @@ int friend_in_list(char*uid, char *n_uid)
       n_uid);
 
   tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
   row = mysql_num_rows(res);
   mysql_free_result(res);
 
@@ -69,6 +73,8 @@ int friend_request_exists(char *uid, char *n_uid)
       n_uid);
 
   tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
   row = mysql_num_rows(res);
   mysql_free_result(res);
 
@@ -90,6 +96,8 @@ int email_exists(char *email)
       "select email from user where email='%s'", email);
 
   tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
   row = mysql_num_rows(res);
   mysql_free_result(res);
 
@@ -187,6 +195,8 @@ int get_user_pass(char *uid, char *pass, char *salt)
   sprintf(SQL, "select salt, password from user where uname='%s'", uid);
 
   ret = tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
   if(!ret)
     row = mysql_num_rows(res);
   if(!ret && row == 1)

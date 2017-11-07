@@ -222,7 +222,7 @@ void _tls_client_test_login()
 {
   int ret = 1;
   tul_net_context conn;
-  char uid[30] = "admin";
+  char uid[30] = "t_admin";
   char pass[16] = "tulip!2345";
 
   conn._use_tls = 1;
@@ -261,10 +261,10 @@ void _create_users()
 {
   int ret = 0; 
 
-  ret |= create_user("admin", "admin", "root@project-tulip.org", "tulip!2345");
-  ret |= create_user("tommychuckles", "tommy", "tommy@chuckles.ca", "chuckes123");
-  ret |= create_user("salma99", "salmahayek", "salma@latin.ca", "salma123");
-  ret |= create_user("tiacarrer", "tia", "tiaC@hotmail.ca", "tia12345");
+  ret |= create_user("t_admin", "root@project-tulip.org", "tulip!2345");
+  ret |= create_user("tommychuckles", "tommy@chuckles.ca", "chuckes123");
+  ret |= create_user("salma99", "salma@latin.ca", "salma123");
+  ret |= create_user("tiacarrer", "tiaC@hotmail.ca", "tia12345");
 
 
   if(ret)
@@ -280,7 +280,7 @@ void _create_friend_requests()
   tul_net_context conn;
   char *list = NULL;
   unsigned list_sz = 0;
-  char uid[30] = "admin";
+  char uid[30] = "t_admin";
   char pass[16] = "tulip!2345";
 
   conn._use_tls = 1;
@@ -326,7 +326,7 @@ void _test_get_friends()
   tul_net_context conn;
   char *list = NULL;
   unsigned list_sz = 0;
-  char uid[30] = "admin";
+  char uid[30] = "t_admin";
   char pass[16] = "tulip!2345";
 
   conn._use_tls = 1;
@@ -369,7 +369,7 @@ void _test_get_add_reqests()
   tul_net_context conn;
   char *list = NULL;
   unsigned list_sz = 0;
-  char uid[30] = "admin";
+  char uid[30] = "t_admin";
   char pass[16] = "tulip!2345";
 
   conn._use_tls = 1;
@@ -413,7 +413,7 @@ void _send_friend_accept_tests()
   tul_net_context conn;
   char *list = NULL;
   unsigned list_sz = 0;
-  char uid[30] = "admin";
+  char uid[30] = "t_admin";
   char pass[16] = "tulip!2345";
 
   conn._use_tls = 1;
@@ -445,14 +445,15 @@ void _send_friend_accept_tests()
 
 void _cleanup()
 {
-  fprintf(stdout, " about to wipe db-clean!...");
-  fflush(stdout);
   sleep(10);
-  tul_query(4,
-      "delete from friend_list",
-      "delete from friend_request",
-      "delete from message",
-      "delete from user"
+  tul_query(7,
+      "delete from friend_list where uname='t_admin'",
+      "delete from friend_request where uname='t_admin'",
+      "delete from message where uname='t_admin'",
+      "delete from user where uname = 'salma99'",
+      "delete from user where uname = 'tiacarrer'",
+      "delete from user where uname = 'tommychuckles'",
+      "delete from user where uname = 't_admin'"
       );
   tul_dbclean();
   TUL_SIGNAL_INT = 1;

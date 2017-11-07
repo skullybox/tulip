@@ -180,7 +180,6 @@ int do_get_addreq(char *user, comm_payload *p)
   if(res == NULL || mysql_num_rows(res) == 0)
   {
     /* send END */
-    mysql_free_result(res);
     p->action = END;
     p->data_sz = 0;
     if(p->data)
@@ -224,7 +223,8 @@ int do_get_addreq(char *user, comm_payload *p)
     p->action = END;
 
 GETADDRQ_END:
-  mysql_free_result(res);
+  if(res)
+    mysql_free_result(res);
   return 0;
 
 }
