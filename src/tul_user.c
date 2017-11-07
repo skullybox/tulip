@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "tul_b64.h"
 #include "tul_log.h"
-#include "tul_db.h"
+#include "tul_mysql.h"
 #include "tul_user.h"
 #include "tul_random.h"
 #include "rc5_cipher.h"
@@ -16,16 +16,19 @@
 unsigned char dbk[17]="sxUq##X~$ml/<|6.";
 int user_exists(char *uid)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
 
   sprintf(SQL,
-      "select uid from user where uid='%s'", uid);
+      "select uname from user where uname='%s'", uid);
 
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
+  tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 0;
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -35,18 +38,21 @@ int user_exists(char *uid)
 
 int friend_in_list(char*uid, char *n_uid)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
 
   sprintf(SQL, 
-      "select uid, friend from friend_list where uid='%s' and friend = '%s'",
+      "select uname, friend from friend_list where uname='%s' and friend = '%s'",
       uid, 
       n_uid);
 
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
+  tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -56,18 +62,21 @@ int friend_in_list(char*uid, char *n_uid)
 
 int friend_request_exists(char *uid, char *n_uid)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
 
   sprintf(SQL, 
-      "select uid, user_from from friend_request where uid='%s' and user_from = '%s'",
+      "select uname, user_from from friend_request where uname='%s' and user_from = '%s'",
       uid, 
       n_uid);
 
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
+  tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -78,7 +87,7 @@ int friend_request_exists(char *uid, char *n_uid)
 
 int email_exists(char *email)
 {
-  char ** res;
+  MYSQL_RES *res = NULL;
   int row = 0;
   int col = 0;
   char SQL[4096] = {0};
@@ -86,8 +95,11 @@ int email_exists(char *email)
   sprintf(SQL,
       "select email from user where email='%s'", email);
 
-  tul_query_get(SQL, &res, &row, &col);
-  sqlite3_free_table(res);
+  tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
+  row = mysql_num_rows(res);
+  mysql_free_result(res);
 
   if(row)
     return 1;
@@ -100,12 +112,11 @@ int email_exists(char *email)
  * 1 - uid taken
  * 2 - email taken
  * 3 - uid length
- * 4 - name length
- * 5 - email length
- * 6 - pass length
- * 7 - db error
+ * 4 - email length
+ * 5 - pass length
+ * 6 - db error
  */
-int create_user(char *uid, char *name, char *email, char *pass)
+int create_user(char *uid, char *email, char *pass)
 {
   RC5_ctx rc5;
   unsigned char *tmp = NULL;
@@ -124,12 +135,10 @@ int create_user(char *uid, char *name, char *email, char *pass)
     return 2;
   if(strlen(uid) < 3)
     return 3;
-  if(strlen(name) < 3)
-    return 4;
   if(strlen(email) < 5)
-    return 5;
+    return 4;
   if(strlen(pass) < 8)
-    return 6;
+    return 5;
 
 
   strncpy(_pass, pass, 16);
@@ -159,13 +168,13 @@ int create_user(char *uid, char *name, char *email, char *pass)
 
   /* store user
   */
-  sprintf(SQL, "BEGIN; insert into user(uid, name, email, password, salt) values ('%s', '%s', '%s','%s','%s'); COMMIT;",
-      uid, name, email, epass, salt);
+  sprintf(SQL, "insert into user(uname, email, password, salt) values ('%s', '%s', '%s','%s') ",
+      uid, email, epass, salt);
 
   if(tul_query(1,SQL))
-    return 7;
+    return 6;
   if(!user_exists(uid))
-    return 7;
+    return 6;
 
   return 0;
 }
@@ -179,20 +188,27 @@ int get_user_pass(char *uid, char *pass, char *salt)
   char SQL[4096] = {0};
   int col = 0;
   int row = 0;
-  char **res = NULL;
+  unsigned ret = 0;
+  MYSQL_RES *res;
+  MYSQL_ROW irow;
 
-  sprintf(SQL, "select salt, password from user where uid='%s'", uid);
+  sprintf(SQL, "select salt, password from user where uname='%s'", uid);
 
-  tul_query_get(SQL, &res, &row, &col);
-  if(row == 1)
+  ret = tul_query_get(SQL, &res);
+  if(res == NULL)
+    return 1;
+  if(!ret)
+    row = mysql_num_rows(res);
+  if(!ret && row == 1)
   {
-    strcpy(salt, res[col]);
-    strcpy(pass, res[col+1]);
-    sqlite3_free_table(res);
+    irow = mysql_fetch_row(res);
+    strcpy(salt, irow[0]);
+    strcpy(pass, irow[1]);
+    mysql_free_result(res);
     return 0;
   }
 
-  sqlite3_free_table(res);
+  mysql_free_result(res);
   return 1;
 }
 

@@ -29,6 +29,9 @@ void run_tests()
   _send_friend_accept_tests();
   _test_get_friends();
 
+  tul_log("\n clean-up...\n");
+  _cleanup();
+
   tul_log("\n waiting 10s for threads ...\n");
   sleep(10);
 

@@ -4,7 +4,7 @@
  **/
 
 #include "tulip.h"
-#include "tul_db.h"
+#include "tul_mysql.h"
 #include "tul_log.h"
 #include "tul_module.h"
 #include "tul_daemon.h"

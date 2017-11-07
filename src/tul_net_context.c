@@ -161,7 +161,7 @@ void tul_dest_context_list()
 
   /* find the end of the list */
 CHECK_LIST:
-  while(cur->next != NULL)
+  while(cur != NULL && cur->next != NULL)
   {
     tmp = cur;
     cur = cur->next;
