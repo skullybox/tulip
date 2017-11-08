@@ -31,6 +31,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_ctr_drbg_init( &(c->ctr_drbg) );
   mbedtls_pk_init( &(c->pkey) );
   mbedtls_entropy_init( &(c->entropy) );
+  mbedtls_net_set_nonblock(&(c->server_fd));
 
   ret = mbedtls_ctr_drbg_seed( &(c->ctr_drbg), 
       mbedtls_entropy_func, &(c->entropy),
@@ -64,8 +65,6 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   ret = mbedtls_net_connect( &(c->server_fd), 
       c->host, buff, MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
-
-  mbedtls_net_set_nonblock(&(c->server_fd));
 
 #if defined(MBEDTLS_SSL_CACHE_C)
   mbedtls_ssl_conf_session_cache( &(c->conf), &(c->cache),

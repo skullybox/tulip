@@ -470,6 +470,8 @@ int client_recieve(tul_net_context *conn)
 
     if(conn->_use_tls)
     {
+
+      mbedtls_net_set_nonblock(&(conn->tls.server_fd));
       if(conn->_ttrecv == 0)
         bread = tls_read(&(conn->tls),
             &(conn->payload_in[conn->_trecv]),
