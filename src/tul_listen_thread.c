@@ -208,6 +208,7 @@ void do_read(int i, int tls)
     if(bread == -1)
     {
 DO_READ_CLOSE:
+      close(i);
       FD_CLR(i, &active_set);
       tul_rem_context(i);
     }
@@ -279,6 +280,7 @@ void do_write(int i, int tls)
   if(ctx->_teardown)
   {
 DO_WRITE_CLOSE:
+    close(i);
     FD_CLR(i, &active_set);
     tul_rem_context(i);
   }

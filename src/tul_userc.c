@@ -502,11 +502,11 @@ int client_recieve(tul_net_context *conn)
       }
     }
 
-    /* 300ms timeout */
+    /* 12s timeout */
     if(bread <= 0)
     {
       current_time = clock() - last_transmission;
-      if( current_time/3000 )
+      if( current_time/12000 > 0)
         break;
     }
 

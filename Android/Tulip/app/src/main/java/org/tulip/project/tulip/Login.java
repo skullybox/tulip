@@ -1,5 +1,6 @@
 package org.tulip.project.tulip;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,7 +26,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         Button btn = (Button) findViewById(R.id.t_signin);
-        btn.setOnClickListener(new View.OnClickListener(){
+        btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -40,11 +41,22 @@ public class Login extends AppCompatActivity {
                 pass = password.getText().toString();
                 ret = ClientLogin(user, pass);
 
+                if (ret == 0) {
+                    username.setText("");
+                    password.setText("");
+
+                    TulipSession.user = user;
+                    TulipSession.password = pass;
+                    user = "";
+                    pass = "";
+
+                    startActivity(new Intent(Login.this, MainActivity.class));
+                }
+
             }
         });
 
     }
-
 
 
     /**
