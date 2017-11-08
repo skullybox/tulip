@@ -591,7 +591,10 @@ int client_get_ok(tul_net_context *conn, char *pass)
     ret |= verify_client_payload(conn, &r, &p, pass);
 
   if(p.data)
+  {
     free(p.data);
+    p.data = NULL;
+  }
 
   if(ret)
     return ret;

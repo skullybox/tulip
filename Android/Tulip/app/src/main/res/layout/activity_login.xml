@@ -4,25 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="22dp"
+    android:layout_margin="5dp"
     android:background="@android:color/background_light"
     tools:context="org.tulip.project.tulip.Login">
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="362dp"
-        android:layout_height="489dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:background="@android:color/background_light"
         android:orientation="vertical"
-        android:paddingTop="22dp"
-        tools:layout_editor_absoluteX="14dp"
-        tools:layout_editor_absoluteY="-10dp"
-        tools:ignore="MissingConstraints">
+        android:padding="11dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="-10dp">
 
         <EditText
             android:id="@+id/tx_user"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:ems="10"
             android:hint="Username"
             android:inputType="textPersonName"
@@ -48,7 +50,7 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
-            android:layout_height="282dp"
+            android:layout_height="wrap_content"
             android:baselineAlignBottom="false"
             android:paddingBottom="22dp"
             android:paddingEnd="22dp"
@@ -61,7 +63,7 @@
 
         <Button
             android:id="@+id/t_signin"
-            android:layout_width="337dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Sign In"
             android:textAlignment="center" />
