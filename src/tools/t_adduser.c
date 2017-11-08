@@ -17,7 +17,6 @@ int main(int argc, char **argv)
 {
 
   char uid[30] = {0};
-  char name[51] = {0};
   char email[51] = {0};
   char pass[17] = {0};
   int ret = 0;
@@ -52,10 +51,10 @@ int main(int argc, char **argv)
 
   if(!ret)
   {
-    fprintf(stdout, "Created user: %s (%s)\n", uid, name);
+    fprintf(stdout, "Created user: %s \n", uid);
   }
   else {
-    fprintf(stderr, "Error creating user: %s (%s)\n", uid, name);
+    fprintf(stderr, "Error creating user: %s \n", uid);
   }
 
   return ret;
