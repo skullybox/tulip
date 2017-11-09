@@ -88,13 +88,13 @@ void *_run_listener(void *data)
 void _run_core(int fd, int tls)
 {
   int ret = 0;
-  int ref_sock;
   int fd_new;
   socklen_t size;
   struct sockaddr_in client;
   int efd = epoll_create1 (0);
   struct epoll_event event;
   struct epoll_event *events;
+  tul_net_context *t = NULL;
   
   if(efd == -1)
   {
@@ -137,7 +137,12 @@ void _run_core(int fd, int tls)
           (events[i].events & EPOLLHUP) ||
           (!(events[i].events & EPOLLIN)))
       {
-        close (events[i].data.fd);
+
+        t = tul_find_context(events[i].data.fd);
+        if(t)
+          tul_rem_context(events[i].data.fd);
+        else
+          close (events[i].data.fd);
         continue;
       }
       else if(fd == events[i].data.fd)
@@ -156,15 +161,13 @@ void _run_core(int fd, int tls)
         epoll_ctl(efd, EPOLL_CTL_ADD, fd_new, &event);
       }
       else {
-        if(FD_ISSET(ref_sock, &read_fd_set))
-        {
-          do_read(ref_sock, tls);
-        }
-        if(FD_ISSET(ref_sock, &write_fd_set))
-        {
-          do_write(ref_sock, tls);
-        }
+        do_read(events[i].data.fd, tls);
 
+        t = tul_find_context(events[i].data.fd);
+        if(t && t->_ttsend)
+        {
+          do_write(events[i].data.fd, tls);
+        }
       }
     }
   }
