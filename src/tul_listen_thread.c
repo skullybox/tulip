@@ -91,6 +91,7 @@ void _run_core(int fd, int tls)
   int fd_new;
   socklen_t size;
   struct sockaddr_in client;
+  struct timeval tm;
 
   size = sizeof(client);
 
@@ -108,7 +109,9 @@ void _run_core(int fd, int tls)
   {
     read_fd_set = active_set;
     write_fd_set = active_set;
-    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
+    tm.tv_sec = 15;
+    tm.tv_usec = 0;
+    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, &tm) < 0)
     {
       TUL_SIGNAL_INT = 1;
       return;
