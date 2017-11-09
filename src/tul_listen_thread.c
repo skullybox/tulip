@@ -11,6 +11,7 @@
 #include "tul_tcp_soc.h"
 #include "tul_globals.h"
 #include "tul_listen_thread.h"
+#include <sys/epoll.h>
 
 extern int TUL_SIGNAL_INT;
 extern int daemon_mode;
@@ -91,7 +92,29 @@ void _run_core(int fd, int tls)
   int fd_new;
   socklen_t size;
   struct sockaddr_in client;
-  struct timeval tm;
+  int efd = epoll_create1 (0);
+  struct epoll_event event;
+  struct epoll_event *events;
+  
+  if(efd == -1)
+  {
+    tul_log("epoll - system error!");
+    TUL_SIGNAL_INT = 1;
+    return;
+  }
+
+  event.data.fd = fd;
+  event.events = EPOLLIN|EPOLLET;
+
+  ret = epoll_ctl (efd, EPOLL_CTL_ADD, fd, &event);
+  if(ret == -1)
+  {
+    tul_log("epoll_ctl - system error!");
+    TUL_SIGNAL_INT = 1;
+    return;
+  }
+
+  events = calloc (55096, sizeof event);
 
   size = sizeof(client);
 
@@ -100,37 +123,24 @@ void _run_core(int fd, int tls)
   if(tls && fd != tls_serv.server_fd.fd)
     tls_serv.server_fd.fd = fd;
 
-  FD_ZERO(&read_fd_set);
-  FD_ZERO(&write_fd_set);
-  FD_SET(fd, &active_set);
-
   /* main loop of thread */
   while(!TUL_SIGNAL_INT)
   {
-    read_fd_set = active_set;
-    write_fd_set = active_set;
-    tm.tv_sec = 15;
-    tm.tv_usec = 0;
-    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, &tm) < 0)
-    {
-      TUL_SIGNAL_INT = 1;
-      return;
-    }
+    int n = 0;
 
-    for(int i = 0; i < FD_SETSIZE; ++i)
-    {
-      if( i == 0 )
-      {
-        ref_sock = fd;
-      }
-      else
-      {
-        ref_sock = tul_get_sock(i);
-        if(ref_sock == -1)
-          continue;
-      }
+    n = epoll_wait(efd, events, 55096, -1);
 
-      if(FD_ISSET(ref_sock, &read_fd_set) && ref_sock == fd )
+    for(int i = 0; i < n; ++i)
+    {
+
+      if ((events[i].events & EPOLLERR) ||
+          (events[i].events & EPOLLHUP) ||
+          (!(events[i].events & EPOLLIN)))
+      {
+        close (events[i].data.fd);
+        continue;
+      }
+      else if(fd == events[i].data.fd)
       {
         /* new socket */
         fd_new = accept(fd, (struct sockaddr *)&client, &size);
@@ -140,8 +150,10 @@ void _run_core(int fd, int tls)
           TUL_SIGNAL_INT=1;
           return;
         }
-        FD_SET(fd_new, &active_set);
         ret = tul_add_context(fd_new, tls);
+        event.data.fd = fd_new;
+        event.events = EPOLLIN|EPOLLET;
+        epoll_ctl(efd, EPOLL_CTL_ADD, fd_new, &event);
       }
       else {
         if(FD_ISSET(ref_sock, &read_fd_set))
