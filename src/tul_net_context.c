@@ -96,7 +96,7 @@ int tul_get_sock(unsigned pos)
 
   for( int i = 0; i < pos; i++)
   {
-    if(cur->next != NULL)
+    if(cur != NULL && cur->next != NULL)
     {
       cur = cur->next;
       count++;
