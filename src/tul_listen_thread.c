@@ -91,7 +91,6 @@ void _run_core(int fd, int tls)
   int fd_new;
   socklen_t size;
   struct sockaddr_in client;
-  struct timeval tm;
 
   size = sizeof(client);
 
@@ -109,9 +108,7 @@ void _run_core(int fd, int tls)
   {
     read_fd_set = active_set;
     write_fd_set = active_set;
-    tm.tv_sec = 15;
-    tm.tv_usec = 0;
-    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, &tm) < 0)
+    if (select (FD_SETSIZE, &read_fd_set, &write_fd_set, NULL, NULL) < 0)
     {
       TUL_SIGNAL_INT = 1;
       return;
@@ -185,6 +182,7 @@ void do_read(int i, int tls)
     {
       if(!(tls_ctx->handshake_done))
       {
+        mbedtls_net_set_nonblock(&(tls_ctx->server_fd));
         int ret = mbedtls_ssl_handshake(&(tls_ctx->ssl));
         if(ret ==  MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_READ)
         {
@@ -201,9 +199,13 @@ void do_read(int i, int tls)
 
       }
       if(ctx->_trecv < DEF_SOCK_BUFF_SIZE)
+      {
+        mbedtls_net_set_nonblock(&(tls_ctx->server_fd));
         bread = tls_read(tls_ctx,
             &(ctx->payload_in[ctx->_trecv]),
             DEF_SOCK_BUFF_SIZE-ctx->_trecv);
+        mbedtls_net_set_block(&(tls_ctx->server_fd));
+    }
     }
 
 
@@ -254,9 +256,11 @@ void do_write(int i, int tls)
       }
       else if(tls_ctx->handshake_done)
       {
+        mbedtls_net_set_nonblock(&(tls_ctx->server_fd));
         bwrite = tls_write(tls_ctx,
             &(ctx->payload_out[ctx->_tsend]),
             ctx->_ttsend-ctx->_tsend);
+        mbedtls_net_set_block(&(tls_ctx->server_fd));
       }
 
       if(bwrite == -1)
