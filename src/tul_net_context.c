@@ -82,6 +82,7 @@ int tul_add_context(unsigned sock, int tls)
       }
       else {
         new->_this->tls.handshake_done = 1;
+        mbedtls_net_set_block(&(new->_this->tls.server_fd));
       }
     }
   }
