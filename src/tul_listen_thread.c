@@ -143,13 +143,16 @@ void _run_core(int fd, int tls)
         FD_SET(fd_new, &active_set);
         ret = tul_add_context(fd_new, tls);
       }
-      else if(FD_ISSET(ref_sock, &read_fd_set))
-      {
-        do_read(ref_sock, tls);
-      }
-      else if(FD_ISSET(ref_sock, &write_fd_set))
-      {
-        do_write(ref_sock, tls);
+      else {
+        if(FD_ISSET(ref_sock, &read_fd_set))
+        {
+          do_read(ref_sock, tls);
+        }
+        if(FD_ISSET(ref_sock, &write_fd_set))
+        {
+          do_write(ref_sock, tls);
+        }
+
       }
     }
   }
