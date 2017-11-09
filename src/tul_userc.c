@@ -506,16 +506,14 @@ int client_recieve(tul_net_context *conn)
     if(bread <= 0)
     {
       current_time = clock() - last_transmission;
-      if( current_time/12000 > 0)
+      if( current_time/CLOCKS_PER_SEC > 12)
         break;
     }
 
   }
 
   if(conn->_trecv < conn->_ttrecv || conn->_ttrecv == 0)
-  {
     return -1;
-  }
   else
     return 0;
 

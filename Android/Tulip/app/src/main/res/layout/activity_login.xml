@@ -29,6 +29,8 @@
             android:hint="Username"
             android:inputType="textPersonName"
             android:paddingTop="22dp"
+            android:textColorLink="@android:color/darker_gray"
+            android:typeface="monospace"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -43,6 +45,9 @@
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingTop="22dp"
+            android:singleLine="false"
+            android:textColorLink="@android:color/darker_gray"
+            android:typeface="monospace"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             tools:layout_editor_absoluteY="64dp" />

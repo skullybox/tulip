@@ -83,6 +83,7 @@ void module_read(tul_net_context *c)
       }
       else {
         /* this should not happen!
+         * failed logins drop the connection above
          * send INVALID
          */
         send_response(r.user, INVALID, c, NULL);
