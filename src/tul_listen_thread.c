@@ -157,7 +157,7 @@ void _run_core(int fd, int tls)
         }
         ret = tul_add_context(fd_new, tls);
         event.data.fd = fd_new;
-        event.events = EPOLLIN|EPOLLET;
+        event.events = EPOLLIN|EPOLLET|EPOLLRDHUP;
         epoll_ctl(efd, EPOLL_CTL_ADD, fd_new, &event);
       }
       else {
@@ -167,6 +167,15 @@ void _run_core(int fd, int tls)
         if(t && t->_ttsend)
         {
           do_write(events[i].data.fd, tls);
+        }
+
+        /* close off stale connections */
+        if(t && (time(NULL) - t->timestamp) > 120)
+        {
+          event.data.fd = events[i].data.fd;
+          event.events = EPOLLIN|EPOLLET;
+          epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
+          tul_rem_context(events[i].data.fd);
         }
       }
     }
@@ -179,6 +188,8 @@ void do_read(int i, int tls)
   int bread = 0;
   tul_net_context *ctx;
   tul_tls_ctx *tls_ctx;
+  struct epoll_event event;
+  int efd = epoll_create1 (0);
 
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
@@ -226,11 +237,12 @@ void do_read(int i, int tls)
 
 
     /* socket closed */
-    if(bread == -1)
+    if(bread == -1 || bread == 0)
     {
 DO_READ_CLOSE:
-      close(i);
-      FD_CLR(i, &active_set);
+      event.data.fd = i;
+      event.events = EPOLLIN|EPOLLET;
+      epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
       tul_rem_context(i);
     }
     else if(bread > 0)
@@ -252,6 +264,8 @@ void do_write(int i, int tls)
   int bwrite = 0;
   tul_net_context *ctx;
   tul_tls_ctx *tls_ctx;
+  struct epoll_event event;
+  int efd = epoll_create1 (0);
 
   ctx = tul_find_context(i);
   tls_ctx = &(ctx->tls);
@@ -301,8 +315,9 @@ void do_write(int i, int tls)
   if(ctx->_teardown)
   {
 DO_WRITE_CLOSE:
-    close(i);
-    FD_CLR(i, &active_set);
+    event.data.fd = i;
+    event.events = EPOLLIN|EPOLLET;
+    epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
     tul_rem_context(i);
   }
 }

@@ -38,6 +38,7 @@ int tul_add_context(unsigned sock, int tls)
     {
       cur->_this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       cur->_this->_sock = sock;
+      cur->_this->timestamp = time(NULL);
       new = cur;
     }
     else
@@ -45,6 +46,7 @@ int tul_add_context(unsigned sock, int tls)
       new = (_tul_int_context_struct *)calloc(1, sizeof(_tul_int_context_struct));
       new->_this = (tul_net_context*)calloc(1, sizeof(tul_net_context));
       new->_this->_sock = sock;
+      new->_this->timestamp = time(NULL);
       cur->next = new;
     }
 
