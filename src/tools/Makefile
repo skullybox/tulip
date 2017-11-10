@@ -9,6 +9,13 @@ deps := ../tul_user.c ../tul_random.c ../tul_b64.c ../tul_log.c ../tul_mysql.c .
 
 all: add_user
 
-add_user: 
+add_user: sql
 	${C} ${cflgs} t_adduser.c ${deps} -o t_adduser ${libs}
+
+sql:
+	if [ ! -d "../mysql/mysql-connector-c-6.1.10-src" ]; then \
+		tar zxf "../mysql/mysql-connector-c-6.1.10-src.tar.gz" -C "../mysql";\
+		cd "../mysql/mysql-connector-c-6.1.10-src" && cmake . && ${MAKE};\
+	fi
+
 
