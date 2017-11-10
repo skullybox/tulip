@@ -18,6 +18,7 @@ extern tul_read_callback tul_RD_callback;
 extern tul_write_callback tul_WR_callback;
 
 /* forward declarations */
+int do_ignore_friend(char *user, comm_payload *p);
 int do_login(char *user, comm_payload *p);
 int send_response(char *u, unsigned s, tul_net_context *c, comm_payload *_p);
 int do_get_msg(char *user, comm_payload *p);
@@ -140,6 +141,9 @@ void module_read(tul_net_context *c)
           send_response(r.user, OK, c, NULL);
         else 
           send_response(r.user, ERROR, c, NULL);
+      break;
+    case IGNOREFRIEND:
+      do_ignore_friend(r.user, &p);
       break;
     case DELFRIEND:
       sprintf(buff, " del friend <<< %s", r.user);
@@ -322,8 +326,10 @@ int do_accept_friend(char *user, comm_payload *p)
 {
   char SQL1[4096] = {0};
   char SQL2[4096] = {0};
+  char SQL3[4096] = {0};
   char uid[30] = {0};
   char t_uid[30] = {0};
+  unsigned ret = 0;
 
   strncpy(uid, user, 30);
   if(p->data_sz == 32)
@@ -334,17 +340,43 @@ int do_accept_friend(char *user, comm_payload *p)
   if(!friend_request_exists(user, t_uid))
     return -1;
 
-  if(friend_in_list(user, t_uid))
-    return 0;
+  if(!friend_in_list(user, t_uid))
+  {
+    sprintf(SQL1, "insert into friend_list(uname, friend) values ('%s', '%s')", 
+        uid, t_uid); 
+    ret |= tul_query(1, SQL1);
+  }
 
-  sprintf(SQL1, "insert into friend_list(uname, friend) values ('%s', '%s')", 
+  if(!friend_in_list(t_uid, user))
+  {
+    sprintf(SQL2, "insert into friend_list(uname, friend) values ('%s', '%s')", 
+        t_uid, uid); 
+    ret |= tul_query(1, SQL2);
+  }
+
+  sprintf(SQL3, "delete from friend_request where uname='%s' and user_from='%s'",
       uid, t_uid); 
 
-  sprintf(SQL2, "delete from friend_request where uname='%s' and user_from='%s'",
+  ret |= tul_query(1, SQL3);
+  return ret;
+
+}
+
+int do_ignore_friend(char *user, comm_payload *p)
+{
+  char SQL[2048] = {0};
+  char uid[30] = {0};
+  char t_uid[30] = {0};
+
+  strncpy(uid, user, 30);
+  if(p->data_sz == 32)
+    strncpy(t_uid, p->data, 30);
+  else 
+    return -1;
+
+  sprintf(SQL, "delete from friend_request where uname='%s' and user_from='%s'", 
       uid, t_uid); 
-
-  return tul_query(2, SQL1, SQL2);
-
+  return tul_query(1, SQL);
 }
 
 int do_add_friend(char *user, comm_payload *p)
@@ -362,9 +394,16 @@ int do_add_friend(char *user, comm_payload *p)
   if(!user_exists(t_uid))
     return -1;
 
+  if(friend_in_list(uid, t_uid))
+    return -1;
+
   sprintf(SQL, "insert into friend_request(uname, user_from) values ('%s', '%s')", 
       uid, t_uid); 
-  return tul_query(1, SQL);
+  
+  if(!friend_request_exists(uid, t_uid))
+    return tul_query(1, SQL);
+  else 
+    return -1;
 }
 
 int do_rem_friend(char *user, comm_payload *p)

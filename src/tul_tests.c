@@ -446,7 +446,8 @@ void _send_friend_accept_tests()
 void _cleanup()
 {
   sleep(10);
-  tul_query(7,
+  tul_query(8,
+      "delete from friend_list where friend='t_admin'",
       "delete from friend_list where uname='t_admin'",
       "delete from friend_request where uname='t_admin'",
       "delete from message where uname='t_admin'",

@@ -55,6 +55,7 @@ enum actions
     GET_FREQ,
     ADDFRIEND, /* friend request */
     ACCEPTFRIEND,
+    IGNOREFRIEND,
     DELFRIEND,
     RESPONSE   /* indicates status payload */
 };
