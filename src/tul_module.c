@@ -128,7 +128,7 @@ void module_read(tul_net_context *c)
       do_get_msg(r.user, &p);
       break;
     case GET_FREQ:
-      sprintf(buff, " fiend request <<< %s", r.user);
+      sprintf(buff, " friend request <<< %s", r.user);
       tul_log(buff);
       do_get_addreq(r.user, &p);
       send_response(r.user, p.action, c, &p);
