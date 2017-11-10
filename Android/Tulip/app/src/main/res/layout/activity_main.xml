@@ -6,18 +6,9 @@
     android:layout_height="match_parent"
     tools:context="org.tulip.project.tulip.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/background_light"
-        android:orientation="vertical"
-        android:padding="11dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="-10dp">
-
-    </LinearLayout>
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
 </android.support.constraint.ConstraintLayout>

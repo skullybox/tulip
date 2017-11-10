@@ -26,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:ems="10"
+            android:fontFamily="sans-serif-condensed"
             android:hint="Username"
             android:inputType="textPersonName"
             android:paddingTop="22dp"
@@ -42,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:fontFamily="sans-serif-condensed"
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingTop="22dp"
@@ -70,6 +72,7 @@
             android:id="@+id/t_signin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
             android:text="Sign In"
             android:textAlignment="center" />
     </LinearLayout>
