@@ -26,6 +26,7 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         Button btn = (Button) findViewById(R.id.t_signin);
+
         btn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -33,6 +34,8 @@ public class Login extends AppCompatActivity {
                 int ret = 0;
                 String user = "";
                 String pass = "";
+
+                v.setEnabled(false);
 
                 EditText username = (EditText) findViewById(R.id.tx_user);
                 EditText password = (EditText) findViewById(R.id.tx_password);
@@ -52,6 +55,7 @@ public class Login extends AppCompatActivity {
 
                     startActivity(new Intent(Login.this, MainActivity.class));
                 }
+                v.setEnabled(true);
 
             }
         });
