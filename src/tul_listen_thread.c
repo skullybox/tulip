@@ -169,17 +169,15 @@ void _run_core(int fd, int tls)
           do_write(events[i].data.fd, tls);
         }
 
-        /* close off stale connections */
-        /* disabling this for now as this should
-         * be detected by epoll.
-        if(t && (time(NULL) - t->timestamp) > 120)
-        {
-          event.data.fd = events[i].data.fd;
-          event.events = EPOLLIN|EPOLLET;
-          epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
-          tul_rem_context(events[i].data.fd);
-        }
-        */
+      }
+
+      /* close off stale connections */
+      if(t && (time(NULL) - t->timestamp) > 120)
+      {
+        event.data.fd = events[i].data.fd;
+        event.events = EPOLLIN|EPOLLET;
+        epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
+        tul_rem_context(events[i].data.fd);
       }
     }
   }
