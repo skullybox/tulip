@@ -70,6 +70,9 @@ int tul_dbinit()
         conn_pool[i] = NULL;
         ret = 1;
       }
+
+      my_bool reconnect = 1;
+      mysql_options(conn_pool[i], MYSQL_OPT_RECONNECT, &reconnect);
     }
 
   }
