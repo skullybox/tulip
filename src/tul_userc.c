@@ -132,33 +132,30 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   /* data size with encryption
    * block size into account
    */
-  if((strlen(uid)+1)%16)
+   if((strlen(_uid)+1)%16)
   {
-    p.data_sz = strlen(uid)+1+16;
+    p.data_sz = 16*((strlen(_uid)+1)/16)+16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(strlen(uid)+1+16, 1);
+    p.data = calloc(p.data_sz, 1);
   }
   else
   {
-    p.data_sz = strlen(uid)+1;
+    p.data_sz = ((strlen(_uid)+1)/16)*16;
     PAYLOAD_CHECK_SZ;
-    p.data = calloc(strlen(uid)+1,1);
+    p.data = calloc(p.data_sz,1);
   }
 
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
   /* data stores uid as part of
-   * payload to confirm logout
+   * payload to confirm login
    */
   strcpy(p.data, _uid);
 
-  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
+  prep_transmission(_uid, _pass, &r, &p, conn);
 
   if(p.data)
     free(p.data);
-  if(ret)
-    return ret;
-
   return 0;
 }
 
