@@ -160,6 +160,14 @@ void _run_core(int fd, int tls)
         event.events = EPOLLIN|EPOLLET|EPOLLRDHUP|EPOLLHUP|EPOLLERR;
         epoll_ctl(efd, EPOLL_CTL_ADD, fd_new, &event);
       }
+      else if(events[i].events & EPOLLERR || events[i].events & EPOLLRDHUP || events[i].events & EPOLLHUP )
+      {
+        tul_log("client socket HUP");
+        event.data.fd = events[i].data.fd;
+        event.events = EPOLLIN|EPOLLET;
+        epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
+        tul_rem_context(events[i].data.fd);
+      }
       else {
         do_read(events[i].data.fd, tls);
 
