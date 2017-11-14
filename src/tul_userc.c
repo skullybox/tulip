@@ -37,7 +37,7 @@ int client_login(char *uid, char *pass, tul_net_context *conn)
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
 
-  strncpy(r.user, uid, 30);
+  strncpy(r.user, _uid, 30);
 
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);
@@ -254,7 +254,7 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
    */
   strcpy(p.data, _tuid);
 
-  int ret = prep_transmission(_uid, pass, &r, &p, conn);
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
   if(ret)
     goto FRIEND_REQ_ERROR;
 
