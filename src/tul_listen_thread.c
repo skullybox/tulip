@@ -128,7 +128,7 @@ void _run_core(int fd, int tls)
   {
     int n = 0;
 
-    n = epoll_wait(efd, events, 55096, -1);
+    n = epoll_wait(efd, events, 55096, 5000);
 
     for(int i = 0; i < n; ++i)
     {
@@ -172,7 +172,7 @@ void _run_core(int fd, int tls)
       }
 
       /* close off stale connections */
-      if(t && (time(NULL) - t->timestamp) > 120)
+      if(t && (time(NULL) - t->timestamp) > 120 || t->_teardown)
       {
         event.data.fd = events[i].data.fd;
         event.events = EPOLLIN|EPOLLET;
