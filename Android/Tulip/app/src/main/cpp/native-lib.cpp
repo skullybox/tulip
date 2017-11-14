@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include <vector>
 #include "tul_userc.h"
 #include "tul_tls_client.h"
 #include "tul_tls_common.h"
@@ -73,21 +74,32 @@ Java_org_tulip_project_tulip_MainActivity_GetList(JNIEnv *env, jobject instance,
     char *list = NULL;
     char t_str[30] = {0};
     unsigned list_sz = 0;
-    ret = (jobjectArray) env->NewObjectArray(500,
-                                             env->FindClass("java/lang/String"),
-                                             env->NewStringUTF(""));
+    std::vector <std::string> vlist;
+    std::vector <std::string> :: iterator i;
     client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, 0);
 
-    while (list_sz > 0 && count < 500) {
+    while (list_sz > 0 ) {
         count += list_sz;
         memcpy(&offset, list, 8);
         for (int i = 0; i < 30 * list_sz; i += 30) {
-            if (count + ((i + 30) / 30) < 500) {
+            if (count + ((i + 30) / 30) < 200) {
                 memcpy(t_str, &list[8 + i], 30);
-                env->SetObjectArrayElement(ret, (count + (i + 30) / 30), env->NewStringUTF(t_str));
+                vlist.push_back(std::string(t_str));
             }
         }
         client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, offset);
+    }
+
+    ret = (jobjectArray) env->NewObjectArray(vlist.size(),
+                                             env->FindClass("java/lang/String"),
+                                             env->NewStringUTF(""));
+
+    count = 0;
+    for( i = vlist.begin(); i!= vlist.end(); ++i)
+    {
+        env->SetObjectArrayElement(ret, count,
+                                   env->NewStringUTF(i->c_str()));
+        count ++;
     }
 
     env->ReleaseStringUTFChars(user_, user);
