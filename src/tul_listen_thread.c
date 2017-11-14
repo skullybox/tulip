@@ -172,7 +172,7 @@ void _run_core(int fd, int tls)
       }
 
       /* close off stale connections */
-      if(t && (time(NULL) - t->timestamp) > 120 || t->_teardown)
+      if(t && (time(NULL) - t->timestamp) > 120 ||  (t && t->_teardown))
       {
         event.data.fd = events[i].data.fd;
         event.events = EPOLLIN|EPOLLET;
