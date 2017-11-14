@@ -140,7 +140,10 @@ Java_org_tulip_project_tulip_MainActivity_FriendRequest(JNIEnv *env, jobject ins
     const char *pass = env->GetStringUTFChars(pass_, 0);
     const char *request = env->GetStringUTFChars(request_, 0);
 
-    client_friend_req((char*)user, (char*)request, (char*)pass, conn);
+    int ret = 0;
+
+    ret |= client_friend_req((char*)user, (char*)request, (char*)pass, conn);
+    ret |= client_recieve(conn);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
