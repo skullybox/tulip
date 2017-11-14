@@ -172,6 +172,7 @@ void _run_core(int fd, int tls)
       }
 
       /* close off stale connections */
+      t = tul_find_context(events[i].data.fd);
       if(t && (time(NULL) - t->timestamp) > 120 ||  (t && t->_teardown))
       {
         event.data.fd = events[i].data.fd;
