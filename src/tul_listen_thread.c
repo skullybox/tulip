@@ -160,23 +160,22 @@ void _run_core(int fd, int tls)
         event.events = EPOLLIN|EPOLLET|EPOLLRDHUP|EPOLLHUP|EPOLLERR;
         epoll_ctl(efd, EPOLL_CTL_ADD, fd_new, &event);
       }
-      else if(events[i].events & EPOLLERR || events[i].events & EPOLLRDHUP || events[i].events & EPOLLHUP )
-      {
-        tul_log("client socket HUP");
-        event.data.fd = events[i].data.fd;
-        event.events = EPOLLIN|EPOLLET;
-        epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
-        tul_rem_context(events[i].data.fd);
-      }
       else {
+        t = tul_find_context(events[i].data.fd);
         do_read(events[i].data.fd, tls);
 
-        t = tul_find_context(events[i].data.fd);
-        if(t && t->_ttsend)
+        if(events[i].events & EPOLLERR || events[i].events & EPOLLRDHUP || events[i].events & EPOLLHUP )
+        {
+          tul_log("client socket HUP");
+          event.data.fd = events[i].data.fd;
+          event.events = EPOLLIN|EPOLLET;
+          epoll_ctl(efd, EPOLL_CTL_DEL, event.data.fd, &event);
+          tul_rem_context(events[i].data.fd);
+        }
+        else if(t && t->_ttsend)
         {
           do_write(events[i].data.fd, tls);
         }
-
       }
 
       /* close off stale connections */
