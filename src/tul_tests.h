@@ -21,6 +21,7 @@ void _test_get_add_reqests();
 void _test_get_friends();
 void _create_friend_requests();
 void _send_friend_accept_tests();
+void _login_logout_test();
 void _cleanup();
 
 #endif
