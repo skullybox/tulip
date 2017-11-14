@@ -157,7 +157,7 @@ void _run_core(int fd, int tls)
         }
         ret = tul_add_context(fd_new, tls);
         event.data.fd = fd_new;
-        event.events = EPOLLIN|EPOLLET|EPOLLRDHUP;
+        event.events = EPOLLIN|EPOLLET|EPOLLRDHUP|EPOLLHUP;
         epoll_ctl(efd, EPOLL_CTL_ADD, fd_new, &event);
       }
       else {
