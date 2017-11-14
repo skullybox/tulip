@@ -24,6 +24,7 @@ void run_tests()
   _tls_server_test();
   _create_users();
   _tls_client_test_login();
+  _login_logout_test();
   _create_friend_requests();
   _test_get_add_reqests();
   _send_friend_accept_tests();

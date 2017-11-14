@@ -443,6 +443,52 @@ void _send_friend_accept_tests()
     fprintf(stdout, " PASS: send_friend_accept_test\n");
 }
 
+void _login_logout_test()
+{
+  int ret = 1;
+  tul_net_context conn;
+  char uid[30] = "t_admin";
+  char pass[16] = "tulip!2345";
+
+  conn._use_tls = 1;
+  strcpy(conn.tls.host, "127.0.0.1");
+  while(ret)
+  {
+    ret = tls_client_init(&conn.tls, 9443);
+    if(ret)
+    {
+      fprintf(stdout, " FAIL: client_test_login - TLS ERROR - %d\n", ret);
+    }
+  }
+
+  if(client_login(uid, pass, &conn))
+  {
+    fprintf(stdout, " FAIL: client_test_login_logout\n");
+    return;
+  }
+
+  ret |= client_transmit(&conn);
+  if(!ret)
+    ret |= client_get_ok(&conn, pass);
+
+  if(!ret)
+  {
+    ret |= client_logout(uid, pass, &conn);
+    ret |= client_transmit(&conn);
+  }
+
+  if(ret)
+  {
+    fprintf(stdout, " FAIL: client_test_logout\n");
+    return;
+  }
+  else {
+    fprintf(stdout, " PASS: client_test_logout\n");
+  }
+
+
+}
+
 void _cleanup()
 {
   sleep(10);

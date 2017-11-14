@@ -112,6 +112,11 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
 {
   comm_req r;
   comm_payload p;
+  char _uid[30] = {0};
+  char _pass[16] = {0};
+  
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 16);
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
@@ -145,9 +150,9 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   /* data stores uid as part of
    * payload to confirm logout
    */
-  strcpy(p.data, uid);
+  strcpy(p.data, _uid);
 
-  int ret = prep_transmission(uid, pass, &r, &p, conn);
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
 
   if(p.data)
     free(p.data);
