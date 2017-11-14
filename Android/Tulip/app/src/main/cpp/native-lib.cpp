@@ -14,9 +14,10 @@ Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, js
 
     int ret = 0;
     if (conn) {
-        if (conn->_sock > 0)
-            close(conn->_sock);
+        if (conn->tls.server_fd.fd > 0)
+            close(conn->tls.server_fd.fd);
         free(conn);
+        conn = NULL;
     }
     conn = (tul_net_context *) calloc(1, sizeof(tul_net_context));
 
@@ -30,14 +31,15 @@ Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, js
     ret |= tls_client_init(&(conn->tls), 9999);
     if (!ret)
         ret |= client_login((char *) user, (char *) pass, conn);
-    if(!ret)
+    if (!ret)
         ret |= client_transmit(conn);
-    if(!ret)
-        ret |= client_get_ok(conn, (char*)pass);
+    if (!ret)
+        ret |= client_get_ok(conn, (char *) pass);
 
     if (ret)
-        if (conn)
-        {
+        if (conn) {
+            if (conn->tls.server_fd.fd > 0)
+                close(conn->tls.server_fd.fd);
             free(conn);
             conn = NULL;
         }
@@ -71,27 +73,47 @@ Java_org_tulip_project_tulip_MainActivity_GetList(JNIEnv *env, jobject instance,
     char *list = NULL;
     char t_str[30] = {0};
     unsigned list_sz = 0;
-    ret= (jobjectArray)env->NewObjectArray(500,
-                                           env->FindClass("java/lang/String"),env->NewStringUTF(""));
-    client_get_friendlist((char*)user, (char*)pass, conn, &list, &list_sz, 0);
+    ret = (jobjectArray) env->NewObjectArray(500,
+                                             env->FindClass("java/lang/String"),
+                                             env->NewStringUTF(""));
+    client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, 0);
 
-    while(list_sz > 0 && count < 500)
-    {
+    while (list_sz > 0 && count < 500) {
         count += list_sz;
         memcpy(&offset, list, 8);
-        for(int i = 0; i < 30*list_sz; i+=30)
-        {
-            if(count +((i+30)/30) < 500)
-            {
-                memcpy(t_str, &list[8+i], 30);
-                env->SetObjectArrayElement(ret,(count+(i+30)/30),env->NewStringUTF(t_str));
+        for (int i = 0; i < 30 * list_sz; i += 30) {
+            if (count + ((i + 30) / 30) < 500) {
+                memcpy(t_str, &list[8 + i], 30);
+                env->SetObjectArrayElement(ret, (count + (i + 30) / 30), env->NewStringUTF(t_str));
             }
         }
-        client_get_friendlist((char*)user, (char*)pass, conn, &list, &list_sz, offset);
+        client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, offset);
     }
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
 
     return ret;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_tulip_project_tulip_MainActivity_Logout(JNIEnv *env, jobject instance, jstring user_,
+                                                 jstring pass_) {
+    const char *user = env->GetStringUTFChars(user_, 0);
+    const char *pass = env->GetStringUTFChars(pass_, 0);
+
+    client_logout((char *) user, (char *) pass, conn);
+    client_transmit(conn);
+
+    if (conn) {
+        if (conn->tls.server_fd.fd > 0)
+            close(conn->tls.server_fd.fd);
+        free(conn);
+        conn = NULL;
+    }
+
+
+    env->ReleaseStringUTFChars(user_, user);
+    env->ReleaseStringUTFChars(pass_, pass);
 }
