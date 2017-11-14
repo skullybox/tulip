@@ -129,3 +129,20 @@ Java_org_tulip_project_tulip_MainActivity_Logout(JNIEnv *env, jobject instance, 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_tulip_project_tulip_MainActivity_FriendRequest(JNIEnv *env, jobject instance,
+                                                        jstring user_, jstring pass_,
+                                                        jstring request_) {
+
+    const char *user = env->GetStringUTFChars(user_, 0);
+    const char *pass = env->GetStringUTFChars(pass_, 0);
+    const char *request = env->GetStringUTFChars(request_, 0);
+
+    client_friend_req((char*)user, (char*)request, (char*)pass, conn);
+
+    env->ReleaseStringUTFChars(user_, user);
+    env->ReleaseStringUTFChars(pass_, pass);
+    env->ReleaseStringUTFChars(request_, request);
+}

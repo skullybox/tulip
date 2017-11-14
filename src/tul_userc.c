@@ -222,11 +222,18 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 {
   comm_req r;
   comm_payload p;
+  char _uid[30] = {0};
+  char _tuid[30] = {0};
+  char _pass[16] = {0};
+
+  strncpy(_uid, uid, 30);
+  strncpy(_tuid, t_uid, 30);
+  strncpy(_pass, pass, 16);
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
 
-  strncpy(r.user, uid, 30);
+  strncpy(r.user, _uid, 30);
 
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);
@@ -245,9 +252,9 @@ int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
   /* data stores t_uid as part of
    * payload to confirm buddy request
    */
-  strcpy(p.data, t_uid);
+  strcpy(p.data, _tuid);
 
-  int ret = prep_transmission(uid, pass, &r, &p, conn);
+  int ret = prep_transmission(_uid, pass, &r, &p, conn);
   if(ret)
     goto FRIEND_REQ_ERROR;
 
