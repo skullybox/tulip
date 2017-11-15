@@ -69,8 +69,8 @@ int friend_request_exists(char *uid, char *n_uid)
 
   sprintf(SQL, 
       "select uname, user_from from friend_request where uname='%s' and user_from = '%s'",
-      uid, 
-      n_uid);
+      n_uid, 
+      uid);
 
   tul_query_get(SQL, &res);
   if(res == NULL)

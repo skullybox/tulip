@@ -561,7 +561,7 @@ void _cleanup()
   tul_query(8,
       "delete from friend_list where friend='t_admin'",
       "delete from friend_list where uname='t_admin'",
-      "delete from friend_request where uname='t_admin'",
+      "delete from friend_request where user_from='t_admin'",
       "delete from message where uname='t_admin'",
       "delete from user where uname = 'salma99'",
       "delete from user where uname = 'tiacarrer'",

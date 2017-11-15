@@ -327,6 +327,7 @@ int do_accept_friend(char *user, comm_payload *p)
   char SQL1[4096] = {0};
   char SQL2[4096] = {0};
   char SQL3[4096] = {0};
+  char SQL4[4096] = {0};
   char uid[30] = {0};
   char t_uid[30] = {0};
   unsigned ret = 0;
@@ -337,7 +338,7 @@ int do_accept_friend(char *user, comm_payload *p)
   else 
     return -1;
 
-  if(!friend_request_exists(user, t_uid))
+  if(!friend_request_exists(t_uid, uid))
     return -1;
 
   if(!friend_in_list(user, t_uid))
@@ -356,8 +357,10 @@ int do_accept_friend(char *user, comm_payload *p)
 
   sprintf(SQL3, "delete from friend_request where uname='%s' and user_from='%s'",
       uid, t_uid); 
+  sprintf(SQL4, "delete from friend_request where uname='%s' and user_from='%s'",
+      t_uid, uid); 
 
-  ret |= tul_query(1, SQL3);
+  ret |= tul_query(2, SQL3, SQL4);
   return ret;
 
 }
