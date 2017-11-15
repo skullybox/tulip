@@ -538,11 +538,18 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
 {
   comm_req r;
   comm_payload p;
+  char _uid[30] = {0};
+  char _fuid[30] = {0};
+  char _pass[16] = {0};
+  
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 16);
+  strncpy(_fuid, f_uid, 16);
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
 
-  strncpy(r.user, uid, 30);
+  strncpy(r.user, _uid, 30);
 
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);
@@ -560,9 +567,9 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
   /* data stores uid as part of
    * payload to confirm 
    */
-  strcpy(p.data, f_uid);
+  strcpy(p.data, _fuid);
 
-  int ret = prep_transmission(uid, pass, &r, &p, conn);
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
   if(ret)
     return ret;
 
@@ -574,7 +581,7 @@ int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_u
   ret = 0;
   ret |= client_recieve(conn);
   if(!ret)
-    ret |= verify_client_payload(conn, &r, &p, pass);
+    ret |= verify_client_payload(conn, &r, &p, _pass);
 
   if(p.data)
     free(p.data);
@@ -596,13 +603,15 @@ int client_get_ok(tul_net_context *conn, char *pass)
   comm_req r;
   comm_payload p;
   int ret = 0;
+  char _pass[16] = {0};
 
+  strncpy(_pass, pass, 16);
   memset(&r, 0, sizeof(comm_req));
   memset(&p, 0, sizeof(comm_payload));
 
   ret |= client_recieve(conn);
   if(!ret)
-    ret |= verify_client_payload(conn, &r, &p, pass);
+    ret |= verify_client_payload(conn, &r, &p, _pass);
 
   if(p.data)
   {

@@ -262,7 +262,7 @@ void _create_users()
   int ret = 0; 
 
   ret |= create_user("t_admin", "root@project-tulip.org", "tulip!2345");
-  ret |= create_user("tommychuckles", "tommy@chuckles.ca", "chuckes123");
+  ret |= create_user("tommychuckles", "tommy@chuckles.ca", "chuckles123");
   ret |= create_user("salma99", "salma@latin.ca", "salma123");
   ret |= create_user("tiacarrer", "tiaC@hotmail.ca", "tia12345");
 
@@ -369,8 +369,8 @@ void _test_get_add_reqests()
   tul_net_context conn;
   char *list = NULL;
   unsigned list_sz = 0;
-  char uid[30] = "t_admin";
-  char pass[16] = "tulip!2345";
+  char uid[30] = "salma99";
+  char pass[16] = "salma123";
 
   conn._use_tls = 1;
   strcpy(conn.tls.host, "127.0.0.1");
@@ -409,33 +409,99 @@ void _test_get_add_reqests()
 
 void _send_friend_accept_tests()
 {
-  int ret = 1;
-  tul_net_context conn;
+  int ret = 0;
+  int cret = 1;
+  tul_net_context conn1;
+  tul_net_context conn2;
+  tul_net_context conn3;
   char *list = NULL;
   unsigned list_sz = 0;
   char uid[30] = "t_admin";
   char pass[16] = "tulip!2345";
 
-  conn._use_tls = 1;
-  strcpy(conn.tls.host, "127.0.0.1");
-  while(ret)
+  conn1._use_tls = 1;
+  strcpy(conn1.tls.host, "127.0.0.1");
+  conn2._use_tls = 1;
+  strcpy(conn2.tls.host, "127.0.0.1");
+  conn3._use_tls = 1;
+  strcpy(conn3.tls.host, "127.0.0.1");
+  
+  //salma
+  while(cret)
   {
-    ret = tls_client_init(&conn.tls, 9443);
-    if(ret)
+    cret = tls_client_init(&conn1.tls, 9443);
+    if(cret)
     {
-      fprintf(stdout, " FAIL: send_friend_accept_test - TLS ERROR - %d\n", ret);
+      fprintf(stdout, " FAIL: send_friend_accept_test - TLS ERROR - %d\n", cret);
     }
   }
 
-  if(client_login(uid, pass, &conn))
+  if(client_login("salma99", "salma123", &conn1))
   {
     fprintf(stdout, " FAIL: send_friend_accept_test - login error\n");
     return;
   }
+  ret |= client_transmit(&conn1);
+  if(!ret)
+    ret |= client_get_ok(&conn1, "salma123");
 
-  ret |= client_accept_friend(uid, pass, &conn, "salma99");
-  ret |= client_accept_friend(uid, pass, &conn, "tiacarrer");
-  ret |= client_accept_friend(uid, pass, &conn, "tommychuckles");
+
+  ret |= client_accept_friend("salma99", "salma123", &conn1, "t_admin");
+  ret |= client_logout("salma99", "salma123", &conn1);
+  ret |= client_transmit(&conn1);
+  close(conn1.tls.server_fd.fd);
+  cret = 1;
+
+  //tiacarrer
+  while(cret)
+  {
+    cret = tls_client_init(&conn2.tls, 9443);
+    if(cret)
+    {
+      fprintf(stdout, " FAIL: send_friend_accept_test - TLS ERROR - %d\n", cret);
+    }
+  }
+
+  if(client_login("tiacarrer", "tia12345", &conn2))
+  {
+    fprintf(stdout, " FAIL: send_friend_accept_test - login error\n");
+    return;
+  }
+  ret |= client_transmit(&conn2);
+  if(!ret)
+    ret |= client_get_ok(&conn2, "tia12345");
+
+
+  ret |= client_accept_friend("tiacarrer", "tia12345", &conn2, "t_admin");
+  ret |= client_logout("tiacarrer", "tia12345", &conn2);
+  ret |= client_transmit(&conn2);
+  close(conn2.tls.server_fd.fd);
+  cret = 1;
+
+  //tommy
+  while(cret)
+  {
+    cret = tls_client_init(&conn3.tls, 9443);
+    if(cret)
+    {
+      fprintf(stdout, " FAIL: send_friend_accept_test - TLS ERROR - %d\n", cret);
+    }
+  }
+
+  if(client_login("tommychuckles", "chuckles123", &conn3))
+  {
+    fprintf(stdout, " FAIL: send_friend_accept_test - login error\n");
+    return;
+  }
+  ret |= client_transmit(&conn3);
+  if(!ret)
+    ret |= client_get_ok(&conn3, "chuckles123");
+
+
+  ret |= client_accept_friend("tommychuckles", "chuckles123", &conn3, "t_admin");
+  ret |= client_logout("tommychuckles", "chuckles123", &conn3);
+  ret |= client_transmit(&conn3);
+  close(conn3.tls.server_fd.fd);
 
   if(ret)
     fprintf(stdout, " FAIL: send_friend_accept_test\n");
