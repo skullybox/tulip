@@ -42,18 +42,24 @@ public class Login extends AppCompatActivity {
 
                 user = username.getText().toString();
                 pass = password.getText().toString();
-                ret = ClientLogin(user, pass);
 
-                if (ret == 0) {
-                    username.setText("");
-                    password.setText("");
+                if (user.length() > 3 && pass.length() >= 8) {
+                    ret = ClientLogin(user, pass);
 
-                    TulipSession.user = user;
-                    TulipSession.password = pass;
-                    user = "";
-                    pass = "";
+                    if (ret == 0) {
+                        username.setText("");
+                        password.setText("");
 
-                    startActivity(new Intent(Login.this, MainActivity.class));
+                        TulipSession.user = user;
+                        TulipSession.password = pass;
+                        user = "";
+                        pass = "";
+
+                        startActivity(new Intent(Login.this, MainActivity.class));
+                    }
+                    else{
+                        password.setText("");
+                    }
                 }
                 v.setEnabled(true);
 

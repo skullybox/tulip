@@ -116,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         int indexRet = 0;
 
-        long friend_request_last_check = System.currentTimeMillis() / 1000L;
-        long message_last_check = System.currentTimeMillis() / 1000L;
+        long friend_request_last_check = System.currentTimeMillis() / 1000L - 20;
+        long message_last_check = System.currentTimeMillis() / 1000L - 10;
 
         while (true) {
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 }
 
             // check for friends messages
-            if (System.currentTimeMillis() / 1000L - message_last_check > 10) {
+            if (System.currentTimeMillis() / 1000L - message_last_check > 7) {
 
                 message_last_check = System.currentTimeMillis() / 1000L;
             }
