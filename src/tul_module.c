@@ -398,7 +398,7 @@ int do_add_friend(char *user, comm_payload *p)
     return -1;
 
   if(friend_in_list(uid, t_uid))
-    return -1;
+    return 0;
 
   sprintf(SQL, "insert into friend_request(uname, user_from) values ('%s', '%s')", 
       t_uid, uid); 
