@@ -149,3 +149,16 @@ Java_org_tulip_project_tulip_MainActivity_FriendRequest(JNIEnv *env, jobject ins
     env->ReleaseStringUTFChars(pass_, pass);
     env->ReleaseStringUTFChars(request_, request);
 }
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_org_tulip_project_tulip_MainActivity_GetFriendRequest(JNIEnv *env, jobject instance,
+                                                           jstring user_, jstring pass_) {
+    const char *user = env->GetStringUTFChars(user_, 0);
+    const char *pass = env->GetStringUTFChars(pass_, 0);
+
+    // TODO
+
+    env->ReleaseStringUTFChars(user_, user);
+    env->ReleaseStringUTFChars(pass_, pass);
+}
