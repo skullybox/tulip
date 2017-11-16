@@ -22,18 +22,22 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
 
+    Userlist adaptor;
     Thread _main_tulip;
     String[] friendRequestList = null;
-    List<String> friendsRequest = new ArrayList<>();
     List<String> friends = new ArrayList<>();
+    List<String> friendsRequest = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
-
     HashMap<String, ArrayList<String>> messages = new HashMap<>();
+
+    AlertDialog.Builder freqDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        freqDialog = new AlertDialog.Builder(this);
 
         ListView listview = (ListView) findViewById(R.id.listView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
@@ -45,8 +49,53 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         for (String _s : _friends)
             friends.add(_s);
 
-        Userlist adaptor = new Userlist();
+        adaptor = new Userlist();
         listview.setAdapter(adaptor);
+
+        fab.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+
+                freqDialog.setTitle("Friend Request: " + friendsRequest.get(0));
+
+                freqDialog.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
+                        int ret = AcceptFriend(TulipSession.user, TulipSession.password,
+                                friendsRequest.get(0));
+                        if(ret == 0) {
+                            friends.add(friendsRequest.get(0));
+
+                            adaptor.notifyDataSetChanged();
+
+                            friendsRequest.remove(0);
+                        }
+                        if(friendsRequest.size() == 0)
+                            fab.setVisibility(View.INVISIBLE);
+                        else
+                            fab.setVisibility(View.VISIBLE);
+                    }
+                });
+                freqDialog.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
+                        IgnoreFriend(TulipSession.user, TulipSession.password,
+                                friendsRequest.get(0));
+                        friendsRequest.remove(0);
+                        if(friendsRequest.size() == 0)
+                            fab.setVisibility(View.INVISIBLE);
+                        else
+                            fab.setVisibility(View.VISIBLE);
+                    }
+                });
+
+                freqDialog.show();
+            }
+        });
+
 
         _main_tulip = new Thread(this);
         _main_tulip.start();
@@ -154,6 +203,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             }
                         });
                     }
+
+                    for(String _f : friendRequestList)
+                    {
+                        friendsRequest.add(_f);
+                    }
+
                     friend_request_last_check = System.currentTimeMillis() / 1000L;
                 }
 
@@ -199,10 +254,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     }
 
     public native String[] GetList(String user, String pass);
-
     public native void Logout(String user, String pass);
-
     public native void FriendRequest(String user, String pass, String request);
-
     public native String[] GetFriendRequest(String user, String pass);
+    public native int AcceptFriend(String user, String pass, String freq);
+    public native void IgnoreFriend(String user, String pass, String freq);
+
 }

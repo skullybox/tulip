@@ -190,3 +190,37 @@ Java_org_tulip_project_tulip_MainActivity_GetFriendRequest(JNIEnv *env, jobject 
 
     return ret;
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_org_tulip_project_tulip_MainActivity_AcceptFriend(JNIEnv *env, jobject instance, jstring user_,
+                                                       jstring pass_, jstring freq_) {
+    const char *user = env->GetStringUTFChars(user_, 0);
+    const char *pass = env->GetStringUTFChars(pass_, 0);
+    const char *freq = env->GetStringUTFChars(freq_, 0);
+
+    int ret = 0;
+
+    ret = client_accept_friend( (char*)user, (char*)pass, conn, (char*)freq);
+
+    env->ReleaseStringUTFChars(user_, user);
+    env->ReleaseStringUTFChars(pass_, pass);
+    env->ReleaseStringUTFChars(freq_, freq);
+
+    return ret;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_tulip_project_tulip_MainActivity_IgnoreFriend(JNIEnv *env, jobject instance, jstring user_,
+                                                       jstring pass_, jstring freq_) {
+    const char *user = env->GetStringUTFChars(user_, 0);
+    const char *pass = env->GetStringUTFChars(pass_, 0);
+    const char *freq = env->GetStringUTFChars(freq_, 0);
+
+    // TODO
+
+    env->ReleaseStringUTFChars(user_, user);
+    env->ReleaseStringUTFChars(pass_, pass);
+    env->ReleaseStringUTFChars(freq_, freq);
+}
