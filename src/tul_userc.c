@@ -276,11 +276,16 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
 {
   comm_req r;
   comm_payload p;
+  char _uid[30] = {0};
+  char _pass[16] = {0};
+  
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 16);
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
 
-  strncpy(r.user, uid, 30);
+  strncpy(r.user, _uid, 30);
 
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);
@@ -299,9 +304,9 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
    * payload to confirm as well as
    * offset value
    */
-  strcpy(p.data, uid);
+  strcpy(p.data, _uid);
 
-  int ret = prep_transmission(uid, pass, &r, &p, conn);
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
   if(ret)
     goto RETURN_ADDREQLIST_ERROR;
 
@@ -311,7 +316,7 @@ int client_get_addreqlist(char *uid, char *pass, tul_net_context *conn, char **l
 
   /* now get the list */
   ret = client_recieve(conn);
-  ret = verify_client_payload(conn, &r, &p, pass);
+  ret = verify_client_payload(conn, &r, &p, _pass);
 
   if(ret)
     goto RETURN_ADDREQLIST_ERROR;

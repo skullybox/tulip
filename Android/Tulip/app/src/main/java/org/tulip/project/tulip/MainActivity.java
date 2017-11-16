@@ -17,14 +17,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
 
+    Thread _main_tulip;
+    String[] friendRequestList = null;
     List<String> friendsRequest = new ArrayList<>();
     List<String> friends = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
-    Thread _main_tulip;
+
+    HashMap<String, ArrayList<String>> messages = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         ListView listview = (ListView) findViewById(R.id.listView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
 
-        fab.setVisibility(View.GONE);
+        fab.setVisibility(View.INVISIBLE);
 
         String _friends[] = GetList(TulipSession.user, TulipSession.password);
 
@@ -87,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             case R.id.ChangePass:
                 return true;
             case R.id.Logout:
-                Logout(TulipSession.user, TulipSession.password);
                 _main_tulip.interrupt();
+                Logout(TulipSession.user, TulipSession.password);
                 TulipSession.user = "";
                 TulipSession.password = "";
                 finish();
@@ -108,23 +112,56 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
         ListView listview = (ListView) findViewById(R.id.listView);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
 
         int indexRet = 0;
-        String[] friendRequestList = null;
 
         long friend_request_last_check = System.currentTimeMillis() / 1000L;
+        long message_last_check = System.currentTimeMillis() / 1000L;
 
         while (true) {
 
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+
             // check for friend requests
-            if (System.currentTimeMillis() / 1000L - friend_request_last_check > 22)
+            if (System.currentTimeMillis() / 1000L - friend_request_last_check > 17)
                 if (friendRequestList == null || friendRequestList.length == 0) {
+
                     friendRequestList = GetFriendRequest(TulipSession.user, TulipSession.password);
+
                     if (friendRequestList != null && friendRequestList.length > 0)
-                        fab.setVisibility(View.VISIBLE);
+                    {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // This code will always run on the UI thread, therefore is safe to modify UI elements.
+                                fab.setVisibility(View.VISIBLE);
+                            }
+                        });
+
+                    }
+                    else
+                    {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // This code will always run on the UI thread, therefore is safe to modify UI elements.
+                                fab.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    }
                     friend_request_last_check = System.currentTimeMillis() / 1000L;
                 }
+
+            // check for friends messages
+            if (System.currentTimeMillis() / 1000L - message_last_check > 10) {
+
+                message_last_check = System.currentTimeMillis() / 1000L;
+            }
 
         }
     }

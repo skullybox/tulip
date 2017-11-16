@@ -74,18 +74,20 @@ Java_org_tulip_project_tulip_MainActivity_GetList(JNIEnv *env, jobject instance,
     char *list = NULL;
     char t_str[30] = {0};
     unsigned list_sz = 0;
-    std::vector <std::string> vlist;
-    std::vector <std::string> :: iterator i;
+    std::vector<std::string> vlist;
+    std::vector<std::string>::iterator i;
     client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, 0);
 
-    while (list_sz > 0 ) {
+    while (list_sz > 0) {
         count += list_sz;
         memcpy(&offset, list, 8);
         for (int i = 0; i < 30 * list_sz; i += 30) {
-            if (count + ((i + 30) / 30) < 200) {
-                memcpy(t_str, &list[8 + i], 30);
-                vlist.push_back(std::string(t_str));
-            }
+            memcpy(t_str, &list[8 + i], 30);
+            vlist.push_back(std::string(t_str));
+        }
+        if (list) {
+            free(list);
+            list = NULL;
         }
         client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, offset);
     }
@@ -95,11 +97,10 @@ Java_org_tulip_project_tulip_MainActivity_GetList(JNIEnv *env, jobject instance,
                                              env->NewStringUTF(""));
 
     count = 0;
-    for( i = vlist.begin(); i!= vlist.end(); ++i)
-    {
+    for (i = vlist.begin(); i != vlist.end(); ++i) {
         env->SetObjectArrayElement(ret, count,
                                    env->NewStringUTF(i->c_str()));
-        count ++;
+        count++;
     }
 
     env->ReleaseStringUTFChars(user_, user);
@@ -142,7 +143,7 @@ Java_org_tulip_project_tulip_MainActivity_FriendRequest(JNIEnv *env, jobject ins
 
     int ret = 0;
 
-    ret |= client_friend_req((char*)user, (char*)request, (char*)pass, conn);
+    ret |= client_friend_req((char *) user, (char *) request, (char *) pass, conn);
     ret |= client_recieve(conn);
 
     env->ReleaseStringUTFChars(user_, user);
@@ -157,8 +158,35 @@ Java_org_tulip_project_tulip_MainActivity_GetFriendRequest(JNIEnv *env, jobject 
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
 
-    // TODO
+    jobjectArray ret;
+    unsigned count = 0;
+
+    char *list = NULL;
+    char t_str[30] = {0};
+    unsigned list_sz = 0;
+    std::vector<std::string> rlist;
+    std::vector<std::string>::iterator i;
+
+    client_get_addreqlist((char *) user, (char *) pass, conn, &list, &list_sz);
+
+    for (int i = 0; i < 30 * list_sz; i += 30) {
+        memcpy(t_str, &list[i], 30);
+        rlist.push_back(std::string(t_str));
+    }
+
+    ret = (jobjectArray) env->NewObjectArray(rlist.size(),
+                                             env->FindClass("java/lang/String"),
+                                             env->NewStringUTF(""));
+
+    count = 0;
+    for (i = rlist.begin(); i != rlist.end(); ++i) {
+        env->SetObjectArrayElement(ret, count,
+                                   env->NewStringUTF(i->c_str()));
+        count++;
+    }
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
+
+    return ret;
 }
