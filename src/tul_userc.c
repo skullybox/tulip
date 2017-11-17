@@ -538,6 +538,48 @@ int client_recieve(tul_net_context *conn)
 
 }
 
+int client_ignore_friend(char *uid, char *pass, tul_net_context *conn, char *f_uid)
+{
+  comm_req r;
+  comm_payload p;
+  char _uid[30] = {0};
+  char _fuid[30] = {0};
+  char _pass[16] = {0};
+
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 16);
+  strncpy(_fuid, f_uid, 16);
+
+  memset(&r, 0, REQ_HSZ);
+  memset(&p, 0, sizeof(comm_payload));
+
+  strncpy(r.user, _uid, 30);
+
+  /* random encryption key and salt */
+  tul_random(&(r.salt), 16);
+  tul_random(&(r.kek), 16);
+
+  p.action = IGNOREFRIEND;
+
+  /* data size with encryption
+   * block size into account
+   */
+  p.data_sz = 32;
+  p.data = calloc(32,1);
+  r.payload_sz = sizeof(comm_payload) + p.data_sz;
+
+  /* data stores uid as part of
+   * payload to confirm 
+   */
+  strcpy(p.data, _fuid);
+
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
+  if(ret)
+    return ret;
+
+  ret = client_transmit(conn);
+  return ret;
+}
 
 int client_accept_friend(char *uid, char *pass, tul_net_context *conn, char *f_uid)
 {

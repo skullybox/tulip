@@ -114,7 +114,6 @@ void module_read(tul_net_context *c)
       else
       {
         sprintf(buff, " add friend error >>> %s", r.user);
-        send_response(r.user, OK, c, NULL);
         send_response(r.user, INVALID, c, NULL);
       }
       break;

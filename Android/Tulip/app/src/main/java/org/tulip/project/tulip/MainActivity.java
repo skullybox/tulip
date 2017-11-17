@@ -258,6 +258,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public native void FriendRequest(String user, String pass, String request);
     public native String[] GetFriendRequest(String user, String pass);
     public native int AcceptFriend(String user, String pass, String freq);
-    public native void IgnoreFriend(String user, String pass, String freq);
+    public native int IgnoreFriend(String user, String pass, String freq);
 
 }
