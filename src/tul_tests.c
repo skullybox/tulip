@@ -21,10 +21,21 @@
 #include "tul_module.h"
 #include <assert.h>
 
+void _chat_size_limits_tests()
+{
+  fprintf(stdout, " max chat size: %d\n", MAX_MESSAGE);
+  assert( MAX_MESSAGE < DEF_SOCK_BUFF_SIZE);
+  assert( (MAX_MESSAGE % 16) == 0);
+  fprintf(stdout, " PASS: chat_size_limits_test\n");
+}
+
+
 void _payload_limits_test()
 {
+  fprintf(stdout, " max payload: %d\n", MAX_REQ_PAYLOAD);
+  assert( REQ_HSZ == RES_HSZ);
   assert( REQ_HSZ < DEF_SOCK_BUFF_SIZE);
-  assert( RES_HSZ < DEF_SOCK_BUFF_SIZE);
+  assert( (MAX_REQ_PAYLOAD % 16) == 0);
   fprintf(stdout, " PASS: pay_load_limits_test\n");
 }
 

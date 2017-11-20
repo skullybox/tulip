@@ -159,65 +159,6 @@ int client_logout(char *uid, char *pass, tul_net_context *conn)
   return 0;
 }
 
-
-int client_message(char *uid, char *t_uid, char *pass, 
-    tul_net_context *conn, char *msg, unsigned m_len)
-{
-  comm_req r;
-  comm_payload p;
-  char to_user[30] = {0};
-
-  memset(&r, 0, REQ_HSZ);
-  memset(&p, 0, sizeof(comm_payload));
-
-  strncpy(r.user, uid, 30);
-
-  /* random encryption key and salt */
-  tul_random(&(r.salt), 16);
-  tul_random(&(r.kek), 16);
-
-  p.action = SEND_MSG;
-
-  /* message to user */
-  strncpy(to_user, t_uid, 30);
-
-  /* data size with encryption
-   * block size into account
-   *
-   * first 30 bytes is target username
-   * rest of the bytes are for the message
-   */
-  if((m_len+1+30)%16)
-  {
-    p.data_sz = m_len+1+30+16;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(m_len+1+30+16,1);
-  }
-  else
-  {
-    p.data_sz = m_len+1+40;
-    PAYLOAD_CHECK_SZ;
-    p.data = calloc(m_len+1+30,1);
-  }
-
-  r.payload_sz = sizeof(comm_payload) + p.data_sz;
-
-  memcpy(p.data, to_user, 30);
-  char *tmp = (char*)p.data;
-  memcpy(&(tmp[30]), msg, m_len);
-
-  int ret = prep_transmission(uid, pass, &r, &p, conn);
-
-  if(p.data)
-    free(p.data);
-
-  if(ret)
-    return ret;
-
-  return 0;
-}
-
-
 int client_friend_req(char *uid, char *t_uid, char *pass, tul_net_context *conn)
 {
   comm_req r;
@@ -682,8 +623,8 @@ int client_get_ok(tul_net_context *conn, char *pass)
  * 3 bytes type (SYS/USR)
  * 30 bytes to user
  * 50 bytes reserved
+ * 4 bytes message length
  * message from user
- *
  */
 
 int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, 
@@ -717,7 +658,11 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
   /* data size with encryption
    * block size into account
    */
-  p.data_sz = m_len +1;
+  if((m_len+MESSAGE_META_SZ)%16)
+    p.data_sz = m_len+MESSAGE_META_SZ+((m_len+MESSAGE_META_SZ)%16);
+  else 
+    p.data_sz = m_len+MESSAGE_META_SZ;
+  
   p.data = calloc(p.data_sz,1);
   r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
@@ -725,6 +670,10 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
    * payload to confirm 
    */
   strcpy(p.data, _tuid);
+  memcpy(&((char*)p.data)[12], "USR", 3);
+  memcpy(&((char*)p.data)[15], _tuid, strlen(_tuid));
+  memcpy(&((char*)p.data)[MESSAGE_META_SZ-4], &m_len, sizeof(unsigned));
+  memcpy(&((char*)p.data)[MESSAGE_META_SZ], msg, m_len);
 
   int ret = prep_transmission(_uid, _pass, &r, &p, conn);
   if(ret)

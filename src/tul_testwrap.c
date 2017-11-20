@@ -14,13 +14,14 @@ int RUN_TESTS = 0;
 void run_tests()
 {
   RUN_TESTS = 1;
+  _payload_limits_test();
+  _chat_size_limits_tests();
   _rand_test();
   _tcp_listen_test();
   _tcp_connect_test();
   _b64_test();
   _tls_rc5_test();
   _whirlpool_test();
-  _payload_limits_test();
   _tls_server_test();
   _create_users();
   _tls_client_test_login();

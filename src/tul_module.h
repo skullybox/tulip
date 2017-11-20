@@ -72,20 +72,26 @@ enum status
 static const unsigned RES_HSZ = sizeof(comm_resp); 
 static const unsigned REQ_HSZ = sizeof(comm_req); 
 
-#define MAX_REQ_PAYLOAD DEF_SOCK_BUFF_SIZE - REQ_HSZ
-#define MAX_RES_PAYLOAD DEF_SOCK_BUFF_SIZE - RES_HSZ
+#define _MAX_REQ_PAYLOAD (DEF_SOCK_BUFF_SIZE - REQ_HSZ)
+#define _MAX_RES_PAYLOAD (DEF_SOCK_BUFF_SIZE - RES_HSZ)
+
+#define MAX_REQ_PAYLOAD ((_MAX_REQ_PAYLOAD / 16)*16)
+#define MAX_RES_PAYLOAD ((_MAX_REQ_PAYLOAD / 16)*16)
 
 /*
  * message byte setup:
- * 7 bytes message id
- * 3 bytes true / false new flag
- * 2 bytes type (SYS/USR)
- * 29 bytes to user
- * 49 bytes reserved
+ * 8 bytes message id
+ * 4 bytes true / false new flag
+ * 3 bytes type (SYS/USR)
+ * 30 bytes to user
+ * 50 bytes reserved
+ * 4 bytes message length
  * message from user
  *
  */
-#define MAX_MESSAGE (MAX_REQ_PAYLOAD - 7 - 4 - 3 - 30 - 50)
+#define MESSAGE_META_SZ (8+4+3+30+50+4)
+#define _MAX_MESSAGE (MAX_REQ_PAYLOAD - MESSAGE_META_SZ)
+#define MAX_MESSAGE ((_MAX_MESSAGE/16)*16)
 
 
 #endif

@@ -57,6 +57,8 @@ int main(int argc, char **argv)
   configure_module();
 
   /* print max payload info */
+  sprintf(tmp, " tulip_boot >>>> max chat size: %d", MAX_MESSAGE);
+  tul_log(tmp);
   sprintf(tmp, " tulip_boot >>>> max request payload: %d", MAX_REQ_PAYLOAD);
   tul_log(tmp);
   memset(tmp, 0, 201);

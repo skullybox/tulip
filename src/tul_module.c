@@ -166,6 +166,27 @@ int do_get_msg(char *user, comm_payload *p)
 
 int do_send_msg(char *user, comm_payload *p)
 {
+  char _uid[30] = {0};
+  char _tuid[30] = {0};
+  unsigned msg_len = 0;
+  char *msg = NULL;
+
+
+  strncpy(_uid, user, 30);
+
+  // message should be USR type
+  if(strncmp(&((char*)p->data)[12], "USR", 3))
+    return -1;
+
+  // to user
+  strncpy(_tuid, &((char*)p->data)[15], 30);
+
+  // message length
+  memcpy(&msg_len, &((char*)p->data)[MESSAGE_META_SZ-4], 4);
+
+  // message pointer
+  msg = &((char*)p->data)[MESSAGE_META_SZ];
+
 
   return 0;
 }
