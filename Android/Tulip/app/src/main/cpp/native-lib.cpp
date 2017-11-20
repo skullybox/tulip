@@ -229,3 +229,21 @@ Java_org_tulip_project_tulip_MainActivity_IgnoreFriend(JNIEnv *env, jobject inst
     return ret;
 }
 
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_org_tulip_project_tulip_MainActivity_getMessage(JNIEnv *env, jobject instance, jstring user_,
+                                                     jstring pass_) {
+    const char *user = env->GetStringUTFChars(user_, 0);
+    const char *pass = env->GetStringUTFChars(pass_, 0);
+
+    /*
+     * byte array layout:
+     * message id (8bytes)
+     * read true / false (4 bytes)
+     * from 30 bytes user name
+     * message from user
+     */
+
+    env->ReleaseStringUTFChars(user_, user);
+    env->ReleaseStringUTFChars(pass_, pass);
+}

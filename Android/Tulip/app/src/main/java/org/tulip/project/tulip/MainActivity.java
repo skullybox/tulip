@@ -52,6 +52,17 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         adaptor = new Userlist();
         listview.setAdapter(adaptor);
 
+        // fab click listener
+        addClickListener();
+
+        _main_tulip = new Thread(this);
+        _main_tulip.start();
+
+    }
+
+    private void addClickListener()
+    {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
         fab.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -95,11 +106,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 freqDialog.show();
             }
         });
-
-
-        _main_tulip = new Thread(this);
-        _main_tulip.start();
-
     }
 
     @Override
@@ -259,5 +265,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public native String[] GetFriendRequest(String user, String pass);
     public native int AcceptFriend(String user, String pass, String freq);
     public native int IgnoreFriend(String user, String pass, String freq);
+    public native byte[] getMessage(String user, String pass);
 
 }
