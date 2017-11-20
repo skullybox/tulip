@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                     friendRequestList = GetFriendRequest(TulipSession.user, TulipSession.password);
 
-                    if (friendRequestList != null && friendRequestList.length > 0)
+                    if (friendRequestList != null || friendRequestList.length > 0)
                     {
                         runOnUiThread(new Runnable() {
                             @Override
