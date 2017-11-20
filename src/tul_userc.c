@@ -630,7 +630,6 @@ int client_get_ok(tul_net_context *conn, char *pass)
 int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, 
     char *msg, unsigned m_len)
 {
-
   comm_req r;
   comm_payload p;
   char _uid[30] = {0};
@@ -669,7 +668,6 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
   /* data stores uid as part of
    * payload to confirm 
    */
-  strcpy(p.data, _tuid);
   memcpy(&((char*)p.data)[12], "USR", 3);
   memcpy(&((char*)p.data)[15], _tuid, strlen(_tuid));
   memcpy(&((char*)p.data)[MESSAGE_META_SZ-4], &m_len, sizeof(unsigned));

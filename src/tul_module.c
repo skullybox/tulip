@@ -76,7 +76,7 @@ void module_read(tul_net_context *c)
       if(!do_login(r.user, &p))
       {
         c->_user_auth = 1;
-        sprintf(buff, " login <<< %s", r.user);
+        sprintf(buff, " login - OK <<< %s", r.user);
         tul_log(buff);
 
         /* send OK */
@@ -92,14 +92,14 @@ void module_read(tul_net_context *c)
 
       break;
     case LOGOUT:
-      sprintf(buff, " logout <<< %s", r.user);
+      sprintf(buff, " logout - OK <<< %s", r.user);
       tul_log(buff);
       c->_user_auth = 0;
       c->_teardown = 1;
       break;
     case GET_LIST:
       memcpy(&offset,&((char*)p.data)[30], sizeof(unsigned long long));
-      sprintf(buff, " getlist <<< %s", r.user);
+      sprintf(buff, " getlist >>> %s", r.user);
       tul_log(buff);
 
       do_get_list(r.user, &p, offset);
@@ -108,19 +108,29 @@ void module_read(tul_net_context *c)
     case ACCEPTFRIEND:
       if(!do_accept_friend(r.user, &p))
       {
-        sprintf(buff, " add friend >>> %s", r.user);
+        sprintf(buff, " add friend - OK <<< %s", r.user);
+        tul_log(buff);
         send_response(r.user, OK, c, NULL);
       }
       else
       {
-        sprintf(buff, " add friend error >>> %s", r.user);
+        sprintf(buff, " add friend - ERROR >>> %s", r.user);
+        tul_log(buff);
         send_response(r.user, INVALID, c, NULL);
       }
       break;
     case SEND_MSG:
-      sprintf(buff, " send msg <<< %s", r.user);
-      tul_log(buff);
-      do_send_msg(r.user, &p);
+      if(!do_send_msg(r.user, &p))
+      {
+        sprintf(buff, " msg friend - OK >>> %s", r.user);
+        send_response(r.user, OK, c, NULL);
+      }
+      else
+      {
+        sprintf(buff, " msg friend - ERROR >>> %s", r.user);
+        tul_log(buff);
+        send_response(r.user, INVALID, c, NULL);
+      }
       break;
     case GET_MSG:
       sprintf(buff, " get msg <<< %s", r.user);
@@ -134,12 +144,18 @@ void module_read(tul_net_context *c)
       send_response(r.user, p.action, c, &p);
       break;
     case ADDFRIEND:
-      sprintf(buff, " add user <<< %s", r.user);
-      tul_log(buff);
-        if(!do_add_friend(r.user, &p))
-          send_response(r.user, OK, c, NULL);
-        else 
-          send_response(r.user, ERROR, c, NULL);
+      if(!do_add_friend(r.user, &p))
+      {
+        sprintf(buff, " add user - OK <<< %s", r.user);
+        tul_log(buff);
+        send_response(r.user, OK, c, NULL);
+      }
+      else 
+      {
+        sprintf(buff, " add user - ERROR >>> %s", r.user);
+        tul_log(buff);
+        send_response(r.user, ERROR, c, NULL);
+      }
       break;
     case IGNOREFRIEND:
       do_ignore_friend(r.user, &p);
@@ -170,7 +186,7 @@ int do_send_msg(char *user, comm_payload *p)
   char _tuid[30] = {0};
   unsigned msg_len = 0;
   char *msg = NULL;
-
+  char SQL[5048] = {0};
 
   strncpy(_uid, user, 30);
 
@@ -180,15 +196,20 @@ int do_send_msg(char *user, comm_payload *p)
 
   // to user
   strncpy(_tuid, &((char*)p->data)[15], 30);
+  if(!user_exists(_tuid))
+    return -1;
 
-  // message length
-  memcpy(&msg_len, &((char*)p->data)[MESSAGE_META_SZ-4], 4);
+  // friend exists
+  if(!friend_in_list(_uid, _tuid))
+    return -1;
 
   // message pointer
   msg = &((char*)p->data)[MESSAGE_META_SZ];
 
+  sprintf(SQL, "insert into message (uname, frm, typ, msg) values ('%s, '%s', '%s', '%s')",
+      _uid, _tuid, "USR", msg);
 
-  return 0;
+  return tul_query(1, SQL);
 }
 
 int do_get_addreq(char *user, comm_payload *p)

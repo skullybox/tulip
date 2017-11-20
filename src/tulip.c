@@ -42,27 +42,27 @@ int main(int argc, char **argv)
 
   if(daemon_mode)
   {
-    tul_log(" tulip_boot >>>> starting in daemon mode");
+    tul_log(" tulip_boot >>> starting in daemon mode");
     tul_make_daemon();
   }
   else
-    tul_log(" tulip_boot >>>> starting in foreground");
+    tul_log(" tulip_boot >>> starting in foreground");
 
   tul_dbinit();
 
-  tul_log(" tulip_boot >>>> starting listener");
+  tul_log(" tulip_boot >>> starting listener");
   run_listener(port, tls);
 
-  tul_log(" tulip_boot >>>> loading module callbacks");
+  tul_log(" tulip_boot >>> loading module callbacks");
   configure_module();
 
   /* print max payload info */
-  sprintf(tmp, " tulip_boot >>>> max chat size: %d", MAX_MESSAGE);
+  sprintf(tmp, " tulip_boot >>> max chat size: %d", MAX_MESSAGE);
   tul_log(tmp);
-  sprintf(tmp, " tulip_boot >>>> max request payload: %d", MAX_REQ_PAYLOAD);
+  sprintf(tmp, " tulip_boot >>> max request payload: %d", MAX_REQ_PAYLOAD);
   tul_log(tmp);
   memset(tmp, 0, 201);
-  sprintf(tmp, " tulip_boot >>>> max response payload: %d", MAX_RES_PAYLOAD);
+  sprintf(tmp, " tulip_boot >>> max response payload: %d", MAX_RES_PAYLOAD);
   tul_log(tmp);
 
   while(!TUL_SIGNAL_INT)

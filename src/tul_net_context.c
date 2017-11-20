@@ -149,7 +149,7 @@ void tul_init_context_list()
 {
   pthread_mutex_lock(&_glbl_struct_mtx);
   memset(&_glbl_struct_list, 0, sizeof(_tul_int_context_struct));
-  tul_log(" tulip_boot >>>> starting net context");
+  tul_log(" tulip_boot >>> starting net context");
   pthread_mutex_unlock(&_glbl_struct_mtx);
 }
 

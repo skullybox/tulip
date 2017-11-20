@@ -15,12 +15,12 @@ void tul_make_daemon()
   ret_p = fork();
   if(ret_p < 0)
   {
-    tul_log(" tulip_boot >>>> fork error! ..exiting.");
+    tul_log(" tulip_boot >>> fork error! ..exiting.");
     exit(-1);
   }
   else if(ret_p > 0)
   {
-    tul_log(" tulip_boot >>>> launching deamon ..done.");
+    tul_log(" tulip_boot >>> launching deamon ..done.");
     exit(0);
   }
 

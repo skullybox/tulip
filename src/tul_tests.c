@@ -566,6 +566,54 @@ void _login_logout_test()
 
 }
 
+void _test_msg_send()
+{
+  int ret = 0;
+  int cret = 1;
+  tul_net_context conn1;
+  char *list = NULL;
+  unsigned list_sz = 0;
+  char uid[30] = "t_admin";
+  char pass[16] = "tulip!2345";
+
+  conn1._use_tls = 1;
+  strcpy(conn1.tls.host, "127.0.0.1");
+
+  //salma
+  while(cret)
+  {
+    cret = tls_client_init(&conn1.tls, 9443);
+    if(cret)
+    {
+      fprintf(stdout, " FAIL: msg_send_test - TLS ERROR - %d\n", cret);
+    }
+  }
+
+  //if(client_login("salma99", "salma123", &conn1))
+  if(client_login(uid, pass, &conn1))
+  {
+    fprintf(stdout, " FAIL: msg_send_test - login error\n");
+    return;
+  }
+  ret |= client_transmit(&conn1);
+  if(!ret)
+    ret |= client_get_ok(&conn1, pass);
+
+  ret |= client_message(
+      uid, "salma99", pass, &conn1, "hello there!", strlen("hello there!"));
+
+  if(!ret)
+  {
+      fprintf(stdout, " PASS: msg_send_test \n");
+  }
+  else {
+      fprintf(stdout, " FAIL: msg_send_test \n");
+  }
+
+
+}
+
+
 void _cleanup()
 {
   sleep(10);
@@ -573,7 +621,7 @@ void _cleanup()
       "delete from friend_list where friend='t_admin'",
       "delete from friend_list where uname='t_admin'",
       "delete from friend_request where user_from='t_admin'",
-      "delete from message where uname='t_admin'",
+      "delete from message where uname='salma99'",
       "delete from user where uname = 'salma99'",
       "delete from user where uname = 'tiacarrer'",
       "delete from user where uname = 'tommychuckles'",

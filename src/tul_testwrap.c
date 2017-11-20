@@ -30,6 +30,7 @@ void run_tests()
   _test_get_add_reqests();
   _send_friend_accept_tests();
   _test_get_friends();
+  _test_msg_send();
 
   tul_log("\n clean-up...\n");
   _cleanup();

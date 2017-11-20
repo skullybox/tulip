@@ -12,7 +12,7 @@ int TUL_SIGNAL_INT = 0;
 void tul_global_signal_handle_init()
 {
 
-  tul_log(" tulip_boot >>>> adding signal handlers");
+  tul_log(" tulip_boot >>> adding signal handlers");
 
   for(int i = 1; i < 32; i++)
   {
