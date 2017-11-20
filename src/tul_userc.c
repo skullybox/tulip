@@ -675,4 +675,80 @@ int client_get_ok(tul_net_context *conn, char *pass)
   return 0;
 }
 
+/*
+ * message byte setup:
+ * 8 bytes message id
+ * 4 bytes true / false new flag
+ * 3 bytes type (SYS/USR)
+ * 30 bytes to user
+ * 50 bytes reserved
+ * message from user
+ *
+ */
+
+int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, 
+    char *msg, unsigned m_len)
+{
+
+  comm_req r;
+  comm_payload p;
+  char _uid[30] = {0};
+  char _tuid[30] = {0};
+  char _pass[16] = {0};
+
+  if(m_len >= MAX_MESSAGE)
+    return -1;
+
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 16);
+  strncpy(_tuid, t_uid, 16);
+
+  memset(&r, 0, REQ_HSZ);
+  memset(&p, 0, sizeof(comm_payload));
+
+  strncpy(r.user, _uid, 30);
+
+  /* random encryption key and salt */
+  tul_random(&(r.salt), 16);
+  tul_random(&(r.kek), 16);
+
+  p.action = SEND_MSG;
+
+  /* data size with encryption
+   * block size into account
+   */
+  p.data_sz = m_len +1;
+  p.data = calloc(p.data_sz,1);
+  r.payload_sz = sizeof(comm_payload) + p.data_sz;
+
+  /* data stores uid as part of
+   * payload to confirm 
+   */
+  strcpy(p.data, _tuid);
+
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
+  if(ret)
+    return ret;
+
+  ret = client_transmit(conn);
+  if(ret)
+    return ret;
+
+  /* now get the confirmation */
+  ret = 0;
+  ret |= client_recieve(conn);
+  if(!ret)
+    ret |= verify_client_payload(conn, &r, &p, _pass);
+
+  if(p.data)
+    free(p.data);
+
+  if(ret)
+    return ret;
+
+  if(p.action != OK)
+    return -1;
+
+  return 0;
+}
 

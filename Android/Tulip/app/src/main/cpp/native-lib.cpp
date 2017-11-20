@@ -240,7 +240,9 @@ Java_org_tulip_project_tulip_MainActivity_getMessage(JNIEnv *env, jobject instan
      * byte array layout:
      * message id (8bytes)
      * read true / false (4 bytes)
+     * message type 3 bytes
      * from 30 bytes user name
+     * 50 bytes reserved
      * message from user
      */
 

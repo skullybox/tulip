@@ -75,5 +75,17 @@ static const unsigned REQ_HSZ = sizeof(comm_req);
 #define MAX_REQ_PAYLOAD DEF_SOCK_BUFF_SIZE - REQ_HSZ
 #define MAX_RES_PAYLOAD DEF_SOCK_BUFF_SIZE - RES_HSZ
 
+/*
+ * message byte setup:
+ * 7 bytes message id
+ * 3 bytes true / false new flag
+ * 2 bytes type (SYS/USR)
+ * 29 bytes to user
+ * 49 bytes reserved
+ * message from user
+ *
+ */
+#define MAX_MESSAGE (MAX_REQ_PAYLOAD - 7 - 4 - 3 - 30 - 50)
+
 
 #endif
