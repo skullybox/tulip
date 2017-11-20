@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     List<String> friends = new ArrayList<>();
     List<String> friendsRequest = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
-    HashMap<String, ArrayList<String>> messages = new HashMap<>();
+    HashMap<String, ArrayList<Message>> messages = new HashMap<>();
 
     AlertDialog.Builder freqDialog;
 
