@@ -28,6 +28,7 @@ int do_get_addreq(char *user, comm_payload *p);
 int do_add_friend(char *user, comm_payload *p);
 int do_rem_friend(char *user, comm_payload *p);
 int do_accept_friend(char *user, comm_payload *p);
+int do_msg_read(char *user, comm_payload *p);
 
 void configure_module()
 {
@@ -174,8 +175,84 @@ void module_read(tul_net_context *c)
 
 }
 
+/*
+ * getting a message involves the
+ * following in the request:
+ * offset message ID > 0 [optional]
+ * the target uid [optional]
+ *
+ * one message is returned per request
+ */
+
 int do_get_msg(char *user, comm_payload *p)
 {
+  char _uid[30] = {0};
+  char _tuid[30] = {0};
+  unsigned msg_len = 0;
+  char *msg = NULL;
+  char SQL[5048] = {0};
+  unsigned _tuid_set = 0;
+  unsigned long long _offset = 0;
+  MYSQL_RES *res = NULL;
+  MYSQL_ROW irow;
+  unsigned ret = 0;
+  unsigned long long id, rows = 0ULL;
+
+
+  // when no offset or t_uid is set or not
+  char QL0[] = "select rowid, uname, frm, typ, new, msg from message where uname='%s' or frm='%s' order by rowid desc limit 1";
+  char QL1[] = "select rowid, uname, frm, typ, new, msg from message where (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid desc limit 1";
+
+  // when offset is provided
+  char QL2[] = "select rowid, uname, frm, typ, new, msg from message where rowid > %llu and uname='%s' or frm='%s' order by rowid desc limit 1";
+
+  // when offset is provided and t_uid is set
+  char QL3[] = "select rowid, uname, frm, typ, new, msg from message where rowid > %llu and (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid desc limit 1";
+
+  strncpy(_uid, user, 30);
+  strncpy(_tuid, &((char*)p->data)[8], 30);
+
+  memcpy(&_offset, &((char*)p->data)[0], 8);
+
+  if(strlen(_tuid))
+    _tuid_set = 1;
+
+  if(_tuid_set && !user_exists(_tuid))
+    return -1;
+
+  // friend exists
+  if(_tuid_set && !friend_in_list(_uid, _tuid))
+    return -1;
+
+  switch(_offset)
+  {
+    case 0:
+      if(!_tuid_set)
+        sprintf(SQL, QL0, _uid, _uid);
+      else 
+        sprintf(SQL, QL1, _uid, _uid, _tuid, _tuid);
+      break;
+    default:
+      if(!_tuid_set)
+        sprintf(SQL, QL0, _offset, _uid, _uid);
+      else 
+        sprintf(SQL, QL1, _offset, _uid, _uid, _tuid, _tuid);
+      break;
+  }
+
+  ret = tul_query_get(SQL, &res);
+  if(res == NULL || mysql_num_rows(res) == 0)
+  {
+    /* send END */
+    p->action = END;
+    p->data_sz = 0;
+    if(p->data)
+      free(p->data);
+    p->data = NULL;
+    if(res)
+      mysql_free_result(res);
+    return 0;
+  }
 
   return 0;
 }
