@@ -206,8 +206,8 @@ int do_send_msg(char *user, comm_payload *p)
   // message pointer
   msg = &((char*)p->data)[MESSAGE_META_SZ];
 
-  sprintf(SQL, "insert into message (uname, frm, typ, msg) values ('%s, '%s', '%s', '%s')",
-      _uid, _tuid, "USR", msg);
+  sprintf(SQL, "insert into message (uname, frm, typ, msg) values ('%s', '%s', '%s', '%s')",
+      _tuid, _uid, "USR", msg);
 
   return tul_query(1, SQL);
 }

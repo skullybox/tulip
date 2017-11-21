@@ -658,7 +658,7 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
    * block size into account
    */
   if((m_len+MESSAGE_META_SZ)%16)
-    p.data_sz = m_len+MESSAGE_META_SZ+((m_len+MESSAGE_META_SZ)%16);
+    p.data_sz = m_len+MESSAGE_META_SZ+(16-((m_len+MESSAGE_META_SZ)%16));
   else 
     p.data_sz = m_len+MESSAGE_META_SZ;
   
@@ -670,7 +670,7 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
    */
   memcpy(&((char*)p.data)[12], "USR", 3);
   memcpy(&((char*)p.data)[15], _tuid, strlen(_tuid));
-  memcpy(&((char*)p.data)[MESSAGE_META_SZ-4], &m_len, sizeof(unsigned));
+  memcpy(&((char*)p.data)[MESSAGE_META_SZ-4], &m_len, 4);
   memcpy(&((char*)p.data)[MESSAGE_META_SZ], msg, m_len);
 
   int ret = prep_transmission(_uid, _pass, &r, &p, conn);

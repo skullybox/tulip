@@ -23,6 +23,7 @@ void _test_get_friends();
 void _create_friend_requests();
 void _send_friend_accept_tests();
 void _login_logout_test();
+void _test_msg_send();
 void _cleanup();
 
 #endif
