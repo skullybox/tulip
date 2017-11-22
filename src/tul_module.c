@@ -137,6 +137,7 @@ void module_read(tul_net_context *c)
       sprintf(buff, " get msg <<< %s", r.user);
       tul_log(buff);
       do_get_msg(r.user, &p);
+      send_response(r.user, p.action, c, &p);
       break;
     case GET_FREQ:
       sprintf(buff, " friend request <<< %s", r.user);
@@ -254,6 +255,41 @@ int do_get_msg(char *user, comm_payload *p)
     return 0;
   }
 
+  rows = mysql_num_rows(res);
+  if(rows == 1)
+  {
+    // rowid, uname, frm, typ, new, msg 
+    irow = mysql_fetch_row(res);
+    unsigned long long rowid = 0;
+    char uname[30] = {0};
+    char frm[30] = {0};
+    char typ[4] = {0};
+    unsigned new = 0;
+    char msg[MAX_MESSAGE];
+
+    memset(msg, 0, MAX_MESSAGE);
+
+    // copy offset
+    rowid = strtoull(irow[0], NULL, 10);
+
+    // uname
+    strncpy(uname, irow[1], 30);
+
+    // frm
+    strncpy(frm, irow[2], 30);
+    
+    // typ
+    strncpy(typ, irow[3], 3);
+
+    // new
+    new = atoi(irow[4]);
+
+    // msg
+    strncpy(msg, irow[5], MAX_MESSAGE);
+
+
+  }
+
   return 0;
 }
 
@@ -292,12 +328,12 @@ int do_send_msg(char *user, comm_payload *p)
 int do_get_addreq(char *user, comm_payload *p)
 {
   unsigned long long rows = 0ULL;
-  int ret = 0;
   MYSQL_RES *res = NULL;
   MYSQL_ROW irow;
   char SQL[2048] = {0};
   char uid[30] = {0};
   sprintf(SQL, "select user_from from friend_request where uname='%s' limit 20", user);
+  int ret = 0;
 
   ret = tul_query_get(SQL, &res);
   if(res == NULL || mysql_num_rows(res) == 0)

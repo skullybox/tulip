@@ -699,3 +699,19 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
   return 0;
 }
 
+int client_get_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, char *msg, unsigned *m_len)
+{
+  comm_req r;
+  comm_payload p;
+  char _uid[30] = {0};
+  char _tuid[30] = {0};
+  char _pass[16] = {0};
+
+  if(t_uid)
+    strncpy(_tuid, t_uid, 30);
+
+  strncpy(_uid, uid, 30);
+  strncpy(_pass, pass, 30);
+
+
+}
