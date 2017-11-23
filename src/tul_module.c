@@ -191,7 +191,6 @@ int do_get_msg(char *user, comm_payload *p)
   char _uid[30] = {0};
   char _tuid[30] = {0};
   unsigned msg_len = 0;
-  char *msg = NULL;
   char SQL[5048] = {0};
   unsigned _tuid_set = 0;
   unsigned long long _offset = 0;
@@ -199,6 +198,13 @@ int do_get_msg(char *user, comm_payload *p)
   MYSQL_ROW irow;
   unsigned ret = 0;
   unsigned long long id, rows = 0ULL;
+  unsigned long long rowid = 0;
+  char uname[30] = {0};
+  char frm[30] = {0};
+  char typ[4] = {0};
+  unsigned new = 0;
+  char msg[MAX_MESSAGE];
+
 
 
   // when no offset or t_uid is set or not
@@ -261,13 +267,6 @@ int do_get_msg(char *user, comm_payload *p)
   {
     // rowid, uname, frm, typ, new, msg 
     irow = mysql_fetch_row(res);
-    unsigned long long rowid = 0;
-    char uname[30] = {0};
-    char frm[30] = {0};
-    char typ[4] = {0};
-    unsigned new = 0;
-    char msg[MAX_MESSAGE];
-
     memset(msg, 0, MAX_MESSAGE);
 
     // copy offset
@@ -316,11 +315,11 @@ int do_get_msg(char *user, comm_payload *p)
   p->data = calloc(p->data_sz, 1);
 
   memcpy(p->data, &rowid, 8);
-  memcpy(&p->data[8], &new, 4);
-  memcpy(&p->data[12], typ, 3);
-  memcpy(&p->data[15], uname, 30);
-  memcpy(&p->data[95], &msg_len, 4);
-  memcpy(&p->data[99], msg, msg_len);
+  memcpy(&((char*)p->data)[8], &new, 4);
+  memcpy(&((char*)p->data)[12], typ, 3);
+  memcpy(&((char*)p->data)[15], uname, 30);
+  memcpy(&((char*)p->data)[95], &msg_len, 4);
+  memcpy(&((char*)p->data)[99], msg, msg_len);
 
   return 0;
 }
