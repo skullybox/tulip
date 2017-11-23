@@ -187,6 +187,7 @@ void module_read(tul_net_context *c)
 
 int do_get_msg(char *user, comm_payload *p)
 {
+  unsigned sz = 0;
   char _uid[30] = {0};
   char _tuid[30] = {0};
   unsigned msg_len = 0;
@@ -287,8 +288,39 @@ int do_get_msg(char *user, comm_payload *p)
     // msg
     strncpy(msg, irow[5], MAX_MESSAGE);
 
+    msg_len = strlen(msg);
 
+    p->action = PAGING;
   }
+  else {
+    p->action = END;
+  }
+  mysql_free_result(res);
+
+/*
+ * message byte setup:
+ * 8 bytes message id
+ * 4 bytes true / false new flag
+ * 3 bytes type (SYS/USR)
+ * 30 bytes to user
+ * 50 bytes reserved
+ * 4 bytes message length
+ * message from user
+ */
+ 
+  sz = (8+4+3+30+50+4+(strlen(msg)));
+
+  p->data_sz = sz;
+  if(p->data)
+    free(p->data);
+  p->data = calloc(p->data_sz, 1);
+
+  memcpy(p->data, &rowid, 8);
+  memcpy(&p->data[8], &new, 4);
+  memcpy(&p->data[12], typ, 3);
+  memcpy(&p->data[15], uname, 30);
+  memcpy(&p->data[95], &msg_len, 4);
+  memcpy(&p->data[99], msg, msg_len);
 
   return 0;
 }
