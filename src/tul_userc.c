@@ -699,13 +699,20 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
   return 0;
 }
 
-int client_get_message(char *uid, char *t_uid, char *pass, tul_net_context *conn, char *msg, unsigned *m_len)
+int client_get_message(char *uid, char *t_uid, char *pass, 
+    tul_net_context *conn, char *msg, 
+    unsigned *m_len, unsigned long long offset,
+    char **ret_data)
 {
   comm_req r;
   comm_payload p;
   char _uid[30] = {0};
   char _tuid[30] = {0};
   char _pass[16] = {0};
+  unsigned long long _offset = offset;
+
+  if(*ret_data)
+    return -1;
 
   if(t_uid)
     strncpy(_tuid, t_uid, 30);
@@ -713,5 +720,44 @@ int client_get_message(char *uid, char *t_uid, char *pass, tul_net_context *conn
   strncpy(_uid, uid, 30);
   strncpy(_pass, pass, 30);
 
+  memset(&r, 0, REQ_HSZ);
+  memset(&p, 0, sizeof(comm_payload));
 
+  strncpy(r.user, _uid, 30);
+
+  if(p.data)
+    free(p.data);
+  p.data = calloc(48,1);
+  p.data_sz = 48;
+
+  /* random encryption key and salt */
+  tul_random(&(r.salt), 16);
+  tul_random(&(r.kek), 16);
+
+  p.action = GET_MSG;
+
+  /* data size with encryption
+   * block size into account
+   */
+  memcpy(p.data, &_offset, 8);
+  memcpy(&((char*)p.data)[8], &_tuid, 30);
+
+  int ret = prep_transmission(_uid, _pass, &r, &p, conn);
+  if(ret)
+    return ret;
+
+  ret = client_transmit(conn);
+  if(ret)
+    return ret;
+
+  ret |= client_recieve(conn);
+  if(!ret)
+    ret |= verify_client_payload(conn, &r, &p, _pass);
+
+  *ret_data = calloc(p.data_sz, 1);
+  memcpy(*ret_data, p.data, p.data_sz);
+
+  return 0;
 }
+
+
