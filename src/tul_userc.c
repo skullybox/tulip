@@ -700,9 +700,7 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
 }
 
 int client_get_message(char *uid, char *t_uid, char *pass, 
-    tul_net_context *conn, char *msg, 
-    unsigned *m_len, unsigned long long offset,
-    char **ret_data)
+    tul_net_context *conn, unsigned long long offset, char **ret_data)
 {
   comm_req r;
   comm_payload p;
@@ -718,7 +716,7 @@ int client_get_message(char *uid, char *t_uid, char *pass,
     strncpy(_tuid, t_uid, 30);
 
   strncpy(_uid, uid, 30);
-  strncpy(_pass, pass, 30);
+  strncpy(_pass, pass, 16);
 
   memset(&r, 0, REQ_HSZ);
   memset(&p, 0, sizeof(comm_payload));
@@ -729,6 +727,7 @@ int client_get_message(char *uid, char *t_uid, char *pass,
     free(p.data);
   p.data = calloc(48,1);
   p.data_sz = 48;
+  r.payload_sz = sizeof(comm_payload) + p.data_sz;
 
   /* random encryption key and salt */
   tul_random(&(r.salt), 16);

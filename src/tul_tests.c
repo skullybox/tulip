@@ -579,7 +579,6 @@ void _test_msg_send()
   conn1._use_tls = 1;
   strcpy(conn1.tls.host, "127.0.0.1");
 
-  //salma
   while(cret)
   {
     cret = tls_client_init(&conn1.tls, 9443);
@@ -589,7 +588,6 @@ void _test_msg_send()
     }
   }
 
-  //if(client_login("salma99", "salma123", &conn1))
   if(client_login(uid, pass, &conn1))
   {
     fprintf(stdout, " FAIL: msg_send_test - login error\n");
@@ -613,6 +611,58 @@ void _test_msg_send()
 
 }
 
+void _test_msg_get()
+{
+  int ret = 0;
+  int cret = 1;
+  tul_net_context conn1;
+  char *list = NULL;
+  unsigned list_sz = 0;
+  char uid[30] = "salma99";
+  char pass[16] = "salma123";
+  char *MESG1 = NULL;
+  char *MESG2 = NULL;
+
+  conn1._use_tls = 1;
+  strcpy(conn1.tls.host, "127.0.0.1");
+
+  while(cret)
+  {
+    cret = tls_client_init(&conn1.tls, 9443);
+    if(cret)
+    {
+      fprintf(stdout, " FAIL: msg_get_test - TLS ERROR - %d\n", cret);
+    }
+  }
+
+  if(client_login(uid, pass, &conn1))
+  {
+    fprintf(stdout, " FAIL: msg_get_test - login error\n");
+    return;
+  }
+  ret |= client_transmit(&conn1);
+  if(!ret)
+    ret |= client_get_ok(&conn1, pass);
+
+  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1);
+  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2);
+
+  if(!ret && MESG1 && MESG2)
+  {
+    fprintf(stdout, " PASS: msg_get_test \n");
+  }
+  else {
+    fprintf(stdout, " FAIL: msg_get_test \n");
+  }
+
+  if(MESG1)
+    free(MESG1);
+  if(MESG2)
+    free(MESG2);
+
+  fprintf(stdout, "MSG(S): %s\n%s\n", MESG1, MESG2);
+
+}
 
 void _cleanup()
 {
