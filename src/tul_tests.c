@@ -618,10 +618,13 @@ void _test_msg_get()
   tul_net_context conn1;
   char *list = NULL;
   unsigned list_sz = 0;
+  char uname[30] = {0};
   char uid[30] = "salma99";
   char pass[16] = "salma123";
   char *MESG1 = NULL;
   char *MESG2 = NULL;
+  unsigned long long offset = 0;
+  unsigned _new = 0;
 
   conn1._use_tls = 1;
   strcpy(conn1.tls.host, "127.0.0.1");
@@ -644,8 +647,8 @@ void _test_msg_get()
   if(!ret)
     ret |= client_get_ok(&conn1, pass);
 
-  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1);
-  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2);
+  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1, &offset, &_new, uname);
+  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2, &offset, &_new, uname);
 
   if(!ret && MESG1 && MESG2)
   {
@@ -655,12 +658,12 @@ void _test_msg_get()
     fprintf(stdout, " FAIL: msg_get_test \n");
   }
 
+  fprintf(stdout, "MSG(S): \n%s\n%s\n", MESG1, MESG2);
   if(MESG1)
     free(MESG1);
   if(MESG2)
     free(MESG2);
 
-  fprintf(stdout, "MSG(S): %s\n%s\n", MESG1, MESG2);
 
 }
 

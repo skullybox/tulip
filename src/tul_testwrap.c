@@ -31,7 +31,7 @@ void run_tests()
   _send_friend_accept_tests();
   _test_get_friends();
   _test_msg_send();
-//  _test_msg_get();
+  _test_msg_get();
 
   tul_log("\n clean-up...\n");
   _cleanup();

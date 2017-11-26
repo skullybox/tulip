@@ -700,7 +700,7 @@ int client_message(char *uid, char *t_uid, char *pass, tul_net_context *conn,
 }
 
 int client_get_message(char *uid, char *t_uid, char *pass, 
-    tul_net_context *conn, unsigned long long offset, char **ret_data)
+    tul_net_context *conn, unsigned long long offset, char **msg, unsigned long long *ret_offset, unsigned *_new, char *uname)
 {
   comm_req r;
   comm_payload p;
@@ -709,7 +709,7 @@ int client_get_message(char *uid, char *t_uid, char *pass,
   char _pass[16] = {0};
   unsigned long long _offset = offset;
 
-  if(*ret_data)
+  if(*msg)
     return -1;
 
   if(t_uid)
@@ -753,8 +753,14 @@ int client_get_message(char *uid, char *t_uid, char *pass,
   if(!ret)
     ret |= verify_client_payload(conn, &r, &p, _pass);
 
-  *ret_data = calloc(p.data_sz, 1);
-  memcpy(*ret_data, p.data, p.data_sz);
+  *msg = calloc(
+      (unsigned)((char*)p.data)[95], 1);
+  memcpy(*msg, &((char*)p.data)[99], 
+      (unsigned)((char*)p.data)[95]);
+
+  memcpy(uname, &((char*)p.data)[15], 30);
+  memcpy(ret_offset, p.data, 8);
+  memcpy(_new, &((char*)p.data)[8], 4);
 
   return 0;
 }

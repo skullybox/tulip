@@ -309,6 +309,9 @@ int do_get_msg(char *user, comm_payload *p)
  
   sz = (8+4+3+30+50+4+(strlen(msg)));
 
+  if(sz%16)
+    sz += (16-(sz%16));
+
   p->data_sz = sz;
   if(p->data)
     free(p->data);
