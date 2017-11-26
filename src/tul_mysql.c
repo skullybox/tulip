@@ -64,7 +64,7 @@ int tul_dbinit()
             conn_pool[i],
             SQL_HST, SQL_USR, 
             SQL_PAS, SQL_DB,
-            SQL_PORT, NULL, 0) == NULL)
+            SQL_PORT, NULL, CLIENT_SSL) == NULL)
       {
         mysql_close(conn_pool[i]);
         conn_pool[i] = NULL;
