@@ -16,6 +16,7 @@
 
 extern tul_read_callback tul_RD_callback;
 extern tul_write_callback tul_WR_callback;
+extern unsigned char dbk[17];
 
 /* forward declarations */
 int do_ignore_friend(char *user, comm_payload *p);
@@ -187,7 +188,9 @@ void module_read(tul_net_context *c)
 
 int do_get_msg(char *user, comm_payload *p)
 {
+  RC5_ctx rc5;
   unsigned sz = 0;
+  unsigned nsz = 0;
   char _uid[30] = {0};
   char _tuid[30] = {0};
   unsigned msg_len = 0;
@@ -204,18 +207,19 @@ int do_get_msg(char *user, comm_payload *p)
   char typ[4] = {0};
   unsigned new = 0;
   char msg[MAX_MESSAGE];
-
-
+  unsigned char l_dbk[17] = {0};
+  char *tmp1 = NULL;
+  char *tmp2 = NULL;
 
   // when no offset or t_uid is set or not
-  char QL0[] = "select rowid, uname, frm, typ, new, msg from message where uname='%s' or frm='%s' order by rowid desc limit 1";
-  char QL1[] = "select rowid, uname, frm, typ, new, msg from message where (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid desc limit 1";
+  char QL0[] = "select rowid, uname, frm, typ, new, msg, salt from message where uname='%s' or frm='%s' order by rowid desc limit 1";
+  char QL1[] = "select rowid, uname, frm, typ, new, msg, salt from message where (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid desc limit 1";
 
   // when offset is provided
-  char QL2[] = "select rowid, uname, frm, typ, new, msg from message where rowid > %llu and uname='%s' or frm='%s' order by rowid desc limit 1";
+  char QL2[] = "select rowid, uname, frm, typ, new, msg, salt from message where rowid > %llu and uname='%s' or frm='%s' order by rowid desc limit 1";
 
   // when offset is provided and t_uid is set
-  char QL3[] = "select rowid, uname, frm, typ, new, msg from message where rowid > %llu and (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid desc limit 1";
+  char QL3[] = "select rowid, uname, frm, typ, new, msg, salt from message where rowid > %llu and (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid desc limit 1";
 
   strncpy(_uid, user, 30);
   strncpy(_tuid, &((char*)p->data)[8], 30);
@@ -284,9 +288,19 @@ int do_get_msg(char *user, comm_payload *p)
     // new
     new = atoi(irow[4]);
 
-    // msg
-    strncpy(msg, irow[5], MAX_MESSAGE);
+    // msg -- decrypt
+    tmp1 = base64_dec(irow[6], strlen(irow[6])); // salt
+    tmp2 = base64_dec_gt_sz(irow[5], strlen(irow[5]), &nsz); // msg
 
+    memcpy(l_dbk, dbk, 16);
+    salt_password(l_dbk, tmp1, 16);
+    free(tmp1);
+    tmp1 = NULL;
+
+    RC5_SETUP(l_dbk, &rc5);
+    rc5_decrypt((unsigned*)tmp2, (unsigned*)msg, &rc5, nsz);
+    
+    free(tmp2);
     msg_len = strlen(msg);
 
     p->action = PAGING;
@@ -329,11 +343,18 @@ int do_get_msg(char *user, comm_payload *p)
 
 int do_send_msg(char *user, comm_payload *p)
 {
+  RC5_ctx rc5;
   char _uid[30] = {0};
   char _tuid[30] = {0};
   unsigned msg_len = 0;
+  unsigned sz = 0;
   char *msg = NULL;
   char SQL[5048] = {0};
+  unsigned char salt[25] = {0};
+  unsigned char l_dbk[17] = {0};
+  char *tmp1 = NULL;
+  char *tmp2 = NULL;
+  char *tmp3 = NULL;
 
   strncpy(_uid, user, 30);
 
@@ -353,9 +374,38 @@ int do_send_msg(char *user, comm_payload *p)
   // message pointer
   msg = &((char*)p->data)[MESSAGE_META_SZ];
 
-  sprintf(SQL, "insert into message (uname, frm, typ, msg) values ('%s', '%s', '%s', '%s')",
-      _tuid, _uid, "USR", msg);
 
+  // encrypt message before insert
+  tul_random(&salt[0], 16); 
+  tmp1 = base64_enc(salt, 16);
+  memcpy(l_dbk, dbk, 16);
+  salt_password(l_dbk, salt,16);
+
+  // copy base64 salt back to salt variable
+  memset(salt, 0, 25);
+  strcpy(salt, tmp1);
+  free(tmp1);
+  tmp1 = NULL;
+
+  if(strlen(msg)%16)
+    sz = strlen(msg)+(16-(strlen(msg)%16));
+  else 
+    sz = strlen(msg);
+
+  tmp1 = calloc(sz, 1);
+  tmp2 = calloc(sz, 1);
+  strcpy(tmp1, msg);
+
+  RC5_SETUP(l_dbk, &rc5);
+  rc5_encrypt((unsigned*)tmp1, (unsigned*)tmp2, &rc5, sz);
+  free(tmp1);
+  tmp1 = base64_enc(tmp2, sz);
+  free(tmp2);
+
+  sprintf(SQL, "insert into message (uname, frm, typ, msg, salt) values ('%s', '%s', '%s', '%s', '%s')",
+      _tuid, _uid, "USR", tmp1, salt);
+
+  free(tmp1);
   return tul_query(1, SQL);
 }
 

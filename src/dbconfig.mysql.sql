@@ -31,6 +31,7 @@ create table message(
   ctime DATETIME not null DEFAULT CURRENT_TIMESTAMP, 
   msg text, 
   new BOOL NOT NULL default TRUE, 
+  salt varchar(25) NOT NULL, 
   foreign key (uname) references user(uname), 
   foreign key(frm) references user(uname), 
   primary key(rowid));

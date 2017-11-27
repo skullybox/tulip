@@ -59,7 +59,7 @@ unsigned char * base64_enc(unsigned char *d, size_t sz)
   return n;
 }
 
-unsigned char * base64_dec(unsigned char *d, size_t sz)
+unsigned char * base64_dec_gt_sz(unsigned char *d, size_t sz, unsigned *nsz)
 {
   unsigned char *n = NULL;
   size_t n_sz = 0;
@@ -74,6 +74,8 @@ unsigned char * base64_dec(unsigned char *d, size_t sz)
     offset = 1;
 
   n_sz = ((sz)/4)*3 - offset;
+  if(nsz)
+    *nsz = n_sz;
 
   n = calloc(1, n_sz+1);
 
@@ -125,6 +127,11 @@ unsigned char * base64_dec(unsigned char *d, size_t sz)
   }
 
   return n;
+}
+
+unsigned char * base64_dec(unsigned char *d, size_t sz)
+{
+  return base64_dec_gt_sz(d, sz, NULL);
 }
 
 
