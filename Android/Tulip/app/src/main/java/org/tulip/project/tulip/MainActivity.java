@@ -228,6 +228,42 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     @Override
                     public void run() {
 
+                        boolean flag_update_user_list = false;
+                        Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
+                                TulipSession.current_offset);
+
+                        if(_msg.getMessage().length() <= 0)
+                            return;
+
+                        if(_msg.getId().compareTo(TulipSession.current_offset) == 1)
+                            TulipSession.current_offset = _msg.getId();
+
+                        if(_msg.sysType())
+                        {
+                            // TODO: System messages;
+                            return;
+                        }
+
+                        int friend_pos = friends.indexOf(_msg.getUser());
+                        if(friend_pos == -1)
+                        {
+                            // TODO: message from user not in list
+
+                            flag_update_user_list = true;
+                        }
+                        else
+                        {
+                            // TODO: add message to hashmap
+                        }
+
+                        if(_msg.isNew())
+                        {
+                            // TODO: update UI where user is set to new message
+
+                            flag_update_user_list = true;
+                        }
+
+
                     }
                 });
             }

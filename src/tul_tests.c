@@ -618,6 +618,7 @@ void _test_msg_get()
   tul_net_context conn1;
   char *list = NULL;
   unsigned list_sz = 0;
+  char typ[4] = {0};
   char uname[30] = {0};
   char uid[30] = "salma99";
   char pass[16] = "salma123";
@@ -647,8 +648,8 @@ void _test_msg_get()
   if(!ret)
     ret |= client_get_ok(&conn1, pass);
 
-  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1, &offset, &_new, uname);
-  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2, &offset, &_new, uname);
+  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1, &offset, &_new, uname, typ);
+  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2, &offset, &_new, uname, typ);
 
   if(!ret && MESG1 && MESG2)
   {
