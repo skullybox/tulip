@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                     friendRequestList = GetFriendRequest(TulipSession.user, TulipSession.password);
 
-                    if (friendRequestList != null || friendRequestList.length > 0)
+                    if (friendRequestList != null && friendRequestList.length > 0)
                     {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -222,6 +223,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             if (System.currentTimeMillis() / 1000L - message_last_check > 7) {
 
                 message_last_check = System.currentTimeMillis() / 1000L;
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
             }
 
         }
@@ -265,6 +273,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public native String[] GetFriendRequest(String user, String pass);
     public native int AcceptFriend(String user, String pass, String freq);
     public native int IgnoreFriend(String user, String pass, String freq);
-    public native byte[] getMessage(String user, String pass);
+    public native Message GetMessage(String user, String pass, String frm_user, BigInteger offset);
 
 }

@@ -230,22 +230,47 @@ Java_org_tulip_project_tulip_MainActivity_IgnoreFriend(JNIEnv *env, jobject inst
 }
 
 extern "C"
-JNIEXPORT jbyteArray JNICALL
-Java_org_tulip_project_tulip_MainActivity_getMessage(JNIEnv *env, jobject instance, jstring user_,
-                                                     jstring pass_) {
+JNIEXPORT jobject JNICALL
+Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instance, jstring user_,
+                                                     jstring pass_, jstring frm_user_,
+                                                     jobject offset) {
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
+    const char *frm_user = env->GetStringUTFChars(frm_user_, 0);
 
-    /*
-     * byte array layout:
-     * message id (8bytes)
-     * read true / false (4 bytes)
-     * message type 3 bytes
-     * from 30 bytes user name
-     * 50 bytes reserved
-     * message from user
-     */
+
+    int ret = 0;
+    unsigned _new = 0;
+    unsigned long long _offset = 0;
+    unsigned long long _ret_offset = 0;
+    char uname[30] = {0};
+    char *msg = NULL;
+    memset(msg, 0, MAX_MESSAGE);
+
+    //client_get_message(char *uid,
+    // char *t_uid,
+    // char *pass,
+    // tul_net_context *conn,
+    // unsigned long long offset,
+    // char **msg,
+    // unsigned long long *ret_offset,
+    // unsigned *_new,
+    // char *uname);
+    ret = client_get_message(
+            (char*) user,
+            (char*)frm_user,
+            (char*)pass,
+            conn,
+            _offset,
+            &msg,
+            &_ret_offset,
+            &_new,
+            uname);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
+    env->ReleaseStringUTFChars(frm_user_, frm_user);
+
+    free(msg);
+
 }
