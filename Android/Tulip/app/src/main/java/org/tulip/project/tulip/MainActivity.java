@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     Thread _main_tulip;
     String[] friendRequestList = null;
     List<String> friends = new ArrayList<>();
+    List<String> friends_message = new ArrayList<>();
     List<String> friendsRequest = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
     HashMap<String, ArrayList<Message>> messages = new HashMap<>();
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     @Override
                     public void run() {
 
+                        String target_user_list = "";
                         boolean flag_update_user_list = false;
                         Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
                                 TulipSession.current_offset);
@@ -245,18 +247,23 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             return;
                         }
 
-                        int friend_pos = friends.indexOf(_msg.getUser());
-                        if(friend_pos == -1)
+                        if(_msg.getUser().equals(TulipSession.user))
+                            target_user_list = _msg.getFrm();
+                        else
+                            target_user_list = _msg.getUser();
+
+                        int friend_pos = friends.indexOf(target_user_list);
+                        if(friend_pos == -1 )
                         {
-                            friends.add(_msg.getUser());
+                            friends.add(target_user_list);
                             flag_update_user_list = true;
                         }
 
                         List<Message> _m = messages.get(_msg.getUser());
                         if(_m == null)
                         {
-                            messages.put(_msg.getUser(), new ArrayList<Message>());
-                            messages.get(_msg.getUser()).add(_msg);
+                            messages.put(target_user_list, new ArrayList<Message>());
+                            messages.get(target_user_list).add(_msg);
                         }
                         else
                         {
@@ -272,14 +279,17 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                                 }
                             }
                             if(!flag_found)
-                                messages.get(_msg.getUser()).add(_msg);
+                                messages.get(target_user_list).add(_msg);
                         }
 
-                        if(_msg.isNew())
+                        if(_msg.isNew()||flag_update_user_list)
                         {
                             // TODO: update UI where user is set to new message
+                            int pos = friends_message.indexOf(target_user_list);
+                            if(pos == -1)
+                                friends_message.add(target_user_list);
 
-                            flag_update_user_list = true;
+                            adaptor.notifyDataSetChanged();
                         }
 
 
@@ -315,7 +325,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             ImageView imageView = (ImageView) view.findViewById(R.id.statimgview);
             TextView textView = (TextView) view.findViewById(R.id.usernameview);
 
-            imageView.setImageResource(stateimage[0]);
+            int pos = friends_message.indexOf(getItem(i).toString());
+            if(pos == -1)
+                imageView.setImageResource(stateimage[0]);
+            else
+                imageView.setImageResource(stateimage[1]);
+
             textView.setText(getItem(i).toString());
 
             return view;

@@ -335,6 +335,7 @@ int do_get_msg(char *user, comm_payload *p)
   memcpy(&((char*)p->data)[8], &new, 4);
   memcpy(&((char*)p->data)[12], typ, 3);
   memcpy(&((char*)p->data)[15], uname, 30);
+  memcpy(&((char*)p->data)[45], frm, 30);
   memcpy(&((char*)p->data)[95], &msg_len, 4);
   memcpy(&((char*)p->data)[99], msg, msg_len);
 

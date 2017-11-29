@@ -244,6 +244,7 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     unsigned long long _offset = 0;
     unsigned long long _ret_offset = 0;
     char uname[30] = {0};
+    char frm[30] = {0};
     char typ[4] = {0};
     char *msg = NULL;
     char tmp[30] = {0};
@@ -258,11 +259,12 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
             &_ret_offset,
             &_new,
             uname,
+            frm,
             typ);
 
     jclass jmsg = env->FindClass("org/tulip/project/tulip/Message");
     jmethodID cons = env->GetMethodID(jmsg, "<init>",
-                                      "(Ljava/lang/String;Ljava/lang/String;Ljava/math/BigInteger;ZLjava/lang/String;)V");
+                                      "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/math/BigInteger;ZLjava/lang/String;)V");
 
     jclass jbigint = env->FindClass("java/math/BigInteger");
     jmethodID jbigcons = env->GetMethodID(jbigint, "<init>", "(Ljava/lang/String;)V");
@@ -274,18 +276,20 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     if (jmsg && cons && jbigint && jbigcons) {
         jobject _msg = env->NewStringUTF(msg);
         jobject _uname = env->NewStringUTF(uname);
+        jobject _frm = env->NewStringUTF(frm);
         jobject _jstrtmp = env->NewStringUTF(tmp);
         jobject _msg_offset = env->NewObject(jbigint, jbigcons, _jstrtmp);
         jobject _type = env->NewStringUTF(uname);
 
 
         if (_new)
-            retObj = env->NewObject(jmsg, cons, _msg, _uname, _msg_offset, true, _type);
+            retObj = env->NewObject(jmsg, cons, _msg, _uname, _frm, _msg_offset, true, _type);
         else
-            retObj = env->NewObject(jmsg, cons, _msg, _uname, _msg_offset, false, _type);
+            retObj = env->NewObject(jmsg, cons, _msg, _uname, _frm, _msg_offset, false, _type);
 
         env->DeleteLocalRef(_msg);
         env->DeleteLocalRef(_uname);
+        env->DeleteLocalRef(_frm);
         env->DeleteLocalRef(_msg_offset);
         env->DeleteLocalRef(_type);
         env->DeleteLocalRef(_jstrtmp);

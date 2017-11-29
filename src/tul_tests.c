@@ -620,6 +620,7 @@ void _test_msg_get()
   unsigned list_sz = 0;
   char typ[4] = {0};
   char uname[30] = {0};
+  char frm[30] = {0};
   char uid[30] = "salma99";
   char pass[16] = "salma123";
   char *MESG1 = NULL;
@@ -648,8 +649,8 @@ void _test_msg_get()
   if(!ret)
     ret |= client_get_ok(&conn1, pass);
 
-  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1, &offset, &_new, uname, typ);
-  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2, &offset, &_new, uname, typ);
+  ret |= client_get_message(uid, "", pass, &conn1, 0, &MESG1, &offset, &_new, uname, frm,  typ);
+  ret |= client_get_message(uid, "t_admin", pass, &conn1, 0, &MESG2, &offset, &_new, uname, frm, typ);
 
   if(!ret && MESG1 && MESG2)
   {
