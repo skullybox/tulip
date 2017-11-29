@@ -1,7 +1,7 @@
 # Top-level make file
 C = gcc
 
-ANDROID_CC_TOOLS = "$(HOME)/Android/Sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh"
+ANDROID_CC_TOOLS = "$(HOME)/Android/ndk-bundle/build/tools/make-standalone-toolchain.sh"
 
 sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
