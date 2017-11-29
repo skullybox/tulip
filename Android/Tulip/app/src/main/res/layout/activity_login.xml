@@ -22,21 +22,21 @@
         tools:layout_editor_absoluteY="-10dp">
 
         <EditText
-            android:id="@+id/tx_user"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:ems="10"
-            android:fontFamily="sans-serif-condensed"
-            android:hint="Username"
-            android:inputType="textPersonName"
-            android:paddingTop="22dp"
-            android:textColorLink="@android:color/darker_gray"
-            android:typeface="monospace"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.017" />
+                android:id="@+id/tx_user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:fontFamily="sans-serif-condensed"
+                android:hint="Username"
+                android:inputType="textPersonName"
+                android:paddingTop="22dp"
+                android:textColorLink="@android:color/darker_gray"
+                android:typeface="monospace"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.017"/>
 
         <EditText
             android:id="@+id/tx_password"
