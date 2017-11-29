@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
@@ -247,13 +248,31 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         int friend_pos = friends.indexOf(_msg.getUser());
                         if(friend_pos == -1)
                         {
-                            // TODO: message from user not in list
-
+                            friends.add(_msg.getUser());
                             flag_update_user_list = true;
+                        }
+
+                        List<Message> _m = messages.get(_msg.getUser());
+                        if(_m == null)
+                        {
+                            messages.put(_msg.getUser(), new ArrayList<Message>());
+                            messages.get(_msg.getUser()).add(_msg);
                         }
                         else
                         {
-                            // TODO: add message to hashmap
+                            Iterator<Message> itr = _m.iterator();
+                            boolean flag_found = false;
+                            while(itr.hasNext())
+                            {
+                                Message _tmsg = itr.next();
+                                if(_tmsg.getId().compareTo(_msg.getId()) == 0)
+                                {
+                                    flag_found = true;
+                                    break;
+                                }
+                            }
+                            if(!flag_found)
+                                messages.get(_msg.getUser()).add(_msg);
                         }
 
                         if(_msg.isNew())
