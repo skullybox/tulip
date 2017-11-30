@@ -160,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 Logout(TulipSession.user, TulipSession.password);
                 TulipSession.user = "";
                 TulipSession.password = "";
+                messages.clear();
+                friends_message.clear();
+                friendsRequest.clear();
+                friends.clear();
                 finish();
                 return true;
             default:
