@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<android.widget.RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,4 +7,27 @@
         android:layout_height="match_parent"
         tools:context="org.tulip.project.tulip.Chat">
 
-</android.support.constraint.ConstraintLayout>
+    <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="false" android:layout_alignParentEnd="false"
+            android:layout_alignWithParentIfMissing="false" android:layout_alignBottom="@+id/floatingActionButton4"
+            android:layout_marginBottom="30dp" android:padding="12dp"/>
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText7" android:layout_weight="1"
+            android:layout_alignParentEnd="false" android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true" android:layout_alignLeft="@+id/floatingActionButton4"
+            android:layout_marginBottom="11dp" android:layout_marginLeft="5dp" android:layout_marginRight="55dp"/>
+    <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:fabSize="mini" app:srcCompat="@android:drawable/ic_menu_send"
+            android:id="@+id/floatingActionButton4" android:layout_weight="1"
+            app:backgroundTint="@android:color/background_light" app:elevation="14dp"
+            android:baselineAlignBottom="false" android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="true" android:layout_alignParentBottom="true"
+            android:layout_marginBottom="14dp" android:layout_marginRight="10dp"/>
+</android.widget.RelativeLayout>

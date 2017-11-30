@@ -10,6 +10,7 @@ public class TulipSession {
 
     protected static String user = "";
     protected static String password = "";
+    protected static String current_chat_user = "";
     protected static BigInteger current_offset = BigInteger.ZERO;
 }
 

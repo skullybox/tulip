@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String itm = adapterView.getItemAtPosition(i).toString();
-
+                TulipSession.current_chat_user = itm;
                 startActivity(new Intent(MainActivity.this, Chat.class));
             }
         });
