@@ -18,14 +18,14 @@
         app:srcCompat="@drawable/grey" />
 
     <TextView
-        android:id="@+id/usernameview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/statimgview"
-        android:layout_marginStart="18dp"
-        android:layout_toEndOf="@+id/statimgview"
-        android:elegantTextHeight="true"
-        android:fontFamily="sans-serif-condensed"
-        android:text="TextView"
-        android:textColorLink="@android:color/darker_gray" />
+            android:id="@+id/usernameview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/statimgview"
+            android:layout_marginStart="18dp"
+            android:layout_toEndOf="@+id/statimgview"
+            android:elegantTextHeight="true"
+            android:text="TextView"
+            android:textColorLink="@android:color/darker_gray"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
 </RelativeLayout>

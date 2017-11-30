@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 TulipSession.password = "";
                 TulipSession.current_chat_user = "";
                 TulipSession.current_chat_user = "";
-                
+
                 messages.clear();
                 friends_message.clear();
                 friendsRequest.clear();

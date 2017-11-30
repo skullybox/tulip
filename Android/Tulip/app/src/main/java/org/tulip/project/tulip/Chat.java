@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Chat extends AppCompatActivity {
 
@@ -86,6 +87,42 @@ public class Chat extends AppCompatActivity {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
+
+            view = getLayoutInflater().inflate(R.layout.activity_chat, null);
+            TextView textView = (TextView) view.findViewById(R.id.chattext);
+
+            int count = 0;
+            Message current_message = null;
+            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+
+            if(_msgs == null)
+                return null;
+
+            Iterator<Message> itr = _msgs.iterator();
+            while(itr.hasNext() && count <= i)
+            {
+                if(count == i)
+                    current_message = itr.next();
+                else
+                    itr.next();
+                count++;
+            }
+
+            if (count == i)
+            {
+                if(current_message.getFrm().equals(TulipSession.user))
+                {
+                    textView.setTextColor(android.R.color.black);
+                    textView.setBackgroundColor(android.R.color.darker_gray);
+                }
+                else
+                {
+                    textView.setTextColor(android.R.color.white);
+                    textView.setBackgroundColor(android.R.color.holo_blue_light);
+                }
+                textView.setText(current_message.getMessage());
+            }
+
             return null;
         }
     }
