@@ -256,11 +256,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         }
 
                         if(_msg.getFrm().equals(TulipSession.user)) {
-                            target_user_list = _msg.getFrm();
+                            target_user_list = _msg.getUser();
                             current_user_message = true;
                         }
                         else {
-                            target_user_list = _msg.getUser();
+                            target_user_list = _msg.getFrm();
                         }
 
                         int friend_pos = friends.indexOf(target_user_list);

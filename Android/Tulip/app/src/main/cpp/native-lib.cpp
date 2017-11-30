@@ -307,7 +307,7 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
         jobject _frm = env->NewStringUTF(frm);
         jobject _jstrtmp = env->NewStringUTF(tmp);
         jobject _msg_offset = env->NewObject(jbigint, jbigcons, _jstrtmp);
-        jobject _type = env->NewStringUTF(uname);
+        jobject _type = env->NewStringUTF(typ);
 
 
         if (_new)
