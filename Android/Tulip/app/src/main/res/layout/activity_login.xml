@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="5dp"
-    android:background="@android:color/background_light"
-    tools:context="org.tulip.project.tulip.Login">
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:layout_margin="5dp"
+                                             tools:context="org.tulip.project.tulip.Login" android:elevation="1dp"
+                                             android:backgroundTint="@android:color/background_light">
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/background_light"
-        android:orientation="vertical"
-        android:padding="11dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="-10dp">
+            android:id="@+id/linearLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="11dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteY="-10dp">
 
         <EditText
                 android:id="@+id/tx_user"
@@ -39,56 +38,56 @@
                 app:layout_constraintVertical_bias="0.017"/>
 
         <EditText
-            android:id="@+id/tx_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:fontFamily="sans-serif-condensed"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:paddingTop="22dp"
-            android:singleLine="false"
-            android:textColorLink="@android:color/darker_gray"
-            android:typeface="monospace"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:layout_editor_absoluteY="64dp" />
+                android:id="@+id/tx_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:fontFamily="sans-serif-condensed"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:paddingTop="22dp"
+                android:singleLine="false"
+                android:textColorLink="@android:color/darker_gray"
+                android:typeface="monospace"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:layout_editor_absoluteY="64dp"/>
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:baselineAlignBottom="false"
-            android:paddingBottom="22dp"
-            android:paddingEnd="22dp"
-            android:paddingLeft="22dp"
-            android:paddingRight="22dp"
-            android:paddingStart="22dp"
-            android:paddingTop="22dp"
-            android:textAlignment="center"
-            app:srcCompat="@drawable/tulip_m" />
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAlignBottom="false"
+                android:paddingBottom="22dp"
+                android:paddingEnd="22dp"
+                android:paddingLeft="22dp"
+                android:paddingRight="22dp"
+                android:paddingStart="22dp"
+                android:paddingTop="22dp"
+                android:textAlignment="center"
+                app:srcCompat="@drawable/tulip_m"/>
 
         <Button
-            android:id="@+id/t_signin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
-            android:text="Sign In"
-            android:textAlignment="center" />
+                android:id="@+id/t_signin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:text="Sign In"
+                android:textAlignment="center"/>
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:autoLink="web"
-            android:fontFamily="sans-serif-condensed"
-            android:linksClickable="true"
-            android:text="@string/signupstring"
-            android:textAlignment="textEnd"
-            android:textColorLink="@color/colorPrimaryDark"
-            tools:layout_editor_absoluteX="158dp"
-            tools:layout_editor_absoluteY="330dp" />
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:autoLink="web"
+                android:fontFamily="sans-serif-condensed"
+                android:linksClickable="true"
+                android:text="@string/signupstring"
+                android:textAlignment="textEnd"
+                android:textColorLink="@color/colorPrimaryDark"
+                tools:layout_editor_absoluteX="158dp"
+                tools:layout_editor_absoluteY="330dp"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
