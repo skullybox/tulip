@@ -2,6 +2,7 @@ package org.tulip.project.tulip;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,11 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     Thread _main_tulip;
     String[] friendRequestList = null;
     List<String> friends = new ArrayList<>();
-    List<String> friends_message = new ArrayList<>();
+    List<String> friends_message = new ArrayList<>(); // list of users with new messages
     List<String> friendsRequest = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
     HashMap<String, ArrayList<Message>> messages = new HashMap<>();
@@ -62,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         _main_tulip.start();
 
     }
-
     private void addClickListener()
     {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
@@ -109,6 +105,17 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 freqDialog.show();
             }
         });
+
+        ListView userList = (ListView) findViewById(R.id.listView);
+        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String itm = adapterView.getItemAtPosition(i).toString();
+
+                startActivity(new Intent(MainActivity.this, Chat.class));
+            }
+        });
+
     }
 
     @Override
@@ -232,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                         String target_user_list = "";
                         boolean flag_update_user_list = false;
+                        boolean current_user_message = false;
                         Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
                                 TulipSession.current_offset);
 
@@ -247,10 +255,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             return;
                         }
 
-                        if(_msg.getUser().equals(TulipSession.user))
+                        if(_msg.getUser().equals(TulipSession.user)) {
                             target_user_list = _msg.getFrm();
-                        else
+                            current_user_message = true;
+                        }
+                        else {
                             target_user_list = _msg.getUser();
+                        }
 
                         int friend_pos = friends.indexOf(target_user_list);
                         if(friend_pos == -1 )
@@ -262,6 +273,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         List<Message> _m = messages.get(_msg.getUser());
                         if(_m == null)
                         {
+                            // this should not happen
+                            // if the user is on the list but on on the client
                             messages.put(target_user_list, new ArrayList<Message>());
                             messages.get(target_user_list).add(_msg);
                         }
@@ -282,9 +295,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                                 messages.get(target_user_list).add(_msg);
                         }
 
-                        if(_msg.isNew()||flag_update_user_list)
+                        if(!current_user_message && (_msg.isNew()||flag_update_user_list))
                         {
-                            // TODO: update UI where user is set to new message
+                            // update UI where user is set to new message
                             int pos = friends_message.indexOf(target_user_list);
                             if(pos == -1)
                                 friends_message.add(target_user_list);
