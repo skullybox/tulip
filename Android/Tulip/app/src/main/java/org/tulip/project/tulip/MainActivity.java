@@ -24,11 +24,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     Userlist adaptor;
     Thread _main_tulip;
     String[] friendRequestList = null;
-    List<String> friends = new ArrayList<>();
-    List<String> friends_message = new ArrayList<>(); // list of users with new messages
-    List<String> friendsRequest = new ArrayList<>();
+    public static List<String> friends = new ArrayList<>();
+    public static List<String> friends_message = new ArrayList<>(); // list of users with new messages
+    public static List<String> friendsRequest = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
-    HashMap<String, ArrayList<Message>> messages = new HashMap<>();
+    public static HashMap<String, ArrayList<Message>> messages = new HashMap<>();
 
     AlertDialog.Builder freqDialog;
 
