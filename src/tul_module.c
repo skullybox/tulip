@@ -316,7 +316,8 @@ int do_get_msg(char *user, comm_payload *p)
  * 4 bytes true / false new flag
  * 3 bytes type (SYS/USR)
  * 30 bytes to user
- * 50 bytes reserved
+ * 30 bytes from user
+ * 20 bytes reserved
  * 4 bytes message length
  * message from user
  */

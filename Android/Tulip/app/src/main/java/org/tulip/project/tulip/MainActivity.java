@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             return;
                         }
 
-                        if(_msg.getUser().equals(TulipSession.user)) {
+                        if(_msg.getFrm().equals(TulipSession.user)) {
                             target_user_list = _msg.getFrm();
                             current_user_message = true;
                         }

@@ -758,7 +758,7 @@ int client_get_message(char *uid, char *t_uid, char *pass,
   memcpy(*msg, &((char*)p.data)[99], 
       (unsigned)((char*)p.data)[95]);
 
-  memcpy(typ, &((char*)p.data)[15], 3);
+  memcpy(typ, &((char*)p.data)[12], 3);
   memcpy(uname, &((char*)p.data)[15], 30);
   memcpy(frm, &((char*)p.data)[45], 30);
   memcpy(ret_offset, p.data, 8);
