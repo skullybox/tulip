@@ -47,7 +47,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         String _friends[] = GetList(TulipSession.user, TulipSession.password);
 
         for (String _s : _friends)
-            friends.add(_s);
+        {
+            int pos = friends.indexOf(_s);
+            if(pos == -1)
+                friends.add(_s);
+        }
 
         adaptor = new Userlist();
         listview.setAdapter(adaptor);
