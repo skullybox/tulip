@@ -161,6 +161,8 @@ Java_org_tulip_project_tulip_MainActivity_FriendRequest(JNIEnv *env, jobject ins
     ret |= client_recieve(lconn);
 
     if (lconn) {
+        client_logout((char *) user, (char *) pass, lconn);
+        client_transmit(lconn);
         if (lconn->tls.server_fd.fd > 0)
             close(lconn->tls.server_fd.fd);
         free(lconn);
@@ -368,6 +370,8 @@ Java_org_tulip_project_tulip_Chat_SendMessage
     ret = client_message((char*)user, (char*)to_user, (char*)pass, lconn, (char*)msg, strlen(msg) );
 
     if (lconn) {
+        client_logout((char *) user, (char *) pass, lconn);
+        client_transmit(lconn);
         if (lconn->tls.server_fd.fd > 0)
             close(lconn->tls.server_fd.fd);
         free(lconn);
