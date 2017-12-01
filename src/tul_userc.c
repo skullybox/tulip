@@ -754,7 +754,7 @@ int client_get_message(char *uid, char *t_uid, char *pass,
     ret |= verify_client_payload(conn, &r, &p, _pass);
 
   *msg = calloc(
-      (unsigned)((char*)p.data)[95], 1);
+      (unsigned)((char*)p.data)[95]+1, 1);
   memcpy(*msg, &((char*)p.data)[99], 
       (unsigned)((char*)p.data)[95]);
 

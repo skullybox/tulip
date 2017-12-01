@@ -16,6 +16,8 @@ import android.widget.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
 
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public static List<Object> friendsRequest = Collections.synchronizedList(new ArrayList<>());
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
     public static ConcurrentHashMap<String, ArrayList<Message>> messages = new ConcurrentHashMap<>();
+    public static Lock lck = new ReentrantLock();
 
     AlertDialog.Builder freqDialog;
 
@@ -206,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                break;
+                continue;
             }
 
             // check for friend requests
@@ -254,14 +257,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         TulipSession.current_offset.toString());
 
                 if (_msg == null)
-                    return;
+                    continue;
 
                 if (_msg.getId().compareTo(TulipSession.current_offset) == 1)
                     TulipSession.current_offset = _msg.getId();
 
                 if (_msg.sysType()) {
                     // TODO: System messages;
-                    return;
+                    continue;
                 }
 
                 if (_msg.getFrm().equals(TulipSession.user)) {
@@ -290,11 +293,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         Message _tmsg = itr.next();
                         if (_tmsg.getId().compareTo(_msg.getId()) == 0) {
                             flag_found = true;
-                            break;
+                            continue;
                         }
                     }
-                    if (!flag_found)
+                    if (!flag_found) {
                         messages.get(target_user_list).add(_msg);
+                    }
                 }
 
                 if (!current_user_message && (_msg.isNew() || flag_update_user_list)) {

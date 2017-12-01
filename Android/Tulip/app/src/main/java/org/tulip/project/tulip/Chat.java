@@ -36,11 +36,12 @@ public class Chat extends AppCompatActivity {
 
     private void addClickListener()
     {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.sendbutton);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.sendbutton);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                fab.setClickable(false);
                 TextView chatin = (TextView) findViewById(R.id.editText7);
                 String msg = new StringBuilder(chatin.getText()).toString();
 
@@ -53,6 +54,7 @@ public class Chat extends AppCompatActivity {
                     MainActivity.messages.put(TulipSession.current_chat_user, new ArrayList<Message>());
                     chatlist = MainActivity.messages.get(TulipSession.current_chat_user);
                 }
+
                 if(chatlist == null)
                     return;
 
@@ -76,6 +78,7 @@ public class Chat extends AppCompatActivity {
                         }
                     });
                 }
+                fab.setClickable(true);
 
             }
         });
@@ -94,7 +97,9 @@ public class Chat extends AppCompatActivity {
 
         @Override
         public int getCount() {
+
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+
             if(_msgs == null)
                 return 0;
             return _msgs.size();
@@ -127,7 +132,6 @@ public class Chat extends AppCompatActivity {
 
             Message current_message = null;
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-
             if(_msgs == null)
                 return view;
 

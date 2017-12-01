@@ -295,7 +295,6 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     char *msg = NULL;
     char tmp[30] = {0};
 
-
     //big int stuff
     _offset = strtoull(bigint_str,(char **)NULL, 10 );
 
@@ -337,7 +336,12 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     sprintf(tmp, "%llu", _ret_offset);
 
     if (jmsg && cons && jbigint && jbigcons) {
-        jobject _msg = env->NewStringUTF(msg);
+        jobject _msg;
+        if(msg)
+            _msg = env->NewStringUTF(msg);
+        else
+           _msg = env->NewStringUTF("");
+
         jobject _uname = env->NewStringUTF(uname);
         jobject _frm = env->NewStringUTF(frm);
         jobject _jstrtmp = env->NewStringUTF(tmp);
