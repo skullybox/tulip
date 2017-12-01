@@ -59,15 +59,23 @@ public class Chat extends AppCompatActivity {
 
                 int ret = 0;
                 if(_m.getMessage().length() > 0)
-                    SendMessage(TulipSession.user, TulipSession.password, TulipSession.current_chat_user,
+                    ret = SendMessage(TulipSession.user, TulipSession.password, TulipSession.current_chat_user,
                         msg);
+                else
+                    ret = -1;
 
                 if(ret == 0)
                 {
                     chatin.setText("");
                     if(_m.getMessage().length()>0)
                         chatlist.add(_m);
-                    adaptor.notifyDataSetChanged();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adaptor.notifyDataSetChanged();
+                        }
+                    });
                 }
 
             }

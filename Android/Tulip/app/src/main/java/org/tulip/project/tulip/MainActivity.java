@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public static List<String> friends_message = new ArrayList<>(); // list of users with new messages
     public static List<String> friendsRequest = new ArrayList<>();
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
-    public static HashMap<String, ArrayList<Message>> messages = new HashMap<>();
+    public static ConcurrentHashMap<String, ArrayList<Message>> messages = new ConcurrentHashMap<>();
 
     AlertDialog.Builder freqDialog;
 
@@ -48,10 +49,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         String _friends[] = GetList(TulipSession.user, TulipSession.password);
 
-        for (String _s : _friends)
-        {
+        for (String _s : _friends) {
             int pos = friends.indexOf(_s);
-            if(pos == -1)
+            if (pos == -1)
                 friends.add(_s);
         }
 
@@ -65,10 +65,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         _main_tulip.start();
 
     }
-    private void addClickListener()
-    {
+
+    private void addClickListener() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
-        fab.setOnClickListener(new View.OnClickListener(){
+        fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
@@ -81,14 +81,19 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
                         int ret = AcceptFriend(TulipSession.user, TulipSession.password,
                                 friendsRequest.get(0));
-                        if(ret == 0) {
+                        if (ret == 0) {
                             friends.add(friendsRequest.get(0));
 
-                            adaptor.notifyDataSetChanged();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adaptor.notifyDataSetChanged();
+                                }
+                            });
 
                             friendsRequest.remove(0);
                         }
-                        if(friendsRequest.size() == 0)
+                        if (friendsRequest.size() == 0)
                             fab.setVisibility(View.INVISIBLE);
                         else
                             fab.setVisibility(View.VISIBLE);
@@ -101,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         IgnoreFriend(TulipSession.user, TulipSession.password,
                                 friendsRequest.get(0));
                         friendsRequest.remove(0);
-                        if(friendsRequest.size() == 0)
+                        if (friendsRequest.size() == 0)
                             fab.setVisibility(View.INVISIBLE);
                         else
                             fab.setVisibility(View.VISIBLE);
@@ -213,8 +218,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                     friendRequestList = GetFriendRequest(TulipSession.user, TulipSession.password);
 
-                    if (friendRequestList != null && friendRequestList.length > 0)
-                    {
+                    if (friendRequestList != null && friendRequestList.length > 0) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -223,9 +227,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             }
                         });
 
-                    }
-                    else
-                    {
+                    } else {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -235,8 +237,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         });
                     }
 
-                    for(String _f : friendRequestList)
-                    {
+                    for (String _f : friendRequestList) {
                         friendsRequest.add(_f);
                     }
 
@@ -248,81 +249,72 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                 message_last_check = System.currentTimeMillis() / 1000L;
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
 
-                        String target_user_list = "";
-                        boolean flag_update_user_list = false;
-                        boolean current_user_message = false;
-                        Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
-                                TulipSession.current_offset.toString());
+                String target_user_list = "";
+                boolean flag_update_user_list = false;
+                boolean current_user_message = false;
+                Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
+                        TulipSession.current_offset.toString());
 
-                        if(_msg == null)
-                            return;
+                if (_msg == null)
+                    return;
 
-                        if(_msg.getId().compareTo(TulipSession.current_offset) == 1)
-                            TulipSession.current_offset = _msg.getId();
+                if (_msg.getId().compareTo(TulipSession.current_offset) == 1)
+                    TulipSession.current_offset = _msg.getId();
 
-                        if(_msg.sysType())
-                        {
-                            // TODO: System messages;
-                            return;
+                if (_msg.sysType()) {
+                    // TODO: System messages;
+                    return;
+                }
+
+                if (_msg.getFrm().equals(TulipSession.user)) {
+                    target_user_list = _msg.getUser();
+                    current_user_message = true;
+                } else {
+                    target_user_list = _msg.getFrm();
+                }
+
+                int friend_pos = friends.indexOf(target_user_list);
+                if (friend_pos == -1) {
+                    friends.add(target_user_list);
+                    flag_update_user_list = true;
+                }
+
+                List<Message> _m = messages.get(_msg.getUser());
+                if (_m == null) {
+                    // this should not happen
+                    // if the user is on the list but on on the client
+                    messages.put(target_user_list, new ArrayList<Message>());
+                    messages.get(target_user_list).add(_msg);
+                } else {
+                    Iterator<Message> itr = _m.iterator();
+                    boolean flag_found = false;
+                    while (itr.hasNext()) {
+                        Message _tmsg = itr.next();
+                        if (_tmsg.getId().compareTo(_msg.getId()) == 0) {
+                            flag_found = true;
+                            break;
                         }
+                    }
+                    if (!flag_found)
+                        messages.get(target_user_list).add(_msg);
+                }
 
-                        if(_msg.getFrm().equals(TulipSession.user)) {
-                            target_user_list = _msg.getUser();
-                            current_user_message = true;
-                        }
-                        else {
-                            target_user_list = _msg.getFrm();
-                        }
+                if (!current_user_message && (_msg.isNew() || flag_update_user_list)) {
+                    // update UI where user is set to new message
+                    int pos = friends_message.indexOf(target_user_list);
+                    if (pos == -1)
+                        friends_message.add(target_user_list);
 
-                        int friend_pos = friends.indexOf(target_user_list);
-                        if(friend_pos == -1 )
-                        {
-                            friends.add(target_user_list);
-                            flag_update_user_list = true;
-                        }
-
-                        List<Message> _m = messages.get(_msg.getUser());
-                        if(_m == null)
-                        {
-                            // this should not happen
-                            // if the user is on the list but on on the client
-                            messages.put(target_user_list, new ArrayList<Message>());
-                            messages.get(target_user_list).add(_msg);
-                        }
-                        else
-                        {
-                            Iterator<Message> itr = _m.iterator();
-                            boolean flag_found = false;
-                            while(itr.hasNext())
-                            {
-                                Message _tmsg = itr.next();
-                                if(_tmsg.getId().compareTo(_msg.getId()) == 0)
-                                {
-                                    flag_found = true;
-                                    break;
-                                }
-                            }
-                            if(!flag_found)
-                                messages.get(target_user_list).add(_msg);
-                        }
-
-                        if(!current_user_message && (_msg.isNew()||flag_update_user_list))
-                        {
-                            // update UI where user is set to new message
-                            int pos = friends_message.indexOf(target_user_list);
-                            if(pos == -1)
-                                friends_message.add(target_user_list);
-
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
                             adaptor.notifyDataSetChanged();
                         }
+                    });
+                }
 
 
-                    }
-                });
             }
 
         }
@@ -354,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             TextView textView = (TextView) view.findViewById(R.id.usernameview);
 
             int pos = friends_message.indexOf(getItem(i).toString());
-            if(pos == -1)
+            if (pos == -1)
                 imageView.setImageResource(stateimage[0]);
             else
                 imageView.setImageResource(stateimage[1]);
@@ -366,11 +358,17 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     }
 
     public native String[] GetList(String user, String pass);
+
     public native void Logout(String user, String pass);
+
     public native void FriendRequest(String user, String pass, String request);
+
     public native String[] GetFriendRequest(String user, String pass);
+
     public native int AcceptFriend(String user, String pass, String freq);
+
     public native int IgnoreFriend(String user, String pass, String freq);
+
     public native Message GetMessage(String user, String pass, String frm_user, String offset);
 
 }
