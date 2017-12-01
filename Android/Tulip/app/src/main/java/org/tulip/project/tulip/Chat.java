@@ -128,7 +128,7 @@ public class Chat extends AppCompatActivity {
             MainActivity.lck.unlock();
             if(_msgs == null)
                 return 0;
-            return _msgs.listIterator(i).nextIndex();
+            return _msgs.listIterator(i).next().getMessage().hashCode();
         }
 
         @Override
