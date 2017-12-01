@@ -14,10 +14,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
@@ -25,9 +22,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     Userlist adaptor;
     Thread _main_tulip;
     String[] friendRequestList = null;
-    public static List<String> friends = new ArrayList<>();
-    public static List<String> friends_message = new ArrayList<>(); // list of users with new messages
-    public static List<String> friendsRequest = new ArrayList<>();
+    public static List<Object> friends = Collections.synchronizedList(new ArrayList<>());;
+    public static List<Object> friends_message = Collections.synchronizedList(new ArrayList<>()); // list of users with new messages
+    public static List<Object> friendsRequest = Collections.synchronizedList(new ArrayList<>());
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
     public static ConcurrentHashMap<String, ArrayList<Message>> messages = new ConcurrentHashMap<>();
 
@@ -80,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     public void onClick(DialogInterface dialog, int which) {
                         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
                         int ret = AcceptFriend(TulipSession.user, TulipSession.password,
-                                friendsRequest.get(0));
+                                (String)friendsRequest.get(0));
                         if (ret == 0) {
                             friends.add(friendsRequest.get(0));
 
@@ -104,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     public void onClick(DialogInterface dialog, int which) {
                         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
                         IgnoreFriend(TulipSession.user, TulipSession.password,
-                                friendsRequest.get(0));
+                                (String)friendsRequest.get(0));
                         friendsRequest.remove(0);
                         if (friendsRequest.size() == 0)
                             fab.setVisibility(View.INVISIBLE);

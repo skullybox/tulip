@@ -34,7 +34,6 @@ public class Chat extends AppCompatActivity {
         addClickListener();
     }
 
-
     private void addClickListener()
     {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.sendbutton);
@@ -64,7 +63,7 @@ public class Chat extends AppCompatActivity {
                 else
                     ret = -1;
 
-                if(ret == 0)
+                if(ret == 0 && TulipSession.current_chat_user.length() > 0)
                 {
                     chatin.setText("");
                     if(_m.getMessage().length()>0)

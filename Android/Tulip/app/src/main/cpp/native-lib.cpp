@@ -299,7 +299,6 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     //big int stuff
     _offset = strtoull(bigint_str,(char **)NULL, 10 );
 
-
     pthread_mutex_lock(&global_socket_lock);
     ret = client_get_message(
             (char *) user,
@@ -316,6 +315,7 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     pthread_mutex_unlock(&global_socket_lock);
 
     jobject retObj = NULL;
+    
     if(strlen(uname) == 0 || ret)
     {
         connection_reset((char*)user, (char*) pass);
@@ -363,7 +363,8 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     env->ReleaseStringUTFChars(pass_, pass);
     env->ReleaseStringUTFChars(frm_user_, frm_user);
     env->ReleaseStringUTFChars(offset, bigint_str);
-    free(msg);
+    if(msg)
+        free(msg);
 
     return retObj;
 }

@@ -462,11 +462,11 @@ int client_recieve(tul_net_context *conn)
       }
     }
 
-    /* 12s timeout */
+    /* 3s timeout */
     if(bread <= 0)
     {
       current_time = clock() - last_transmission;
-      if( current_time/CLOCKS_PER_SEC > 12)
+      if( current_time/CLOCKS_PER_SEC > 3)
         break;
     }
 
