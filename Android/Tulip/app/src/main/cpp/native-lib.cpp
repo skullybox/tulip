@@ -315,7 +315,7 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     pthread_mutex_unlock(&global_socket_lock);
 
     jobject retObj = NULL;
-    
+
     if(strlen(uname) == 0 || ret)
     {
         connection_reset((char*)user, (char*) pass);
