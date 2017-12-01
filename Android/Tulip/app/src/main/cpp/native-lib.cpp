@@ -7,11 +7,14 @@
 #include "tul_tls_common.h"
 
 
+static pthread_mutex_t global_socket_lock;
 tul_net_context *conn = NULL;
 char host_string[100] = "stabby.no-ip.org";
 
 extern "C"
 int connection_reset(char *user, char *pass){
+
+    pthread_mutex_lock(&global_socket_lock);
     int ret = 0;
     if (conn) {
         if (conn->tls.server_fd.fd > 0)
@@ -32,6 +35,7 @@ int connection_reset(char *user, char *pass){
     if (!ret)
         ret |= client_get_ok(conn, (char *) pass);
 
+    pthread_mutex_unlock(&global_socket_lock);
     return ret;
 }
 
@@ -296,6 +300,9 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
             uname,
             frm,
             typ);
+
+    if(strlen(uname) == 0)
+        return NULL;
 
     jclass jmsg = env->FindClass("org/tulip/project/tulip/Message");
     jmethodID cons = env->GetMethodID(jmsg, "<init>",

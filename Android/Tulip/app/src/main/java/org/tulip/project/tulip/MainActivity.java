@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
                                 TulipSession.current_offset.toString());
 
-                        if(_msg.getMessage().length() <= 0)
+                        if(_msg == null)
                             return;
 
                         if(_msg.getId().compareTo(TulipSession.current_offset) == 1)
