@@ -25,6 +25,10 @@ public class Chat extends AppCompatActivity {
         ListView lst = (ListView) findViewById(R.id.chatlistview);
         adaptor = new ChatList();
         lst.setAdapter(adaptor);
+
+//        lst.setDivider(null);
+//        lst.setDividerHeight(0);
+
         addClickListener();
     }
 
@@ -72,17 +76,29 @@ public class Chat extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 0;
+            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+            if(_msgs == null)
+                return 0;
+            return _msgs.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return null;
+
+            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+            if(_msgs == null)
+                return null;
+
+            return _msgs.listIterator(i).next();
         }
 
         @Override
         public long getItemId(int i) {
-            return 0;
+
+            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+            if(_msgs == null)
+                return 0;
+            return _msgs.listIterator(i).nextIndex();
         }
 
         @Override
@@ -101,10 +117,14 @@ public class Chat extends AppCompatActivity {
             Iterator<Message> itr = _msgs.iterator();
             while(itr.hasNext() && count <= i)
             {
-                if(count == i)
+                if(count == i) {
                     current_message = itr.next();
+                    break;
+                }
                 else
+                {
                     itr.next();
+                }
                 count++;
             }
 
@@ -121,6 +141,8 @@ public class Chat extends AppCompatActivity {
                     textView.setBackgroundColor(android.R.color.holo_blue_light);
                 }
                 textView.setText(current_message.getMessage());
+
+                return textView;
             }
 
             return null;

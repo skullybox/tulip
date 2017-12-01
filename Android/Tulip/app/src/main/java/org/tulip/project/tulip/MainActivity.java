@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
 
         fab.setVisibility(View.INVISIBLE);
+        listview.setDivider(null);
+        listview.setDividerHeight(0);
 
         String _friends[] = GetList(TulipSession.user, TulipSession.password);
 
@@ -166,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 TulipSession.password = "";
                 TulipSession.current_chat_user = "";
                 TulipSession.current_chat_user = "";
+                TulipSession.current_offset = BigInteger.ZERO;
 
                 messages.clear();
                 friends_message.clear();
@@ -192,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         int indexRet = 0;
 
+        long current_message_timeout = 300; // milliseconds
         long friend_request_last_check = System.currentTimeMillis() / 1000L - 20;
         long message_last_check = System.currentTimeMillis() / 1000L - 10;
 
@@ -240,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 }
 
             // check for friends messages
-            if (System.currentTimeMillis() / 1000L - message_last_check > 7) {
+            if (System.currentTimeMillis() - message_last_check > current_message_timeout) {
 
                 message_last_check = System.currentTimeMillis() / 1000L;
 
