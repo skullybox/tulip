@@ -216,7 +216,7 @@ int do_get_msg(char *user, comm_payload *p)
   char QL1[] = "select rowid, uname, frm, typ, new, msg, salt from message where (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid asc limit 1";
 
   // when offset is provided
-  char QL2[] = "select rowid, uname, frm, typ, new, msg, salt from message where rowid > %llu and uname='%s' or frm='%s' order by rowid asc limit 1";
+  char QL2[] = "select rowid, uname, frm, typ, new, msg, salt from message where rowid > %llu and (uname='%s' or frm='%s') order by rowid asc limit 1";
 
   // when offset is provided and t_uid is set
   char QL3[] = "select rowid, uname, frm, typ, new, msg, salt from message where rowid > %llu and (uname='%s' or frm='%s') and (uname='%s' or frm='%s') order by rowid asc limit 1";
