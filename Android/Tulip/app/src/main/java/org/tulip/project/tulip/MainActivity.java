@@ -280,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     flag_update_user_list = true;
                 }
 
+                lck.lock();
                 List<Message> _m = messages.get(_msg.getUser());
                 if (_m == null) {
                     // this should not happen
@@ -300,12 +301,15 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         messages.get(target_user_list).add(_msg);
                     }
                 }
+                lck.unlock();
 
                 if (!current_user_message && (_msg.isNew() || flag_update_user_list)) {
                     // update UI where user is set to new message
+                    lck.lock();
                     int pos = friends_message.indexOf(target_user_list);
                     if (pos == -1)
                         friends_message.add(target_user_list);
+                    lck.unlock();
 
                     runOnUiThread(new Runnable() {
                         @Override

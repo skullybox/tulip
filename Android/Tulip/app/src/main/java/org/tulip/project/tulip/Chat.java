@@ -48,12 +48,14 @@ public class Chat extends AppCompatActivity {
                 Message _m = new Message( msg, TulipSession.user, TulipSession.current_chat_user, new BigInteger("-1"),
                         false, "SYS");
 
+                MainActivity.lck.lock();
                 ArrayList<Message> chatlist = MainActivity.messages.get(TulipSession.current_chat_user);
                 if(chatlist == null)
                 {
                     MainActivity.messages.put(TulipSession.current_chat_user, new ArrayList<Message>());
                     chatlist = MainActivity.messages.get(TulipSession.current_chat_user);
                 }
+                MainActivity.lck.unlock();
 
                 if(chatlist == null)
                     return;
@@ -98,8 +100,9 @@ public class Chat extends AppCompatActivity {
         @Override
         public int getCount() {
 
+            MainActivity.lck.lock();
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-
+            MainActivity.lck.unlock();
             if(_msgs == null)
                 return 0;
             return _msgs.size();
@@ -108,7 +111,9 @@ public class Chat extends AppCompatActivity {
         @Override
         public Object getItem(int i) {
 
+            MainActivity.lck.lock();
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+            MainActivity.lck.unlock();
             if(_msgs == null)
                 return null;
 
@@ -118,7 +123,9 @@ public class Chat extends AppCompatActivity {
         @Override
         public long getItemId(int i) {
 
+            MainActivity.lck.lock();
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+            MainActivity.lck.unlock();
             if(_msgs == null)
                 return 0;
             return _msgs.listIterator(i).nextIndex();
@@ -131,7 +138,9 @@ public class Chat extends AppCompatActivity {
             TextView textView = (TextView) view.findViewById(R.id.chatcontent);
 
             Message current_message = null;
+            MainActivity.lck.lock();
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
+            MainActivity.lck.unlock();
             if(_msgs == null)
                 return view;
 
