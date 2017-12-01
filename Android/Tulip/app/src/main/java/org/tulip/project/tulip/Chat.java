@@ -1,10 +1,12 @@
 package org.tulip.project.tulip;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,8 +28,8 @@ public class Chat extends AppCompatActivity {
         adaptor = new ChatList();
         lst.setAdapter(adaptor);
 
-//        lst.setDivider(null);
-//        lst.setDividerHeight(0);
+        lst.setDivider(null);
+        lst.setDividerHeight(0);
 
         addClickListener();
     }
@@ -70,6 +72,14 @@ public class Chat extends AppCompatActivity {
             }
         });
 
+        ListView userList = (ListView) findViewById(R.id.chatlistview);
+        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                return;
+            }
+        });
+
     }
 
     class ChatList extends BaseAdapter{
@@ -104,48 +114,34 @@ public class Chat extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
 
-            view = getLayoutInflater().inflate(R.layout.activity_chat, null);
-            TextView textView = (TextView) view.findViewById(R.id.chattext);
+            view = getLayoutInflater().inflate(R.layout.chatitem_layout, null);
+            TextView textView = (TextView) view.findViewById(R.id.chatcontent);
 
-            int count = 0;
             Message current_message = null;
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
 
             if(_msgs == null)
-                return null;
+                return view;
 
-            Iterator<Message> itr = _msgs.iterator();
-            while(itr.hasNext() && count <= i)
-            {
-                if(count == i) {
-                    current_message = itr.next();
-                    break;
-                }
-                else
-                {
-                    itr.next();
-                }
-                count++;
-            }
+            current_message = _msgs.listIterator(i).next();
 
-            if (count == i)
+            if (current_message != null)
             {
-                if(current_message.getFrm().equals(TulipSession.user))
-                {
-                    textView.setTextColor(android.R.color.black);
-                    textView.setBackgroundColor(android.R.color.darker_gray);
-                }
-                else
-                {
-                    textView.setTextColor(android.R.color.white);
-                    textView.setBackgroundColor(android.R.color.holo_blue_light);
-                }
+//                if(current_message.getFrm().equals(TulipSession.user))
+//                {
+//                    textView.setTextColor(android.R.color.black);
+//                    textView.setBackgroundColor(android.R.color.darker_gray);
+//                }
+//                else
+//                {
+//                    textView.setTextColor(android.R.color.white);
+//                    textView.setBackgroundColor(android.R.color.holo_blue_light);
+//                }
+
                 textView.setText(current_message.getMessage());
-
-                return textView;
             }
 
-            return null;
+            return view;
         }
     }
 

@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         boolean flag_update_user_list = false;
                         boolean current_user_message = false;
                         Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
-                                TulipSession.current_offset);
+                                TulipSession.current_offset.toString());
 
                         if(_msg.getMessage().length() <= 0)
                             return;
@@ -371,6 +371,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public native String[] GetFriendRequest(String user, String pass);
     public native int AcceptFriend(String user, String pass, String freq);
     public native int IgnoreFriend(String user, String pass, String freq);
-    public native Message GetMessage(String user, String pass, String frm_user, BigInteger offset);
+    public native Message GetMessage(String user, String pass, String frm_user, String offset);
 
 }

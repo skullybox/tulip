@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+#include <stdlib.h>
 #include "tul_userc.h"
 #include "tul_tls_client.h"
 #include "tul_tls_common.h"
@@ -261,10 +262,11 @@ extern "C"
 JNIEXPORT jobject JNICALL
 Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instance, jstring user_,
                                                      jstring pass_, jstring frm_user_,
-                                                     jobject offset) {
+                                                     jstring offset) {
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
     const char *frm_user = env->GetStringUTFChars(frm_user_, 0);
+    const char *bigint_str = env->GetStringUTFChars(offset, 0);
 
 
     int ret = 0;
@@ -276,6 +278,11 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     char typ[4] = {0};
     char *msg = NULL;
     char tmp[30] = {0};
+
+
+    //big int stuff
+    _offset = strtoull(bigint_str,(char **)NULL, 10 );
+
 
     ret = client_get_message(
             (char *) user,
@@ -327,6 +334,7 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
     env->ReleaseStringUTFChars(frm_user_, frm_user);
+    env->ReleaseStringUTFChars(offset, bigint_str);
     free(msg);
 
     if (ret)
