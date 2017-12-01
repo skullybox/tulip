@@ -246,9 +246,9 @@ int do_get_msg(char *user, comm_payload *p)
       break;
     default:
       if(!_tuid_set)
-        sprintf(SQL, QL0, _offset, _uid, _uid);
+        sprintf(SQL, QL2, _offset, _uid, _uid);
       else 
-        sprintf(SQL, QL1, _offset, _uid, _uid, _tuid, _tuid);
+        sprintf(SQL, QL3, _offset, _uid, _uid, _tuid, _tuid);
       break;
   }
 
