@@ -55,7 +55,8 @@ public class Login extends AppCompatActivity {
                         user = "";
                         pass = "";
 
-                        startActivity(new Intent(Login.this, MainActivity.class));
+                        Intent intent = new Intent(Login.this, MainActivity.class);
+                        startActivity(intent);
                     }
                     else{
                         password.setText("");

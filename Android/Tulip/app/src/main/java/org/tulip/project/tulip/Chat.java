@@ -48,14 +48,14 @@ public class Chat extends AppCompatActivity {
                 Message _m = new Message( msg, TulipSession.user, TulipSession.current_chat_user, new BigInteger("-1"),
                         false, "SYS");
 
-                MainActivity.lck.lock();
+
                 ArrayList<Message> chatlist = MainActivity.messages.get(TulipSession.current_chat_user);
                 if(chatlist == null)
                 {
                     MainActivity.messages.put(TulipSession.current_chat_user, new ArrayList<Message>());
                     chatlist = MainActivity.messages.get(TulipSession.current_chat_user);
                 }
-                MainActivity.lck.unlock();
+
 
                 if(chatlist == null)
                     return;
@@ -76,20 +76,13 @@ public class Chat extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             adaptor.notifyDataSetChanged();
                         }
                     });
                 }
                 fab.setClickable(true);
 
-            }
-        });
-
-        ListView userList = (ListView) findViewById(R.id.chatlistview);
-        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                return;
             }
         });
 
@@ -100,9 +93,9 @@ public class Chat extends AppCompatActivity {
         @Override
         public int getCount() {
 
-            MainActivity.lck.lock();
+
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-            MainActivity.lck.unlock();
+
             if(_msgs == null)
                 return 0;
             return _msgs.size();
@@ -111,9 +104,9 @@ public class Chat extends AppCompatActivity {
         @Override
         public Object getItem(int i) {
 
-            MainActivity.lck.lock();
+
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-            MainActivity.lck.unlock();
+
             if(_msgs == null)
                 return null;
 
@@ -123,12 +116,12 @@ public class Chat extends AppCompatActivity {
         @Override
         public long getItemId(int i) {
 
-            MainActivity.lck.lock();
+
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-            MainActivity.lck.unlock();
+
             if(_msgs == null)
                 return 0;
-            return _msgs.listIterator(i).next().getMessage().hashCode();
+            return _msgs.listIterator(i).nextIndex();
         }
 
         @Override
@@ -138,29 +131,10 @@ public class Chat extends AppCompatActivity {
             TextView textView = (TextView) view.findViewById(R.id.chatcontent);
 
             Message current_message = null;
-            MainActivity.lck.lock();
-            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-            MainActivity.lck.unlock();
-            if(_msgs == null)
-                return view;
-
-            current_message = _msgs.listIterator(i).next();
+            current_message = (Message) getItem(i);
 
             if (current_message != null)
-            {
-//                if(current_message.getFrm().equals(TulipSession.user))
-//                {
-//                    textView.setTextColor(android.R.color.black);
-//                    textView.setBackgroundColor(android.R.color.darker_gray);
-//                }
-//                else
-//                {
-//                    textView.setTextColor(android.R.color.white);
-//                    textView.setBackgroundColor(android.R.color.holo_blue_light);
-//                }
-
                 textView.setText(current_message.getMessage());
-            }
 
             return view;
         }

@@ -16,12 +16,12 @@
                 android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".Chat">
+        <activity android:name=".MainActivity" android:parentActivityName=".Login" android:launchMode="singleTask"/>
+        <activity android:name=".Chat" android:parentActivityName=".MainActivity" android:launchMode="singleTask">
         </activity>
     </application>
 

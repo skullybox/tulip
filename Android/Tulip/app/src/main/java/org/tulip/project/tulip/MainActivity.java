@@ -123,7 +123,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String itm = adapterView.getItemAtPosition(i).toString();
                 TulipSession.current_chat_user = itm;
-                startActivity(new Intent(MainActivity.this, Chat.class));
+                Intent intent = new Intent(MainActivity.this, Chat.class);
+                startActivity(intent);
             }
         });
 
@@ -199,18 +200,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
 
         int indexRet = 0;
+        int count = 0;
 
-        long current_message_timeout = 300; // milliseconds
+        long current_message_timeout = 30; // milliseconds
         long friend_request_last_check = System.currentTimeMillis() / 1000L - 20;
         long message_last_check = System.currentTimeMillis() / 1000L - 10;
 
         while (true) {
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                continue;
-            }
 
             // check for friend requests
             if (System.currentTimeMillis() / 1000L - friend_request_last_check > 17)
@@ -247,8 +243,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             // check for friends messages
             if (System.currentTimeMillis() - message_last_check > current_message_timeout) {
 
-                message_last_check = System.currentTimeMillis() / 1000L;
-
+                message_last_check = System.currentTimeMillis();
+                count++;
 
                 String target_user_list = "";
                 boolean flag_update_user_list = false;
@@ -280,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     flag_update_user_list = true;
                 }
 
-                lck.lock();
+                
                 List<Message> _m = messages.get(_msg.getUser());
                 if (_m == null) {
                     // this should not happen
@@ -301,15 +297,15 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         messages.get(target_user_list).add(_msg);
                     }
                 }
-                lck.unlock();
+                
 
                 if (!current_user_message && (_msg.isNew() || flag_update_user_list)) {
                     // update UI where user is set to new message
-                    lck.lock();
+                    
                     int pos = friends_message.indexOf(target_user_list);
                     if (pos == -1)
                         friends_message.add(target_user_list);
-                    lck.unlock();
+                    
 
                     runOnUiThread(new Runnable() {
                         @Override
