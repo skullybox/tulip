@@ -55,6 +55,7 @@ public class Chat extends AppCompatActivity implements Runnable {
             @Override
             public void onClick(View view) {
                 fab.setClickable(false);
+                int resend = 0;
                 TextView chatin = (TextView) findViewById(R.id.editText7);
                 String msg = new StringBuilder(chatin.getText()).toString();
 
@@ -73,16 +74,20 @@ public class Chat extends AppCompatActivity implements Runnable {
                 if(chatlist == null)
                     return;
 
-                int ret = 0;
-                if(_m.getMessage().length() > 0)
-                    ret = SendMessage(TulipSession.user, TulipSession.password, TulipSession.current_chat_user,
-                        msg);
-                else
-                    ret = -1;
+                int ret = -1;
 
-                if(ret == 0 && TulipSession.current_chat_user.length() > 0)
-                {
-                    chatin.setText("");
+                while(ret != 0 && resend < 2) {
+                    if (_m.getMessage().length() > 0)
+                        ret = SendMessage(TulipSession.user, TulipSession.password, TulipSession.current_chat_user,
+                                msg);
+                    else
+                        ret = -1;
+
+                    if (ret == 0 && TulipSession.current_chat_user.length() > 0) {
+                        chatin.setText("");
+                    } else if (resend == 0) {
+                        resend++;
+                    }
                 }
                 fab.setClickable(true);
 

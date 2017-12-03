@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     int pos = friends_message.indexOf(target_user_list);
                     if (pos == -1)
                         friends_message.add(target_user_list);
-                    
+
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -427,6 +427,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 viewHolder= (ChatViewHolder)convertView.getTag();
                 viewHolder.chatuser.setText(getItem(position).toString());
                 viewHolder.position=position;
+                int pos = friends_message.indexOf(getItem(position).toString());
+
+                if(pos == -1)
+                    viewHolder.imageView.setImageResource(stateimage[0]);
+                else
+                    viewHolder.imageView.setImageResource(stateimage[1]);
             }
 
             return convertView;
