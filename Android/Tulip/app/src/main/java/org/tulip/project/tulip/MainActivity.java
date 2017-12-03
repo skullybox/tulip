@@ -304,11 +304,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     continue;
                 }
 
-                if (_msg.getFrm().equals(TulipSession.user)) {
-                    target_user_list = _msg.getUser();
+                if (_msg.getUser().equals(TulipSession.user)) {
+                    target_user_list = _msg.getFrm();
                     current_user_message = true;
                 } else {
-                    target_user_list = _msg.getFrm();
+                    target_user_list = _msg.getUser();
                 }
 
                 int friend_pos = friends.indexOf(target_user_list);
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 }
 
                 
-                List<Message> _m = messages.get(_msg.getUser());
+                List<Message> _m = messages.get(target_user_list);
                 if (_m == null) {
                     // this should not happen
                     // if the user is on the list but on on the client
@@ -335,7 +335,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         }
                     }
                     if (!flag_found) {
-                        messages.get(target_user_list).add(_msg);
+                        if(messages.get(target_user_list) != null)
+                            messages.get(target_user_list).add(_msg);
                     }
                 }
                 

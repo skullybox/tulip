@@ -17,9 +17,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Chat extends AppCompatActivity {
+public class Chat extends AppCompatActivity implements Runnable {
 
     ChatList adaptor;
+    Thread _chat_view_notifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,16 @@ public class Chat extends AppCompatActivity {
         lst.setDividerHeight(0);
 
         addClickListener();
+
+        _chat_view_notifier = new Thread(this);
+        _chat_view_notifier.start();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        _chat_view_notifier.interrupt();
     }
 
     private void addClickListener()
@@ -72,20 +83,40 @@ public class Chat extends AppCompatActivity {
                 if(ret == 0 && TulipSession.current_chat_user.length() > 0)
                 {
                     chatin.setText("");
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            adaptor.notifyDataSetChanged();
-                        }
-                    });
                 }
                 fab.setClickable(true);
 
             }
         });
 
+    }
+
+    @Override
+    public void run() {
+
+        while(true)
+        {
+            try {
+                Thread.sleep(500);
+                if(_chat_view_notifier.isInterrupted())
+                    break;
+                Thread.sleep(500);
+                if(_chat_view_notifier.isInterrupted())
+                    break;
+
+            } catch (InterruptedException e) {
+                break;
+            }
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adaptor.notifyDataSetChanged();
+                }
+            });
+
+
+        }
     }
 
     static class ViewHolder{
