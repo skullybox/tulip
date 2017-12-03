@@ -27,7 +27,7 @@ public class Chat extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         ListView lst = (ListView) findViewById(R.id.chatlistview);
-        adaptor = new ChatList(this);
+        adaptor = new ChatList(this, MainActivity.messages.get(TulipSession.current_chat_user));
         lst.setAdapter(adaptor);
 
         lst.setDivider(null);
@@ -120,11 +120,7 @@ public class Chat extends AppCompatActivity {
         @Override
         public long getItemId(int i) {
 
-            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-
-            if(_msgs == null)
-                return 0;
-            return getItem(i).hashCode();
+            return i;
         }
 
         @Override
@@ -140,6 +136,7 @@ public class Chat extends AppCompatActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.position = position;
                 viewHolder.chatmsg = (TextView)convertView.findViewById(R.id.chatcontent);
+                viewHolder.chatmsg.setText(getItem(position).toString());
                 convertView.setTag(viewHolder);
             }
             else {
