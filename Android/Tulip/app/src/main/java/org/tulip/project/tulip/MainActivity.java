@@ -2,16 +2,14 @@ package org.tulip.project.tulip;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 
 import java.math.BigInteger;
@@ -56,7 +54,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 friends.add(_s);
         }
 
-        adaptor = new Userlist();
+        ArrayList<String> _t = new ArrayList<String>();
+        Object[] _data = MainActivity.friends.toArray();
+
+        for(Object o:_data){
+            _t.add(o.toString());
+        }
+
+        adaptor = new Userlist(this, _t);
         listview.setAdapter(adaptor);
 
         // fab click listener
@@ -284,6 +289,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     count++;
                     continue;
                 }
+                else
+                {
+                    count = 0;
+                }
 
                 if (_msg.getId().compareTo(TulipSession.current_offset) == 1)
                     TulipSession.current_offset = _msg.getId();
@@ -351,40 +360,72 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         }
     }
 
+    static class ChatViewHolder{
+        int position;
+        TextView chatuser;
+        ImageView imageView;
+    }
+
     class Userlist extends BaseAdapter {
+
+        private final Context context;
+        private final ArrayList<String> data;
+
+        Userlist(Context c, ArrayList<String> data)
+        {
+            context = c;
+            this.data = data;
+        }
 
         @Override
         public int getCount() {
-
-            return friends.size();
+            return data.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return friends.listIterator(i).next();
+
+            return data.get(i);
         }
 
         @Override
         public long getItemId(int i) {
-            return friends.listIterator(i).nextIndex();
+
+            return i;
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int position, View convertView, ViewGroup parent) {
 
-            view = getLayoutInflater().inflate(R.layout.useritem_layout, null);
-            ImageView imageView = (ImageView) view.findViewById(R.id.statimgview);
-            TextView textView = (TextView) view.findViewById(R.id.usernameview);
+            final ChatViewHolder viewHolder;
 
-            int pos = friends_message.indexOf(getItem(i).toString());
-            if (pos == -1)
-                imageView.setImageResource(stateimage[0]);
-            else
-                imageView.setImageResource(stateimage[1]);
+            if (convertView == null) {
 
-            textView.setText(getItem(i).toString());
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView  = inflater.inflate(R.layout.useritem_layout, parent, false);
 
-            return view;
+                viewHolder = new ChatViewHolder();
+                viewHolder.position = position;
+                viewHolder.chatuser = (TextView)convertView.findViewById(R.id.usernameview);
+                viewHolder.chatuser.setText(getItem(position).toString());
+
+                viewHolder.imageView = (ImageView)convertView.findViewById(R.id.statimgview);
+                int pos = friends_message.indexOf(getItem(position).toString());
+
+                if(pos == -1)
+                    viewHolder.imageView.setImageResource(stateimage[0]);
+                else
+                    viewHolder.imageView.setImageResource(stateimage[1]);
+
+                convertView.setTag(viewHolder);
+            }
+            else {
+                viewHolder= (ChatViewHolder)convertView.getTag();
+                viewHolder.chatuser.setText(getItem(position).toString());
+                viewHolder.position=position;
+            }
+
+            return convertView;
         }
     }
 
