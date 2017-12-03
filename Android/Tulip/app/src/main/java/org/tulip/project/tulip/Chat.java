@@ -1,9 +1,11 @@
 package org.tulip.project.tulip;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,7 +27,7 @@ public class Chat extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         ListView lst = (ListView) findViewById(R.id.chatlistview);
-        adaptor = new ChatList();
+        adaptor = new ChatList(this);
         lst.setAdapter(adaptor);
 
         lst.setDivider(null);
@@ -88,55 +90,65 @@ public class Chat extends AppCompatActivity {
 
     }
 
+    static class ViewHolder{
+        int position;
+        TextView chatmsg;
+    }
+
     class ChatList extends BaseAdapter{
+
+        private final Context context;
+        private final ArrayList<Message> data;
+
+        ChatList(Context c, ArrayList<Message> data)
+        {
+            context = c;
+            this.data = data;
+        }
 
         @Override
         public int getCount() {
-
-
-            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-
-            if(_msgs == null)
-                return 0;
-            return _msgs.size();
+            return data.size();
         }
 
         @Override
         public Object getItem(int i) {
 
-
-            ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
-
-            if(_msgs == null)
-                return null;
-
-            return _msgs.listIterator(i).next();
+            return data.get(i).getMessage();
         }
 
         @Override
         public long getItemId(int i) {
 
-
             ArrayList<Message> _msgs = MainActivity.messages.get(TulipSession.current_chat_user);
 
             if(_msgs == null)
                 return 0;
-            return _msgs.listIterator(i).nextIndex();
+            return getItem(i).hashCode();
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(int position, View convertView, ViewGroup parent) {
 
-            view = getLayoutInflater().inflate(R.layout.chatitem_layout, null);
-            TextView textView = (TextView) view.findViewById(R.id.chatcontent);
+            final ViewHolder viewHolder;
 
-            Message current_message = null;
-            current_message = (Message) getItem(i);
+            if (convertView == null) {
 
-            if (current_message != null)
-                textView.setText(current_message.getMessage());
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView  = inflater.inflate(R.layout.chatitem_layout, parent, false);
 
-            return view;
+                viewHolder = new ViewHolder();
+                viewHolder.position = position;
+                viewHolder.chatmsg = (TextView)convertView.findViewById(R.id.chatcontent);
+                convertView.setTag(viewHolder);
+            }
+            else {
+                viewHolder= (ViewHolder)convertView.getTag();
+                viewHolder.chatmsg.setText(getItem(position).toString());
+                viewHolder.position=position;
+            }
+
+            return convertView;
         }
     }
 
