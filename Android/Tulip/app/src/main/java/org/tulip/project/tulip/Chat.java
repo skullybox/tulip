@@ -96,6 +96,9 @@ public class Chat extends AppCompatActivity implements Runnable {
 
         while(true)
         {
+            int sz = 0;
+
+            sz = MainActivity.messages.get(TulipSession.current_chat_user).size();
             try {
                 Thread.sleep(500);
                 if(_chat_view_notifier.isInterrupted())
@@ -108,13 +111,13 @@ public class Chat extends AppCompatActivity implements Runnable {
                 break;
             }
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adaptor.notifyDataSetChanged();
-                }
-            });
-
+            if (MainActivity.messages.get(TulipSession.current_chat_user).size() != sz)
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adaptor.notifyDataSetChanged();
+                    }
+                });
 
         }
     }

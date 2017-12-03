@@ -309,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     current_user_message = true;
                 } else {
                     target_user_list = _msg.getUser();
+                    current_user_message = false;
                 }
 
                 int friend_pos = friends.indexOf(target_user_list);
@@ -341,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 }
                 
 
-                if (!current_user_message && (_msg.isNew() || flag_update_user_list)) {
+                if (current_user_message && (_msg.isNew() || flag_update_user_list)) {
                     // update UI where user is set to new message
                     
                     int pos = friends_message.indexOf(target_user_list);
