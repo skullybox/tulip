@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         _main_tulip = new Thread(this);
         _main_tulip.start();
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
     }
 
 

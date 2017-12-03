@@ -72,8 +72,6 @@ public class Chat extends AppCompatActivity {
                 if(ret == 0 && TulipSession.current_chat_user.length() > 0)
                 {
                     chatin.setText("");
-                    if(_m.getMessage().length()>0)
-                        chatlist.add(_m);
 
                     runOnUiThread(new Runnable() {
                         @Override
