@@ -1,5 +1,6 @@
 package org.tulip.project.tulip;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         _main_tulip.start();
 
     }
+
+
 
     private void addClickListener() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
@@ -132,6 +135,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false); // disable the button
+            actionBar.setDisplayHomeAsUpEnabled(false); // remove the left caret
+            actionBar.setDisplayShowHomeEnabled(false); // remove the icon
+        }
         getMenuInflater().inflate(R.menu.chat_options, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -169,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 return true;
             case R.id.Logout:
                 _main_tulip.interrupt();
+
                 Logout(TulipSession.user, TulipSession.password);
                 TulipSession.user = "";
                 TulipSession.password = "";
@@ -208,6 +218,25 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         while (true) {
 
+            if(_main_tulip.isInterrupted())
+                break;
+
+            if(count >= 7) {
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                try {
+                    Thread.sleep(30);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             // check for friend requests
             if (System.currentTimeMillis() / 1000L - friend_request_last_check > 17)
                 if (friendRequestList == null || friendRequestList.length == 0) {
@@ -244,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             if (System.currentTimeMillis() - message_last_check > current_message_timeout) {
 
                 message_last_check = System.currentTimeMillis();
-                count++;
 
                 String target_user_list = "";
                 boolean flag_update_user_list = false;
@@ -252,8 +280,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 Message _msg = GetMessage(TulipSession.user, TulipSession.password, "",
                         TulipSession.current_offset.toString());
 
-                if (_msg == null)
+                if (_msg == null) {
+                    count++;
                     continue;
+                }
 
                 if (_msg.getId().compareTo(TulipSession.current_offset) == 1)
                     TulipSession.current_offset = _msg.getId();

@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.ContentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="org.tulip.project.tulip.MainActivity">
+                                              xmlns:app="http://schemas.android.com/apk/res-auto"
+                                              xmlns:tools="http://schemas.android.com/tools"
+                                              android:layout_width="match_parent"
+                                              android:layout_height="match_parent"
+                                              tools:context="org.tulip.project.tulip.MainActivity">
 
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="10dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:backgroundTint="@android:color/white"
-        app:srcCompat="@android:drawable/ic_input_add" />
+            android:id="@+id/floatingActionButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:backgroundTint="@android:color/white"
+            app:srcCompat="@android:drawable/ic_input_add"/>
 
     <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
     </ListView>
-
 
 
 </android.support.v7.widget.ContentFrameLayout>
