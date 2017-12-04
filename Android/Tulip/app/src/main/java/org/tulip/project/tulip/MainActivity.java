@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         @Override
         public long getItemId(int i) {
 
-            return i;
+            return getItem(i).hashCode();
         }
 
         @Override

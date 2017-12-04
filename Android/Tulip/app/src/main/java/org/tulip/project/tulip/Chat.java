@@ -120,6 +120,7 @@ public class Chat extends AppCompatActivity implements Runnable {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         adaptor.notifyDataSetChanged();
                     }
                 });
@@ -157,7 +158,7 @@ public class Chat extends AppCompatActivity implements Runnable {
         @Override
         public long getItemId(int i) {
 
-            return i;
+            return getItem(i).hashCode();
         }
 
         @Override
@@ -175,6 +176,8 @@ public class Chat extends AppCompatActivity implements Runnable {
                 viewHolder.chatmsg = (TextView)convertView.findViewById(R.id.chatcontent);
                 viewHolder.chatmsg.setText(getItem(position).toString());
                 convertView.setTag(viewHolder);
+
+                notifyDataSetChanged();
             }
             else {
                 viewHolder= (ViewHolder)convertView.getTag();
