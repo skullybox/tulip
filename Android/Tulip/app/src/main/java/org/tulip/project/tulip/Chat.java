@@ -21,13 +21,13 @@ public class Chat extends AppCompatActivity implements Runnable {
 
     ChatList adaptor;
     Thread _chat_view_notifier;
-
+    ListView lst;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        ListView lst = (ListView) findViewById(R.id.chatlistview);
+        lst = (ListView) findViewById(R.id.chatlistview);
         adaptor = new ChatList(this, MainActivity.messages.get(TulipSession.current_chat_user));
         lst.setAdapter(adaptor);
 
@@ -120,8 +120,8 @@ public class Chat extends AppCompatActivity implements Runnable {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-                        adaptor.notifyDataSetChanged();
+                        adaptor.SetData(MainActivity.messages.get(TulipSession.current_chat_user));
+                        lst.invalidate();
                     }
                 });
 
@@ -136,7 +136,13 @@ public class Chat extends AppCompatActivity implements Runnable {
     class ChatList extends BaseAdapter{
 
         private final Context context;
-        private final ArrayList<Message> data;
+        private ArrayList<Message> data;
+
+        public void SetData(ArrayList<Message> data)
+        {
+            this.data = data;
+            notifyDataSetChanged();
+        }
 
         ChatList(Context c, ArrayList<Message> data)
         {
@@ -177,7 +183,6 @@ public class Chat extends AppCompatActivity implements Runnable {
                 viewHolder.chatmsg.setText(getItem(position).toString());
                 convertView.setTag(viewHolder);
 
-                notifyDataSetChanged();
             }
             else {
                 viewHolder= (ViewHolder)convertView.getTag();

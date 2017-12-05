@@ -28,8 +28,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public static List<Object> friendsRequest = Collections.synchronizedList(new ArrayList<>());
     int[] stateimage = {R.drawable.grey, R.drawable.pink};
     public static ConcurrentHashMap<String, ArrayList<Message>> messages = new ConcurrentHashMap<>();
-    public static Lock lck = new ReentrantLock();
-
+    ListView listview;
     AlertDialog.Builder freqDialog;
 
     @Override
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         freqDialog = new AlertDialog.Builder(this);
 
-        ListView listview = (ListView) findViewById(R.id.listView);
+        listview = (ListView) findViewById(R.id.listView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
 
         fab.setVisibility(View.INVISIBLE);
@@ -60,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         for(Object o:_data){
             _t.add(o.toString());
         }
+
+        listview.fling(2);
 
         adaptor = new Userlist(this, _t);
         listview.setAdapter(adaptor);
@@ -213,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     @Override
     public void run() {
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        ListView listview = (ListView) findViewById(R.id.listView);
+        final ListView listview = (ListView) findViewById(R.id.listView);
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
 
         int indexRet = 0;
@@ -349,11 +350,18 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     if (pos == -1)
                         friends_message.add(target_user_list);
 
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            adaptor.notifyDataSetChanged();
+
+                            ArrayList<String> _t = new ArrayList<String>();
+                            Object[] _data = MainActivity.friends.toArray();
+
+                            for(Object o:_data){
+                                _t.add(o.toString());
+                            }
+                            adaptor.SetData(_t);
+                            listview.invalidate();
                         }
                     });
                 }
@@ -373,7 +381,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     class Userlist extends BaseAdapter {
 
         private final Context context;
-        private final ArrayList<String> data;
+        private ArrayList<String> data;
+
+        public void SetData(ArrayList<String> data){
+            this.data = data;
+            notifyDataSetChanged();
+        }
 
         Userlist(Context c, ArrayList<String> data)
         {
