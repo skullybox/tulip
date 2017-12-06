@@ -350,18 +350,20 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     if (pos == -1)
                         friends_message.add(target_user_list);
 
+                    ArrayList<String> _t = new ArrayList<String>();
+                    Object[] _data = MainActivity.friends.toArray();
+
+                    for(Object o:_data){
+                        _t.add(o.toString());
+                    }
+                    adaptor = new Userlist(this, _t);
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
-                            ArrayList<String> _t = new ArrayList<String>();
-                            Object[] _data = MainActivity.friends.toArray();
-
-                            for(Object o:_data){
-                                _t.add(o.toString());
-                            }
-                            adaptor.SetData(_t);
-                            listview.invalidate();
+                            listview.invalidateViews();
+                            listview.setAdapter(adaptor);
+                            adaptor.notifyDataSetChanged();
                         }
                     });
                 }
@@ -384,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         private ArrayList<String> data;
 
         public void SetData(ArrayList<String> data){
+
             this.data = data;
             notifyDataSetChanged();
         }
@@ -408,7 +411,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         @Override
         public long getItemId(int i) {
 
-            return getItem(i).hashCode();
+            return i;
         }
 
         @Override

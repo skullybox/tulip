@@ -56,7 +56,7 @@ public class Chat extends AppCompatActivity implements Runnable {
             public void onClick(View view) {
                 fab.setClickable(false);
                 int resend = 0;
-                TextView chatin = (TextView) findViewById(R.id.editText7);
+                final TextView chatin = (TextView) findViewById(R.id.editText7);
                 String msg = new StringBuilder(chatin.getText()).toString();
 
                 Message _m = new Message( msg, TulipSession.user, TulipSession.current_chat_user, new BigInteger("-1"),
@@ -81,10 +81,16 @@ public class Chat extends AppCompatActivity implements Runnable {
                         ret = SendMessage(TulipSession.user, TulipSession.password, TulipSession.current_chat_user,
                                 msg);
                     else
-                        ret = -1;
+                        break;
 
                     if (ret == 0 && TulipSession.current_chat_user.length() > 0) {
-                        chatin.setText("");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                chatin.setText("");
+                            }
+                        });
+
                     } else if (resend == 0) {
                         resend++;
                     }
@@ -117,11 +123,13 @@ public class Chat extends AppCompatActivity implements Runnable {
             }
 
             if (MainActivity.messages.get(TulipSession.current_chat_user).size() != sz)
+                adaptor = new ChatList(this, MainActivity.messages.get(TulipSession.current_chat_user));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        adaptor.SetData(MainActivity.messages.get(TulipSession.current_chat_user));
-                        lst.invalidate();
+                        lst.invalidateViews();
+                        lst.setAdapter(adaptor);
+                        adaptor.notifyDataSetChanged();
                     }
                 });
 
@@ -137,12 +145,6 @@ public class Chat extends AppCompatActivity implements Runnable {
 
         private final Context context;
         private ArrayList<Message> data;
-
-        public void SetData(ArrayList<Message> data)
-        {
-            this.data = data;
-            notifyDataSetChanged();
-        }
 
         ChatList(Context c, ArrayList<Message> data)
         {
@@ -164,7 +166,7 @@ public class Chat extends AppCompatActivity implements Runnable {
         @Override
         public long getItemId(int i) {
 
-            return getItem(i).hashCode();
+            return i;
         }
 
         @Override
