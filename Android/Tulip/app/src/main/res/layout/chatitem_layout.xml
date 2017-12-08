@@ -6,7 +6,9 @@
     <TextView
             android:text="TextView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/chatcontent" android:padding="12dp"
+            android:layout_height="wrap_content" android:id="@+id/chatcontent" android:padding="5dp"
             android:textIsSelectable="true" android:focusableInTouchMode="false" android:focusedByDefault="false"
-            android:elevation="1dp"/>
+            android:elevation="1dp" android:layout_margin="10dp"
+            android:layout_alignParentLeft="false" android:layout_alignParentRight="false"
+    />
 </RelativeLayout>

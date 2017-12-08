@@ -8,10 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -38,6 +35,11 @@ public class Chat extends AppCompatActivity implements Runnable {
 
         _chat_view_notifier = new Thread(this);
         _chat_view_notifier.start();
+
+        getSupportActionBar().setTitle(TulipSession.current_chat_user);
+
+
+
 
     }
 
@@ -91,7 +93,7 @@ public class Chat extends AppCompatActivity implements Runnable {
                             }
                         });
 
-                    } else if (resend == 0) {
+                    } else  {
                         resend++;
                     }
                 }
@@ -105,11 +107,9 @@ public class Chat extends AppCompatActivity implements Runnable {
     @Override
     public void run() {
 
+        int sz = 0;
         while(true)
         {
-            int sz = 0;
-
-            sz = MainActivity.messages.get(TulipSession.current_chat_user).size();
             try {
                 Thread.sleep(500);
                 if(_chat_view_notifier.isInterrupted())
@@ -122,7 +122,9 @@ public class Chat extends AppCompatActivity implements Runnable {
                 break;
             }
 
-            if (MainActivity.messages.get(TulipSession.current_chat_user).size() != sz)
+
+            if (MainActivity.messages.get(TulipSession.current_chat_user).size() != sz) {
+                sz = MainActivity.messages.get(TulipSession.current_chat_user).size();
                 adaptor = new ChatList(this, MainActivity.messages.get(TulipSession.current_chat_user));
                 runOnUiThread(new Runnable() {
                     @Override
@@ -132,6 +134,7 @@ public class Chat extends AppCompatActivity implements Runnable {
                         adaptor.notifyDataSetChanged();
                     }
                 });
+            }
 
         }
     }
@@ -155,6 +158,11 @@ public class Chat extends AppCompatActivity implements Runnable {
         @Override
         public int getCount() {
             return data.size();
+        }
+
+        public Message getRawItem(int i)
+        {
+            return data.get(i);
         }
 
         @Override
@@ -183,6 +191,7 @@ public class Chat extends AppCompatActivity implements Runnable {
                 viewHolder.position = position;
                 viewHolder.chatmsg = (TextView)convertView.findViewById(R.id.chatcontent);
                 viewHolder.chatmsg.setText(getItem(position).toString());
+
                 convertView.setTag(viewHolder);
 
             }
@@ -191,6 +200,29 @@ public class Chat extends AppCompatActivity implements Runnable {
                 viewHolder.chatmsg.setText(getItem(position).toString());
                 viewHolder.position=position;
             }
+
+
+            if(getRawItem(position).getUser().equals(TulipSession.user))
+            {
+                // messages received
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((TextView) viewHolder.chatmsg).getLayoutParams();
+                params.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                viewHolder.chatmsg.setLayoutParams(params);
+                viewHolder.chatmsg.setBackgroundColor(0xff2bc5fb);
+                viewHolder.chatmsg.setTextColor(0xffffffff);
+
+            }
+            else
+            {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((TextView) viewHolder.chatmsg).getLayoutParams();
+                params.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                viewHolder.chatmsg.setLayoutParams(params);
+                viewHolder.chatmsg.setBackgroundColor(0xff768f9a);
+                viewHolder.chatmsg.setTextColor(0xffffffff);
+            }
+
 
             return convertView;
         }

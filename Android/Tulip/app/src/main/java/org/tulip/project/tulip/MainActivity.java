@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             case R.id.Logout:
                 _main_tulip.interrupt();
 
-                while(_main_tulip.isAlive()) {}
+                while(_main_tulip.isAlive()) { _main_tulip.interrupt();}
 
                 Logout(TulipSession.user, TulipSession.password);
                 TulipSession.user = "";

@@ -27,5 +27,5 @@
             android:elegantTextHeight="true"
             android:text="TextView"
             android:textColorLink="@android:color/darker_gray"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2" android:fadingEdge="horizontal|vertical"/>
 </RelativeLayout>
