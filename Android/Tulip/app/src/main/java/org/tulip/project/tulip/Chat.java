@@ -123,7 +123,7 @@ public class Chat extends AppCompatActivity implements Runnable {
             }
 
 
-            if (MainActivity.messages.get(TulipSession.current_chat_user).size() != sz) {
+            if (MainActivity.messages.get(TulipSession.current_chat_user)!= null && MainActivity.messages.get(TulipSession.current_chat_user).size() != sz) {
                 sz = MainActivity.messages.get(TulipSession.current_chat_user).size();
                 adaptor = new ChatList(this, MainActivity.messages.get(TulipSession.current_chat_user));
                 runOnUiThread(new Runnable() {
@@ -157,6 +157,8 @@ public class Chat extends AppCompatActivity implements Runnable {
 
         @Override
         public int getCount() {
+            if(data == null)
+                return 0;
             return data.size();
         }
 
