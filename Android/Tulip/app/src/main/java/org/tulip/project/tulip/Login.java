@@ -50,7 +50,7 @@ public class Login extends AppCompatActivity {
                         username.setText("");
                         password.setText("");
 
-                        TulipSession.user = user;
+                        TulipSession.user = user.trim();
                         TulipSession.password = pass;
                         user = "";
                         pass = "";
