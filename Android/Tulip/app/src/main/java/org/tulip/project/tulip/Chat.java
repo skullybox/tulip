@@ -80,10 +80,15 @@ public class Chat extends AppCompatActivity implements Runnable {
 
                 while(ret != 0 && resend < 2) {
                     if (_m.getMessage().length() > 0)
+                    {
                         ret = SendMessage(TulipSession.user, TulipSession.password, TulipSession.current_chat_user,
                                 msg);
+                    }
                     else
-                        break;
+                    {
+                        fab.setClickable(true);
+                        return;
+                    }
 
                     if (ret == 0 && TulipSession.current_chat_user.length() > 0) {
                         runOnUiThread(new Runnable() {
