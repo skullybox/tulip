@@ -24,7 +24,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
   mbedtls_ssl_config_init( &(c->conf) );
-  mbedtls_ssl_conf_read_timeout(&(c->conf), 2000);
+  mbedtls_ssl_conf_read_timeout(&(c->conf), 5000);
 #if defined(MBEDTLS_SSL_CACHE_C)
   mbedtls_ssl_cache_init( &(c->cache) );
 #endif
@@ -88,7 +88,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   CHECK_RET;
 
   mbedtls_ssl_set_bio( &(c->ssl), 
-      &(c->server_fd), mbedtls_net_send, mbedtls_net_recv, NULL );
+      &(c->server_fd), mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout);
 
   ret = mbedtls_ssl_handshake( &(c->ssl) );
   /*  char error_buf[100];

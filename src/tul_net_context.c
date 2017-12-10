@@ -64,7 +64,7 @@ int tul_add_context(unsigned sock, int tls)
       mbedtls_ssl_setup(&(new->_this->tls.ssl), &(tls_serv.conf));
       mbedtls_ssl_set_bio( 
           &(new->_this->tls.ssl), &(new->_this->tls.server_fd), 
-          mbedtls_net_send, mbedtls_net_recv, NULL );
+          mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout);
 
       while( (ret = mbedtls_ssl_handshake( &(tls_serv.ssl))) != 0)
       {

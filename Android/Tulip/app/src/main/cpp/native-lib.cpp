@@ -7,36 +7,35 @@
 #include "tul_tls_common.h"
 
 
-static pthread_mutex_t global_socket_lock;
 tul_net_context *conn = NULL;
 tul_net_context *message_conn = NULL;
 char host_string[100] = "stabby.no-ip.org";
 
 extern "C"
-int connection_reset(char *user, char *pass){
+int connection_reset(char *user, char *pass, tul_net_context **_conn){
 
-    pthread_mutex_lock(&global_socket_lock);
+    
     int ret = 0;
-    if (conn) {
-        if (conn->tls.server_fd.fd > 0)
-            close(conn->tls.server_fd.fd);
-        free(conn);
-        conn = NULL;
+    if (*_conn) {
+        if ((*_conn)->tls.server_fd.fd > 0)
+            close((*_conn)->tls.server_fd.fd);
+        free(*_conn);
+        *_conn = NULL;
     }
-    conn = (tul_net_context *) calloc(1, sizeof(tul_net_context));
+    *_conn = (tul_net_context *) calloc(1, sizeof(tul_net_context));
 
-    conn->_use_tls = 1;
-    strcpy(conn->tls.host, host_string);
+    (*_conn)->_use_tls = 1;
+    strcpy((*_conn)->tls.host, host_string);
 
-    ret |= tls_client_init(&(conn->tls), 9999);
+    ret |= tls_client_init(&((*_conn)->tls), 9999);
     if (!ret)
-        ret |= client_login((char *) user, (char *) pass, conn);
+        ret |= client_login((char *) user, (char *) pass, *_conn);
     if (!ret)
-        ret |= client_transmit(conn);
+        ret |= client_transmit(*_conn);
     if (!ret)
-        ret |= client_get_ok(conn, (char *) pass);
+        ret |= client_get_ok(*_conn, (char *) pass);
 
-    pthread_mutex_unlock(&global_socket_lock);
+    
     return ret;
 }
 
@@ -48,7 +47,7 @@ Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, js
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
 
-    int ret = connection_reset((char*)user, (char*) pass);
+    int ret = connection_reset((char*)user, (char*) pass, &conn);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
@@ -57,12 +56,16 @@ Java_org_tulip_project_tulip_Login_ClientLogin(JNIEnv *env, jobject instance, js
 }
 
 extern "C"
-JNIEXPORT jstring JNICALL
-Java_org_tulip_project_tulip_Login_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+void connection_logout(char *user, char *pass, tul_net_context **_conn)
+{
+    client_logout((char *) user, (char *) pass, *_conn);
+    client_transmit(*_conn);
+    if (*_conn) {
+        if ((*_conn)->tls.server_fd.fd > 0)
+            close((*_conn)->tls.server_fd.fd);
+        free(*_conn);
+        *_conn = NULL;
+    }
 }
 
 extern "C"
@@ -81,9 +84,14 @@ Java_org_tulip_project_tulip_MainActivity_GetList(JNIEnv *env, jobject instance,
     unsigned list_sz = 0;
     std::vector<std::string> vlist;
     std::vector<std::string>::iterator i;
-    pthread_mutex_lock(&global_socket_lock);
-    client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, 0);
-    pthread_mutex_unlock(&global_socket_lock);
+
+    tul_net_context *conn_userlist = NULL;
+    int net_ret = connection_reset((char *) user, (char *) pass, &conn_userlist);
+    if(!net_ret)
+        client_get_friendlist((char *) user, (char *) pass, conn_userlist, &list, &list_sz, 0);
+    else
+        goto RETURN_LIST;
+    
 
     while (list_sz > 0) {
         count += list_sz;
@@ -96,15 +104,16 @@ Java_org_tulip_project_tulip_MainActivity_GetList(JNIEnv *env, jobject instance,
             free(list);
             list = NULL;
         }
-        pthread_mutex_lock(&global_socket_lock);
-        client_get_friendlist((char *) user, (char *) pass, conn, &list, &list_sz, offset);
-        pthread_mutex_unlock(&global_socket_lock);
+        
+        client_get_friendlist((char *) user, (char *) pass, conn_userlist, &list, &list_sz, offset);
+        
     }
 
     ret = (jobjectArray) env->NewObjectArray(vlist.size(),
                                              env->FindClass("java/lang/String"),
                                              env->NewStringUTF(""));
-
+RETURN_LIST:
+    connection_logout((char *) user, (char *) pass, &conn_userlist);
     count = 0;
     for (i = vlist.begin(); i != vlist.end(); ++i) {
         env->SetObjectArrayElement(ret, count,
@@ -125,16 +134,7 @@ Java_org_tulip_project_tulip_MainActivity_Logout(JNIEnv *env, jobject instance, 
     const char *user = env->GetStringUTFChars(user_, 0);
     const char *pass = env->GetStringUTFChars(pass_, 0);
 
-    pthread_mutex_lock(&global_socket_lock);
-    client_logout((char *) user, (char *) pass, conn);
-    client_transmit(conn);
-    if (conn) {
-        if (conn->tls.server_fd.fd > 0)
-            close(conn->tls.server_fd.fd);
-        free(conn);
-        conn = NULL;
-    }
-    pthread_mutex_unlock(&global_socket_lock);
+    connection_logout((char *) user, (char *) pass, &conn);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
@@ -155,30 +155,12 @@ Java_org_tulip_project_tulip_MainActivity_FriendRequest(JNIEnv *env, jobject ins
     // so that there isn't a race condition with background
     // processes
     tul_net_context *lconn = NULL;
-    lconn = (tul_net_context *) calloc(1, sizeof(tul_net_context));
-
-    lconn->_use_tls = 1;
-    strcpy(lconn->tls.host, host_string);
-
-    ret |= tls_client_init(&(lconn->tls), 9999);
-    if (!ret)
-        ret |= client_login((char *) user, (char *) pass, lconn);
-    if (!ret)
-        ret |= client_transmit(lconn);
-    if (!ret)
-        ret |= client_get_ok(lconn, (char *) pass);
+    ret = connection_reset((char *) user, (char *) pass, &lconn);
 
     ret |= client_friend_req((char *) user, (char *) request, (char *) pass, lconn);
     ret |= client_recieve(lconn);
 
-    if (lconn) {
-        client_logout((char *) user, (char *) pass, lconn);
-        client_transmit(lconn);
-        if (lconn->tls.server_fd.fd > 0)
-            close(lconn->tls.server_fd.fd);
-        free(lconn);
-        lconn = NULL;
-    }
+    connection_logout((char *) user, (char *) pass, &lconn);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
@@ -200,27 +182,31 @@ Java_org_tulip_project_tulip_MainActivity_GetFriendRequest(JNIEnv *env, jobject 
     unsigned list_sz = 0;
     std::vector<std::string> rlist;
     std::vector<std::string>::iterator i;
+    tul_net_context *lconn = NULL;
 
-    pthread_mutex_lock(&global_socket_lock);
-    client_get_addreqlist((char *) user, (char *) pass, conn, &list, &list_sz);
-    pthread_mutex_unlock(&global_socket_lock);
-    if(list_sz == 0)
-            connection_reset((char*)user, (char*) pass);
+    int _ret = connection_reset((char*)user, (char*) pass, &lconn);
 
-    for (int i = 0; i < 30 * list_sz; i += 30) {
-        memcpy(t_str, &list[i], 30);
-        rlist.push_back(std::string(t_str));
-    }
+    if(!_ret)
+    {
+        client_get_addreqlist((char *) user, (char *) pass, lconn, &list, &list_sz);
 
-    ret = (jobjectArray) env->NewObjectArray(rlist.size(),
-                                             env->FindClass("java/lang/String"),
-                                             env->NewStringUTF(""));
+        for (int i = 0; i < 30 * list_sz; i += 30) {
+            memcpy(t_str, &list[i], 30);
+            rlist.push_back(std::string(t_str));
+        }
 
-    count = 0;
-    for (i = rlist.begin(); i != rlist.end(); ++i) {
-        env->SetObjectArrayElement(ret, count,
-                                   env->NewStringUTF(i->c_str()));
-        count++;
+        ret = (jobjectArray) env->NewObjectArray(rlist.size(),
+                                                 env->FindClass("java/lang/String"),
+                                                 env->NewStringUTF(""));
+
+        count = 0;
+        for (i = rlist.begin(); i != rlist.end(); ++i) {
+            env->SetObjectArrayElement(ret, count,
+                                       env->NewStringUTF(i->c_str()));
+            count++;
+        }
+
+        connection_logout((char *) user, (char *) pass, &lconn);
     }
 
     env->ReleaseStringUTFChars(user_, user);
@@ -238,12 +224,14 @@ Java_org_tulip_project_tulip_MainActivity_AcceptFriend(JNIEnv *env, jobject inst
     const char *freq = env->GetStringUTFChars(freq_, 0);
 
     int ret = 0;
+    tul_net_context *lconn = NULL;
 
-    pthread_mutex_lock(&global_socket_lock);
-    ret = client_accept_friend((char *) user, (char *) pass, conn, (char *) freq);
-    pthread_mutex_unlock(&global_socket_lock);
-    if(ret)
-        connection_reset((char*)user, (char*) pass);
+    ret = connection_reset((char*)user, (char*) pass, &lconn);
+    if(!ret)
+        ret = client_accept_friend((char *) user, (char *) pass, lconn, (char *) freq);
+    
+    connection_logout((char*)user, (char*) pass, &lconn);
+
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
     env->ReleaseStringUTFChars(freq_, freq);
@@ -260,12 +248,13 @@ Java_org_tulip_project_tulip_MainActivity_IgnoreFriend(JNIEnv *env, jobject inst
     const char *freq = env->GetStringUTFChars(freq_, 0);
 
     int ret = 0;
+    tul_net_context *lconn = NULL;
 
-    pthread_mutex_lock(&global_socket_lock);
-    ret = client_ignore_friend((char *) user, (char *) pass, conn, (char *) freq);
-    pthread_mutex_unlock(&global_socket_lock);
-    if(ret)
-        connection_reset((char*)user, (char*) pass);
+    ret = connection_reset((char*)user, (char*) pass, &lconn);
+    if(!ret)
+        ret = client_ignore_friend((char *) user, (char *) pass, lconn, (char *) freq);
+
+    connection_logout((char*)user, (char*) pass, &lconn);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);
@@ -298,7 +287,7 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
     //big int stuff
     _offset = strtoull(bigint_str,(char **)NULL, 10 );
 
-    pthread_mutex_lock(&global_socket_lock);
+    
     ret = client_get_message(
             (char *) user,
             (char *) frm_user,
@@ -311,13 +300,13 @@ Java_org_tulip_project_tulip_MainActivity_GetMessage(JNIEnv *env, jobject instan
             uname,
             frm,
             typ);
-    pthread_mutex_unlock(&global_socket_lock);
+    
 
     jobject retObj = NULL;
 
     if(strlen(uname) == 0 || ret)
     {
-        connection_reset((char*)user, (char*) pass);
+        connection_reset((char*)user, (char*) pass, &conn);
         env->ReleaseStringUTFChars(user_, user);
         env->ReleaseStringUTFChars(pass_, pass);
         env->ReleaseStringUTFChars(frm_user_, frm_user);
@@ -391,27 +380,14 @@ Java_org_tulip_project_tulip_Chat_SendMessage
     // processes
     if(!message_conn)
     {
-        message_conn = (tul_net_context *) calloc(1, sizeof(tul_net_context));
-        message_conn->_use_tls = 1;
-        strcpy(message_conn->tls.host, host_string);
-
-        ret |= tls_client_init(&(message_conn->tls), 9999);
-        if (!ret)
-                ret |= client_login((char *) user, (char *) pass, message_conn);
-        if (!ret)
-            ret |= client_transmit(message_conn);
-        if (!ret)
-            ret |= client_get_ok(message_conn, (char *) pass);
+        ret = connection_reset((char *) user, (char *) pass, &message_conn);
     }
 
-    ret = client_message((char*)user, (char*)to_user, (char*)pass, message_conn, (char*)msg, strlen(msg) );
+    if(!ret)
+        ret |= client_message((char*)user, (char*)to_user, (char*)pass, message_conn, (char*)msg, strlen(msg) );
 
-    if (ret && message_conn) {
-        if (message_conn->tls.server_fd.fd > 0)
-            close(message_conn->tls.server_fd.fd);
-        free(message_conn);
-        message_conn = NULL;
-    }
+    if(ret)
+        connection_reset((char*)user, (char*) pass, &message_conn);
 
     env->ReleaseStringUTFChars(user_, user);
     env->ReleaseStringUTFChars(pass_, pass);

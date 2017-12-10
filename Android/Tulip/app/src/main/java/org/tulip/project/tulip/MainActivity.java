@@ -45,14 +45,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         listview.setDivider(null);
         listview.setDividerHeight(0);
 
-        String _friends[] = GetList(TulipSession.user, TulipSession.password);
-
-        for (String _s : _friends) {
-            int pos = friends.indexOf(_s);
-            if (pos == -1)
-                friends.add(_s);
-        }
-
         ArrayList<String> _t = new ArrayList<String>();
         Object[] _data = MainActivity.friends.toArray();
 
@@ -272,9 +264,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                         });
                     }
 
-                    for (String _f : friendRequestList) {
-                        friendsRequest.add(_f);
-                    }
+                    if(friendRequestList != null)
+                        for (String _f : friendRequestList) {
+                            friendsRequest.add(_f);
+                        }
 
                     friend_request_last_check = System.currentTimeMillis() / 1000L;
                 }
