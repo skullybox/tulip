@@ -9,7 +9,8 @@
 
 tul_net_context *conn = NULL;
 tul_net_context *message_conn = NULL;
-char host_string[100] = "stabby.no-ip.org";
+// char host_string[100] = "stabby.no-ip.org";
+char host_string[100] = "skullybox.no-ip.net";
 
 extern "C"
 int connection_reset(char *user, char *pass, tul_net_context **_conn){

@@ -285,10 +285,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                 if (_msg == null) {
                     count++;
+                    if(count >= 5)
+                        current_message_timeout = 5000;
                     continue;
                 }
                 else
                 {
+                    current_message_timeout = 30;
                     count = 0;
                 }
 

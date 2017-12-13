@@ -47,7 +47,6 @@ public class Login extends AppCompatActivity {
                     ret = ClientLogin(user, pass);
 
                     if (ret == 0) {
-                        username.setText("");
                         password.setText("");
 
                         TulipSession.user = user.trim();
