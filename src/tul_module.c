@@ -51,7 +51,10 @@ void module_read(tul_net_context *c)
   ret = verify_payload(c, &r, &p);
 
   if(ret == -1)
+  {
+    tul_log(" data pending...");
     return;
+  }
 
   /* if request is validated or error
    * during validation reset recieve buffers
@@ -67,6 +70,7 @@ void module_read(tul_net_context *c)
     if(ret && !(c->_user_auth))
     {
       c->_teardown = 1;
+      tul_log(" payload error...");
       return;
     }
   }
