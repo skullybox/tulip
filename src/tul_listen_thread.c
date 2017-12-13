@@ -152,8 +152,7 @@ void _run_core(int fd, int tls)
 
         if(fd_new < 0)
         {
-          TUL_SIGNAL_INT=1;
-          return;
+          continue;
         }
         ret = tul_add_context(fd_new, tls);
         event.data.fd = fd_new;
