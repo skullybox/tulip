@@ -7,9 +7,9 @@ sources := $(wildcard *.c)
 objects := $(patsubst %.c, %.o, ${sources})
 objects_bin := $(patsubst %.c, .obj/%.o, ${sources})
 
-inc := -I./tls/mbedtls-2.4.2/include -I./mysql/mysql-connector-c-6.1.10-src/include
-androidlibs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 
-libs := -L./tls/mbedtls-2.4.2/library -lmbedtls -lmbedcrypto -lmbedx509 -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmysqlclient
+inc := -I./tls/mbedtls-2.6.0/include -I./mysql/mysql-connector-c-6.1.10-src/include
+androidlibs := -L./tls/mbedtls-2.6.0/library -lmbedtls -lmbedcrypto -lmbedx509 
+libs := -L./tls/mbedtls-2.6.0/library -lmbedtls -lmbedcrypto -lmbedx509 -L./mysql/mysql-connector-c-6.1.10-src/libmysql -lmysqlclient
 cflgs := -DSYSLOG_USE -O3 -Werror -D_FILE_OFFSET_BITS=64 -std=gnu99 ${inc} -c
 
 ifeq ($(USE_MYSQL),1)
@@ -55,7 +55,7 @@ clean-all: clean-libs clean
 	@-rm -rf arm || true
 
 clean-libs: 
-	@-rm -rf tls/mbedtls-2.4.2 || true
+	@-rm -rf tls/mbedtls-2.6.0 || true
 	@-rm -rf mysql/mysql-connector-c-6.1.10-src || true
 
 install:
@@ -69,9 +69,9 @@ clean:
 	@-rm -f tulip.db || true
 
 tls:
-	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
-		tar zxf "tls/mbedtls-2.4.2-apache.tgz" -C "tls";\
-		cd "tls/mbedtls-2.4.2" && cmake -DCMAKE_BUILD_TYPE=Release . && ${MAKE};\
+	if [ ! -d "tls/mbedtls-2.6.0" ]; then \
+		tar zxf "tls/mbedtls-2.6.0-apache.tgz" -C "tls";\
+		cd "tls/mbedtls-2.6.0" && cmake -DCMAKE_BUILD_TYPE=Release . && ${MAKE};\
 	fi
 
 sql:
@@ -88,19 +88,19 @@ android_setup:
 		fi
 
 tls_android: android_setup
-	@-rm -rf tls/mbedtls-2.4.2 || true
-	if [ ! -d "tls/mbedtls-2.4.2" ]; then \
-		tar zxf "tls/mbedtls-2.4.2-apache.tgz" -C "tls";\
-		cp "tls/CMakeLists.txt" "tls/mbedtls-2.4.2/library/";\
-		cd "tls/mbedtls-2.4.2" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} CXXFLAGS="${AN_FLAGS}" cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
+	@-rm -rf tls/mbedtls-2.6.0 || true
+	if [ ! -d "tls/mbedtls-2.6.0" ]; then \
+		tar zxf "tls/mbedtls-2.6.0-apache.tgz" -C "tls";\
+		cp "tls/CMakeLists.txt" "tls/mbedtls-2.6.0/library/";\
+		cd "tls/mbedtls-2.6.0" && CC=$(HOME)/${ANDROID_CC} CXX=$(HOME)/${ANDROID_CPP} CXXFLAGS="${AN_FLAGS}" cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SHARED_MBEDTLS_LIBRARY=On . && ${MAKE} lib;\
 	fi
 
 
 android: clean-libs prep android_setup tls_android
 	@-mkdir -p out/${android_arch}
-	cp tls/mbedtls-2.4.2/library/libmbedcrypto.so ./out/${android_arch}/libmbedcrypto.so
-	cp tls/mbedtls-2.4.2/library/libmbedtls.so ./out/${android_arch}/libmbedtls.so
-	cp tls/mbedtls-2.4.2/library/libmbedx509.so ./out/${android_arch}/libmbedx509.so
+	cp tls/mbedtls-2.6.0/library/libmbedcrypto.so ./out/${android_arch}/libmbedcrypto.so
+	cp tls/mbedtls-2.6.0/library/libmbedtls.so ./out/${android_arch}/libmbedtls.so
+	cp tls/mbedtls-2.6.0/library/libmbedx509.so ./out/${android_arch}/libmbedx509.so
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_userc.c -o out/${android_arch}/tul_userc.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_tls_common.c -o out/${android_arch}/tul_tls_common.o
 	${ANDROID_CC} ${AN_FLAGS} -std=gnu99 ${inc} ${my_inc} -c tul_tls_client.c -o out/${android_arch}/tul_tls_client.o
