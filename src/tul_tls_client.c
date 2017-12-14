@@ -24,7 +24,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
   mbedtls_ssl_config_init( &(c->conf) );
-  mbedtls_ssl_conf_read_timeout(&(c->conf), 5000);
+  mbedtls_ssl_conf_read_timeout(&(c->conf), 1000);
 #if defined(MBEDTLS_SSL_CACHE_C)
   mbedtls_ssl_cache_init( &(c->cache) );
 #endif

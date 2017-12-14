@@ -24,7 +24,7 @@ int tls_server_init(tul_tls_ctx *c, int lport)
   mbedtls_net_init( &(c->server_fd) );
   mbedtls_ssl_init( &(c->ssl) );
   mbedtls_ssl_config_init( &(c->conf) );
-  mbedtls_ssl_conf_read_timeout(&(c->conf), 2000);
+  mbedtls_ssl_conf_read_timeout(&(c->conf), 1000);
 #if defined(MBEDTLS_SSL_CACHE_C)
   mbedtls_ssl_cache_init( &(c->cache) );
 #endif
@@ -60,6 +60,7 @@ int tls_server_init(tul_tls_ctx *c, int lport)
   ret = mbedtls_net_bind( &(c->server_fd), 
       NULL, buff, MBEDTLS_NET_PROTO_TCP );
   CHECK_RET;
+  mbedtls_net_set_nonblock(&(c->server_fd));
 
 #if defined(MBEDTLS_SSL_CACHE_C)
   mbedtls_ssl_conf_session_cache( &(c->conf), &(c->cache),
