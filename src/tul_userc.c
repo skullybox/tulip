@@ -370,6 +370,7 @@ int client_transmit(tul_net_context *conn)
 
   while(conn->_tsend < conn->_ttsend)
   {
+    mbedtls_net_set_nonblock(&(conn->tls.server_fd));
     if(conn->_use_tls)
     {
       bwrite = tls_write(&(conn->tls),
@@ -753,16 +754,19 @@ int client_get_message(char *uid, char *t_uid, char *pass,
   if(!ret)
     ret |= verify_client_payload(conn, &r, &p, _pass);
 
-  *msg = calloc(
-      (unsigned)((char*)p.data)[95]+1, 1);
-  memcpy(*msg, &((char*)p.data)[99], 
-      (unsigned)((char*)p.data)[95]);
+  if(!ret)
+  {
+    *msg = calloc(
+        (unsigned)((char*)p.data)[95]+1, 1);
+    memcpy(*msg, &((char*)p.data)[99], 
+        (unsigned)((char*)p.data)[95]);
 
-  memcpy(typ, &((char*)p.data)[12], 3);
-  memcpy(uname, &((char*)p.data)[15], 30);
-  memcpy(frm, &((char*)p.data)[45], 30);
-  memcpy(ret_offset, p.data, 8);
-  memcpy(_new, &((char*)p.data)[8], 4);
+    memcpy(typ, &((char*)p.data)[12], 3);
+    memcpy(uname, &((char*)p.data)[15], 30);
+    memcpy(frm, &((char*)p.data)[45], 30);
+    memcpy(ret_offset, p.data, 8);
+    memcpy(_new, &((char*)p.data)[8], 4);
+  }
 
   return 0;
 }
