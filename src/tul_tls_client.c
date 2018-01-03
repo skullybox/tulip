@@ -55,6 +55,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
       (const unsigned char *) CLIENT_KEY,
       CLIENT_KEY_len, NULL, 0 );
   CHECK_RET;
+  
 
   /* DISABLED THIS UNLESS WE CARE ABOUT THE CERT USED BY CLIENT
      ret = mbedtls_ssl_conf_own_cert(&(c->conf), &(c->cert), &(c->pkey));
@@ -82,7 +83,7 @@ int tls_client_init(tul_tls_ctx *c, int lport)
   mbedtls_ssl_conf_rng( &(c->conf), 
       mbedtls_ctr_drbg_random, &(c->ctr_drbg) );
 
-  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_REQUIRED);
+  mbedtls_ssl_conf_authmode( &(c->conf), MBEDTLS_SSL_VERIFY_OPTIONAL);
 
   ret = mbedtls_ssl_setup( &(c->ssl), &(c->conf) );
   CHECK_RET;
