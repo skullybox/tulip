@@ -72,7 +72,8 @@ int tul_dbinit()
       }
 
       my_bool reconnect = 1;
-      mysql_options(conn_pool[i], MYSQL_OPT_RECONNECT, &reconnect);
+      if(conn_pool[i])
+        mysql_options(conn_pool[i], MYSQL_OPT_RECONNECT, &reconnect);
     }
 
   }
@@ -158,7 +159,10 @@ int tul_query_get(char *SQL, MYSQL_RES **res)
       pos = 0;
   }
 
-  ret = mysql_query(conn_pool[pos], SQL);
+  if(conn_pool[pos])
+    ret = mysql_query(conn_pool[pos], SQL);
+  else
+    ret = -1;
   if( ret || (!ret && mysql_field_count(conn_pool[pos]) == 0))
   {
     pthread_mutex_unlock(&pool_locks[pos]);
